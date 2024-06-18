@@ -1,4 +1,4 @@
-package main
+package client
 
 import (
 	"github.com/hetznercloud/hcloud-go/v2/hcloud"
@@ -7,6 +7,6 @@ import (
 
 var hcloudClient *hcloud.Client
 
-func initClient() {
+func InitHcloudClient() {
 	hcloudClient = hcloud.NewClient(hcloud.WithToken(os.Getenv("HCLOUD_TOKEN")))
 }
