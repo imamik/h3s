@@ -8,15 +8,16 @@ import (
 )
 
 var rootCmd = &cobra.Command{
-	Use:   "mycli",
-	Short: "A brief description of your application",
-	Long:  `A longer description of your application with usage examples.`,
+	Use:   "hcloud-k8s-cli",
+	Short: "A CLI to setup a k3s Kubernetes cluster on Hetzner Cloud",
+	Long:  `A CLI to setup a k3s Kubernetes cluster on Hetzner Cloud`,
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("Welcome to my CLI")
 	},
 }
 
 func main() {
+	initClient()
 	rootCmd.AddCommand(listCmd) // Register the list command
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Println(err)
