@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
-	"sort"
 )
 
 const k3sReleasesURL = "https://api.github.com/repos/k3s-io/k3s/releases"
@@ -47,11 +46,6 @@ func GetFilteredReleases(prerelease bool, stable bool, limit int) ([]Release, er
 			filteredReleases = append(filteredReleases, version)
 		}
 	}
-
-	// Sort by published date
-	sort.Slice(filteredReleases, func(i, j int) bool {
-		return filteredReleases[i].PublishedAt.Before(filteredReleases[j].PublishedAt)
-	})
 
 	// Apply limit
 	if limit > 0 && limit < len(filteredReleases) {

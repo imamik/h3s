@@ -7,7 +7,7 @@ import (
 	"os"
 )
 
-func Save(config config.Config, filename string) error {
+func save(config config.Config, filename string) error {
 	data, err := yaml.Marshal(config)
 	if err != nil {
 		return fmt.Errorf("error marshalling config data: %w", err)
