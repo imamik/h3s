@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"github.com/spf13/cobra"
+	"hcloud-k3s-cli/cmd/config"
 	"hcloud-k3s-cli/cmd/k3s"
 	"hcloud-k3s-cli/pkg/client"
 	"os"
@@ -24,7 +25,9 @@ var metadataCmd = &cobra.Command{
 
 func init() {
 	client.InitHcloudClient()
-	rootCmd.AddCommand(k3s.FindCmd)
+	rootCmd.AddCommand(k3s.ReleasesCmd)
+	rootCmd.AddCommand(config.InitCmd)
+
 }
 
 func Execute() {
