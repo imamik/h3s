@@ -3,9 +3,9 @@ package cmd
 import (
 	"fmt"
 	"github.com/spf13/cobra"
-	"hcloud-k3s-cli/cmd/config"
+	"hcloud-k3s-cli/cmd/cfg"
+	"hcloud-k3s-cli/cmd/cluster"
 	"hcloud-k3s-cli/cmd/k3s"
-	"hcloud-k3s-cli/pkg/client"
 	"os"
 )
 
@@ -18,15 +18,10 @@ var rootCmd = &cobra.Command{
 	},
 }
 
-var metadataCmd = &cobra.Command{
-	Use:   "k3s",
-	Short: "Commands related to k3s",
-}
-
 func init() {
-	client.InitHcloudClient()
 	rootCmd.AddCommand(k3s.ReleasesCmd)
-	rootCmd.AddCommand(config.InitCmd)
+	rootCmd.AddCommand(cfg.CreateCmd)
+	rootCmd.AddCommand(cluster.ClusterCmd)
 
 }
 

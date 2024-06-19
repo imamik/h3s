@@ -1,4 +1,4 @@
-package config
+package cfg
 
 import (
 	"fmt"
@@ -7,9 +7,9 @@ import (
 	"hcloud-k3s-cli/pkg/k3s/releases"
 )
 
-var InitCmd = &cobra.Command{
-	Use:   "config build",
-	Short: "Initialize project configuration",
+var CreateCmd = &cobra.Command{
+	Use:   "cfg build",
+	Short: "Create project configuration",
 	Run: func(cmd *cobra.Command, args []string) {
 
 		k3sReleases, err := releases.GetFilteredReleases(false, true, 5)

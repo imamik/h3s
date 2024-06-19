@@ -2,7 +2,7 @@ package build
 
 import (
 	"fmt"
-	"gopkg.in/yaml.v2"
+	"gopkg.in/yaml.v3"
 	"hcloud-k3s-cli/pkg/config"
 	"os"
 )
@@ -10,7 +10,7 @@ import (
 func save(config config.Config, filename string) error {
 	data, err := yaml.Marshal(config)
 	if err != nil {
-		return fmt.Errorf("error marshalling config data: %w", err)
+		return fmt.Errorf("error marshalling cfg data: %w", err)
 	}
 
 	file, err := os.Create(filename)
