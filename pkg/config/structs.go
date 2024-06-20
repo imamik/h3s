@@ -1,5 +1,7 @@
 package config
 
+import "github.com/hetznercloud/hcloud-go/v2/hcloud"
+
 type NodePool struct {
 	Name     string   `yaml:"name"`
 	Nodes    int      `yaml:"nodes"`
@@ -14,10 +16,10 @@ type ControlPlane struct {
 }
 
 type Config struct {
-	Name                 string       `yaml:"name"`
-	K3sVersion           string       `yaml:"k3sVersion"`
-	NetworkZone          NetworkZone  `yaml:"networkZone"`
-	ControlPlane         ControlPlane `yaml:"controlPlane"`
-	WorkerPools          []NodePool   `yaml:"workerPools"`
-	CombinedLoadBalancer bool         `yaml:"combinedLoadBalancer"`
+	Name                 string             `yaml:"name"`
+	K3sVersion           string             `yaml:"k3sVersion"`
+	NetworkZone          hcloud.NetworkZone `yaml:"networkZone"`
+	ControlPlane         ControlPlane       `yaml:"controlPlane"`
+	WorkerPools          []NodePool         `yaml:"workerPools"`
+	CombinedLoadBalancer bool               `yaml:"combinedLoadBalancer"`
 }

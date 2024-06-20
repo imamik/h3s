@@ -3,15 +3,16 @@ package survey
 import (
 	"fmt"
 	"github.com/charmbracelet/huh"
+	"github.com/hetznercloud/hcloud-go/v2/hcloud"
 	"hcloud-k3s-cli/pkg/config"
 	"hcloud-k3s-cli/pkg/k3s/releases"
 	"log"
 	"strconv"
 )
 
-func getLocation(title string, description string, networkZone config.NetworkZone) config.Location {
+func getLocation(title string, description string, networkZone hcloud.NetworkZone) config.Location {
 	switch networkZone {
-	case config.EUCentral:
+	case hcloud.NetworkZoneEUCentral:
 		var location config.Location
 		err := huh.NewSelect[config.Location]().
 			Title(title).
@@ -28,9 +29,9 @@ func getLocation(title string, description string, networkZone config.NetworkZon
 			return ""
 		}
 		return location
-	case config.USEast:
+	case hcloud.NetworkZoneUSEast:
 		return config.Ashburn
-	case config.USWest:
+	case hcloud.NetworkZoneUSWest:
 		return config.Hillsboro
 	default:
 		log.Fatal("Invalid network zone")
@@ -38,7 +39,7 @@ func getLocation(title string, description string, networkZone config.NetworkZon
 	}
 }
 
-func getNodePool(networkZone config.NetworkZone) config.NodePool {
+func getNodePool(networkZone hcloud.NetworkZone) config.NodePool {
 	var nodePool config.NodePool
 
 	huh.NewInput().
@@ -86,7 +87,7 @@ func Survey(k3sReleases []releases.Release) (config.Config, error) {
 		Value(&conf.K3sVersion).
 		Run()
 
-	huh.NewSelect[config.NetworkZone]().
+	huh.NewSelect[hcloud.NetworkZone]().
 		Title("Network Zone").
 		Description("The network zone to deploy the cluster in").
 		Options(networkZoneOptions...).

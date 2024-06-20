@@ -2,7 +2,7 @@ package survey
 
 import (
 	"github.com/charmbracelet/huh"
-	"hcloud-k3s-cli/pkg/config"
+	"github.com/hetznercloud/hcloud-go/v2/hcloud"
 	"hcloud-k3s-cli/pkg/k3s/releases"
 )
 
@@ -19,8 +19,8 @@ func releasesToOptions(k3sReleases []releases.Release) []huh.Option[string] {
 	return options
 }
 
-var networkZoneOptions = []huh.Option[config.NetworkZone]{
-	huh.NewOption(string(config.EUCentral), config.EUCentral),
-	huh.NewOption(string(config.USEast), config.USEast),
-	huh.NewOption(string(config.USWest), config.USEast),
+var networkZoneOptions = []huh.Option[hcloud.NetworkZone]{
+	huh.NewOption(string(hcloud.NetworkZoneEUCentral), hcloud.NetworkZoneEUCentral),
+	huh.NewOption(string(hcloud.NetworkZoneUSEast), hcloud.NetworkZoneUSEast),
+	huh.NewOption(string(hcloud.NetworkZoneUSWest), hcloud.NetworkZoneUSWest),
 }

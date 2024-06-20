@@ -1,13 +1,5 @@
 package config
 
-type NetworkZone string
-
-const (
-	EUCentral NetworkZone = "eu-central"
-	USEast    NetworkZone = "us-east"
-	USWest    NetworkZone = "us-west"
-)
-
 type Location string
 
 const (

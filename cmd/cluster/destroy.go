@@ -20,7 +20,5 @@ var Destroy = &cobra.Command{
 		}
 
 		cluster.Destroy(conf)
-
-		fmt.Println(conf)
 	},
 }

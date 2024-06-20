@@ -8,7 +8,7 @@ import (
 )
 
 var Create = &cobra.Command{
-	Use:   "build",
+	Use:   "create",
 	Short: "Create project configuration",
 	Run: func(cmd *cobra.Command, args []string) {
 
