@@ -2,7 +2,6 @@ package cluster
 
 import (
 	"github.com/spf13/cobra"
-	"hcloud-k3s-cli/pkg/client"
 )
 
 var ClusterCmd = &cobra.Command{
@@ -11,6 +10,5 @@ var ClusterCmd = &cobra.Command{
 }
 
 func init() {
-	client.InitHcloudClient()
 	ClusterCmd.AddCommand(CreateCmd)
 }

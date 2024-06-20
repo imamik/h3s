@@ -3,6 +3,7 @@ package cluster
 import (
 	"fmt"
 	"github.com/spf13/cobra"
+	"hcloud-k3s-cli/pkg/cluster"
 	"hcloud-k3s-cli/pkg/config/load"
 )
 
@@ -19,6 +20,8 @@ var CreateCmd = &cobra.Command{
 			fmt.Println(err)
 			return
 		}
+
+		cluster.CreateCluster(conf)
 
 		fmt.Println(conf)
 	},
