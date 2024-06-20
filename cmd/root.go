@@ -10,19 +10,17 @@ import (
 )
 
 var rootCmd = &cobra.Command{
-	Use:   "hcloud-k8s-cli",
+	Use:   "hcloud-k8s",
 	Short: "A CLI to setup a k3s Kubernetes cluster on Hetzner Cloud",
-	Long:  `A CLI to setup a k3s Kubernetes cluster on Hetzner Cloud`,
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("Welcome to my CLI")
 	},
 }
 
 func init() {
-	rootCmd.AddCommand(k3s.ReleasesCmd)
-	rootCmd.AddCommand(cfg.CreateCmd)
-	rootCmd.AddCommand(cluster.ClusterCmd)
-
+	rootCmd.AddCommand(k3s.K3s)
+	rootCmd.AddCommand(cfg.Cfg)
+	rootCmd.AddCommand(cluster.Cluster)
 }
 
 func Execute() {

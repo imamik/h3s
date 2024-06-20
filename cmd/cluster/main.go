@@ -4,11 +4,12 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var ClusterCmd = &cobra.Command{
+var Cluster = &cobra.Command{
 	Use:   "cluster",
 	Short: "CLI to manage k3s Kubernetes clusters on Hetzner Cloud",
 }
 
 func init() {
-	ClusterCmd.AddCommand(CreateCmd)
+	Cluster.AddCommand(Create)
+	Cluster.AddCommand(Destroy)
 }

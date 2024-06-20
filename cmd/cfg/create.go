@@ -7,8 +7,8 @@ import (
 	"hcloud-k3s-cli/pkg/k3s/releases"
 )
 
-var CreateCmd = &cobra.Command{
-	Use:   "cfg build",
+var Create = &cobra.Command{
+	Use:   "build",
 	Short: "Create project configuration",
 	Run: func(cmd *cobra.Command, args []string) {
 

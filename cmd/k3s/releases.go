@@ -11,8 +11,8 @@ var (
 	limit      int
 )
 
-var ReleasesCmd = &cobra.Command{
-	Use:   "k3s releases",
+var Releases = &cobra.Command{
+	Use:   "releases",
 	Short: "Find available k3s releases",
 	Run: func(cmd *cobra.Command, args []string) {
 		r, err := releases.GetFilteredReleases(prerelease, stable, limit)
@@ -25,8 +25,8 @@ var ReleasesCmd = &cobra.Command{
 }
 
 func init() {
-	ReleasesCmd.Flags().BoolVar(&prerelease, "rc", false, "Include release candidates")
-	ReleasesCmd.Flags().BoolVar(&prerelease, "prerelease", false, "Include release candidates")
-	ReleasesCmd.Flags().BoolVar(&stable, "stable", false, "Include stable releases")
-	ReleasesCmd.Flags().IntVar(&limit, "limit", 0, "Limit the number of results")
+	Releases.Flags().BoolVar(&prerelease, "rc", false, "Include release candidates")
+	Releases.Flags().BoolVar(&prerelease, "prerelease", false, "Include release candidates")
+	Releases.Flags().BoolVar(&stable, "stable", false, "Include stable releases")
+	Releases.Flags().IntVar(&limit, "limit", 0, "Limit the number of results")
 }
