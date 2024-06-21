@@ -13,51 +13,32 @@ const (
 type CloudInstanceType string
 
 const (
-	Shared    CloudInstanceType = "shared"
-	Dedicated CloudInstanceType = "dedicated"
-)
-
-type CloudInstanceArchitecture string
-
-const (
-	Intel CloudInstanceArchitecture = "intel"
-	AMD   CloudInstanceArchitecture = "amd"
-	Arm   CloudInstanceArchitecture = "arm"
+	SharedArm    CloudInstanceType = "shared-arm"
+	SharedIntel  CloudInstanceType = "shared-intel"
+	SharedAmd    CloudInstanceType = "shared-amd"
+	DedicatedAmd CloudInstanceType = "dedicated-amd"
 )
 
 type CloudInstance string
 
-// Shared vCPU AMD
 const (
-	CPX11 CloudInstance = "CPX11"
-	CPX21 CloudInstance = "CPX21"
-	CPX31 CloudInstance = "CPX31"
-	CPX41 CloudInstance = "CPX41"
-	CPX51 CloudInstance = "CPX51"
-)
-
-// Shared vCPU Intel
-const (
-	CX22 CloudInstance = "CX22"
-	CX32 CloudInstance = "CX32"
-	CX42 CloudInstance = "CX42"
-	CX52 CloudInstance = "CX52"
-)
-
-// Shared vCPU Arm
-const (
-	CAX11 CloudInstance = "CAX11"
-	CAX21 CloudInstance = "CAX21"
-	CAX31 CloudInstance = "CAX31"
-	CAX41 CloudInstance = "CAX41"
-)
-
-// Dedicated vCPU AMD
-const (
-	CCX13 CloudInstance = "CCX13"
-	CCX23 CloudInstance = "CCX23"
-	CCX33 CloudInstance = "CCX33"
-	CCX43 CloudInstance = "CCX43"
-	CCX53 CloudInstance = "CCX53"
-	CCX63 CloudInstance = "CCX63"
+	CPX11 CloudInstance = "cpx11"
+	CPX21 CloudInstance = "cpx21"
+	CPX31 CloudInstance = "cpx31"
+	CPX41 CloudInstance = "cpx41"
+	CPX51 CloudInstance = "cpx51"
+	CX22  CloudInstance = "cx22"
+	CX32  CloudInstance = "cx32"
+	CX42  CloudInstance = "cx42"
+	CX52  CloudInstance = "cx52"
+	CAX11 CloudInstance = "cax11"
+	CAX21 CloudInstance = "cax21"
+	CAX31 CloudInstance = "cax31"
+	CAX41 CloudInstance = "cax41"
+	CCX13 CloudInstance = "ccx13"
+	CCX23 CloudInstance = "ccx23"
+	CCX33 CloudInstance = "ccx33"
+	CCX43 CloudInstance = "ccx43"
+	CCX53 CloudInstance = "ccx53"
+	CCX63 CloudInstance = "ccx63"
 )

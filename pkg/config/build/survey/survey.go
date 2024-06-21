@@ -34,6 +34,8 @@ func Survey(k3sReleases []releases.Release) (config.Config, error) {
 
 	conf.ControlPlane.Location = getLocation("Control Plane Location", "Location of the control plane node", conf.NetworkZone)
 
+	conf.ControlPlane.InstanceType = getInstance()
+
 	var controlPlaneNodesString string
 	huh.NewInput().
 		Title("Nodes").

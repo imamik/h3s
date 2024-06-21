@@ -36,5 +36,7 @@ func getNodePool(networkZone hcloud.NetworkZone) config.NodePool {
 		networkZone,
 	)
 
+	nodePool.InstanceType = getInstance()
+
 	return nodePool
 }

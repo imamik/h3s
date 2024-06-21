@@ -1,36 +1,76 @@
 package survey
 
-/*
-Shared vCPU
-With x86 architecture:
+import (
+	"github.com/charmbracelet/huh"
+	"hcloud-k3s-cli/pkg/config"
+	"log"
+)
 
-Name	vCPUs		Ram		SSD		Traffic
-CPX11	2 AMD		2 GB	40 GB	20 TB
-CX22	2 Intel		4 GB	40 GB	20 TB
-CPX21	3 AMD		4 GB	80 GB	20 TB
-CX32	4 Intel		8 GB	80 GB	20 TB
-CPX31	4 AMD		8 GB	160 GB	20 TB
-CX42	8 Intel		16 GB	160 GB	20 TB
-CPX41	8 AMD		16 GB	240 GB	20 TB
-CX52	16 Intel	32 GB	320 GB	20 TB
-CPX51	16 AMD		32 GB	360 GB	20 TB
+var instanceTypeOptions = []huh.Option[config.CloudInstanceType]{
+	huh.NewOption("Shared vCPU Arm", config.SharedArm),
+	huh.NewOption("Shared vCPU Intel", config.SharedIntel),
+	huh.NewOption("Shared vCPU AMD", config.SharedAmd),
+	huh.NewOption("Dedicated vCPU AMD", config.DedicatedAmd),
+}
 
-With Arm64 architecture:
+var instanceOptions = map[config.CloudInstanceType][]huh.Option[config.CloudInstance]{
+	config.SharedArm: {
+		huh.NewOption("CAX11	(2  vCPUs,	4  GB RAM,	40  GB SSD)", config.CAX11),
+		huh.NewOption("CAX21	(4  vCPUs,	8  GB RAM,	80  GB SSD)", config.CAX21),
+		huh.NewOption("CAX31	(8  vCPUs,	16 GB RAM,	160 GB SSD)", config.CAX31),
+		huh.NewOption("CAX41	(16 vCPUs,	32 GB RAM,	320 GB SSD)", config.CAX41),
+	},
+	config.SharedIntel: {
+		huh.NewOption("CX22	(2  vCPUs,	4  GB RAM,	40  GB SSD)", config.CX22),
+		huh.NewOption("CX32	(4  vCPUs,	8  GB RAM,	80  GB SSD)", config.CX32),
+		huh.NewOption("CX42	(8  vCPUs,	16 GB RAM,	160 GB SSD)", config.CX42),
+		huh.NewOption("CX52	(16 vCPUs,	32 GB RAM,	320 GB SSD)", config.CX52),
+	},
+	config.SharedAmd: {
+		huh.NewOption("CPX11	(2  vCPUs,	2  GB RAM,	40  GB SSD)", config.CPX11),
+		huh.NewOption("CPX21	(3  vCPUs,	4  GB RAM,	80  GB SSD)", config.CPX21),
+		huh.NewOption("CPX31	(4  vCPUs,	8  GB RAM,	160 GB SSD)", config.CPX31),
+		huh.NewOption("CPX41	(8  vCPUs,	16 GB RAM,	240 GB SSD)", config.CPX41),
+		huh.NewOption("CPX51	(16 vCPUs,	32 GB RAM,	360 GB SSD)", config.CPX51),
+	},
+	config.DedicatedAmd: {
+		huh.NewOption("CCX13	(2  vCPUs,	8  GB RAM,	80  GB SSD)", config.CCX13),
+		huh.NewOption("CCX23	(4  vCPUs,	16 GB RAM,	160 GB SSD)", config.CCX23),
+		huh.NewOption("CCX33	(8  vCPUs,	32 GB RAM,	240 GB SSD)", config.CCX33),
+		huh.NewOption("CCX43	(16 vCPUs,	64 GB RAM,	360 GB SSD)", config.CCX43),
+		huh.NewOption("CCX53	(32 vCPUs,	128 GB RAM,	600 GB SSD)", config.CCX53),
+		huh.NewOption("CCX63	(48 vCPUs,	192 GB RAM,	960 GB SSD)", config.CCX63),
+	},
+}
 
-Name	vCPUs		Ram		SSD		Traffic
-CAX11	2 Ampere	4 GB	40 GB	20 TB
-CAX21	4 Ampere	8 GB	80 GB	20 TB
-CAX31	8 Ampere	16 GB	160 GB	20 TB
-CAX41	16 Ampere	32 GB	320 GB	20 TB
+func getInstance() config.CloudInstance {
+	var instance config.CloudInstance
+	var instanceType config.CloudInstanceType
 
-Dedicated vCPU
-With x86 architecture:
+	err := huh.NewSelect[config.CloudInstanceType]().
+		Title("Instance Type").
+		Description("Architecture and type of vCPU").
+		Options(instanceTypeOptions...).
+		Value(&instanceType).
+		Run()
 
-Name	vCPUs	Ram		SSD		Traffic
-CCX13	2 AMD	8 GB	80 GB	20 TB
-CCX23	4 AMD	16 GB	160 GB	20 TB
-CCX33	8 AMD	32 GB	240 GB	30 TB
-CCX43	16 AMD	64 GB	360 GB	40 TB
-CCX53	32 AMD	128 GB	600 GB	50 TB
-CCX63	48 AMD	192 GB	960 GB	60 TB
-*/
+	if err != nil {
+		log.Fatalf("Error selecting instance type: %v", err)
+		return instance
+	}
+
+	err = huh.NewSelect[config.CloudInstance]().
+		Title("Instance").
+		Description("Select an instance type").
+		Options(instanceOptions[instanceType]...).
+		Value(&instance).
+		Run()
+
+	if err != nil {
+		log.Fatalf("Error selecting instance: %v", err)
+		return instance
+	}
+
+	return instance
+
+}
