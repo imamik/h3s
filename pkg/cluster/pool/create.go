@@ -11,29 +11,30 @@ import (
 
 func CreatePools(n *hcloud.Network, conf config.Config, client *hcloud.Client, ctx context.Context) {
 	// Create control plane pool
-	create("control-plane", true, conf.ControlPlane.AsWorkerPool, conf.ControlPlane.Location, conf.ControlPlane.Nodes, n, conf, client, ctx)
+	create(conf.ControlPlane.Pool, true, conf.ControlPlane.AsWorkerPool, n, conf, client, ctx)
 
 	// Create worker pools
 	for _, pool := range conf.WorkerPools {
-		create(pool.Name, false, true, pool.Location, pool.Nodes, n, conf, client, ctx)
+		create(pool, false, true, n, conf, client, ctx)
 	}
 }
 
 func create(
-	name string,
+	pool config.NodePool,
 	isControlPlane bool,
 	isWorker bool,
-	location config.Location,
-	nodes int,
 	network *hcloud.Network,
 	conf config.Config,
 	client *hcloud.Client,
 	ctx context.Context,
 ) {
-	placementGroup := placementgroup.Create(name+"-pool", conf, client, ctx)
+	placementGroup := placementgroup.Create(pool.Name+"-pool", conf, client, ctx)
 
-	for i := 0; i < nodes; i++ {
-		nodeName := fmt.Sprintf("%s-node-%d", name, i+1)
-		server.Create(nodeName, isControlPlane, isWorker, location, network, placementGroup, conf, client, ctx)
+	for i := 0; i < pool.Nodes; i++ {
+		nodeName := fmt.Sprintf("%s-node-%d", pool.Name, i+1)
+		server.Create(
+			nodeName, isControlPlane, isWorker, pool.Location, pool.Instance,
+			network, placementGroup, conf, client, ctx,
+		)
 	}
 }

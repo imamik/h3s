@@ -14,6 +14,7 @@ func Create(
 	isControlPlane bool,
 	isWorker bool,
 	location config.Location,
+	instance config.CloudInstance,
 	network *hcloud.Network,
 	placementGroup hcloud.PlacementGroupCreateResult,
 	conf config.Config,
@@ -21,7 +22,7 @@ func Create(
 	ctx context.Context,
 ) hcloud.ServerCreateResult {
 	image := &hcloud.Image{Name: "ubuntu-20.04"}
-	serverType := &hcloud.ServerType{Name: "cax11"}
+	serverType := &hcloud.ServerType{Name: string(instance)}
 	datacenter := &hcloud.Datacenter{
 		Location: &hcloud.Location{Name: string(location)},
 	}

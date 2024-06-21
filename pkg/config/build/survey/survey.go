@@ -32,9 +32,9 @@ func Survey(k3sReleases []releases.Release) (config.Config, error) {
 		Value(&conf.NetworkZone).
 		Run()
 
-	conf.ControlPlane.Location = getLocation("Control Plane Location", "Location of the control plane node", conf.NetworkZone)
-
-	conf.ControlPlane.InstanceType = getInstance()
+	conf.ControlPlane.Pool.Name = "control-plane"
+	conf.ControlPlane.Pool.Location = getLocation("Control Plane Location", "Location of the control plane node", conf.NetworkZone)
+	conf.ControlPlane.Pool.Instance = getInstance()
 
 	var controlPlaneNodesString string
 	huh.NewInput().
@@ -46,7 +46,7 @@ func Survey(k3sReleases []releases.Release) (config.Config, error) {
 		Run()
 
 	controlPlaneNodes, _ := strconv.Atoi(controlPlaneNodesString)
-	conf.ControlPlane.Nodes = controlPlaneNodes
+	conf.ControlPlane.Pool.Nodes = controlPlaneNodes
 
 	huh.NewConfirm().
 		Title("Control Plane Load Balancer").
@@ -80,7 +80,7 @@ func Survey(k3sReleases []releases.Release) (config.Config, error) {
 		Run()
 
 	workerPools, _ := strconv.Atoi(workerPoolsString)
-	conf.ControlPlane.Nodes = controlPlaneNodes
+	conf.ControlPlane.Pool.Nodes = controlPlaneNodes
 
 	for i := 0; i < workerPools; i++ {
 		nodePool := getNodePool(conf.NetworkZone)

@@ -11,7 +11,7 @@ import (
 
 func Delete(conf config.Config, client *hcloud.Client, ctx context.Context) {
 	// Delete control plane pool
-	deletePool("control-plane", conf.ControlPlane.Nodes, conf, client, ctx)
+	deletePool(conf.ControlPlane.Pool.Name, conf.ControlPlane.Pool.Nodes, conf, client, ctx)
 
 	// Delete worker pools
 	for _, pool := range conf.WorkerPools {
