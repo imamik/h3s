@@ -13,6 +13,7 @@ func Create(
 	name string,
 	isControlPlane bool,
 	isWorker bool,
+	location config.Location,
 	network *hcloud.Network,
 	placementGroup hcloud.PlacementGroupCreateResult,
 	conf config.Config,
@@ -21,14 +22,18 @@ func Create(
 ) hcloud.ServerCreateResult {
 	image := &hcloud.Image{Name: "ubuntu-20.04"}
 	serverType := &hcloud.ServerType{Name: "cax11"}
+	datacenter := &hcloud.Datacenter{
+		Location: &hcloud.Location{Name: string(location)},
+	}
 
 	server, _, err := client.Server.Create(ctx, hcloud.ServerCreateOpts{
 		Name:           utils.GetName(name, conf),
 		ServerType:     serverType,
 		Image:          image,
-		SSHKeys:        []*hcloud.SSHKey{},
+		Datacenter:     datacenter,
 		Networks:       []*hcloud.Network{network},
 		PlacementGroup: placementGroup.PlacementGroup,
+		SSHKeys:        []*hcloud.SSHKey{},
 		Labels: utils.GetLabels(conf, map[string]string{
 			"isControlPlane": strconv.FormatBool(isControlPlane),
 			"isWorker":       strconv.FormatBool(isWorker),

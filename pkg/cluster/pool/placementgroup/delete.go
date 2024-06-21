@@ -7,7 +7,7 @@ import (
 	"log"
 )
 
-func Delete(name string, ctx context.Context, client *hcloud.Client, conf config.Config) {
+func Delete(name string, conf config.Config, client *hcloud.Client, ctx context.Context) {
 	placementGroup := Get(name, ctx, client, conf)
 
 	_, err := client.PlacementGroup.Delete(ctx, placementGroup)

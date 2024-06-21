@@ -11,11 +11,11 @@ import (
 
 func CreatePools(n *hcloud.Network, conf config.Config, client *hcloud.Client, ctx context.Context) {
 	// Create control plane pool
-	create("control-plane", true, conf.ControlPlane.AsWorkerPool, conf.ControlPlane.Nodes, n, conf, client, ctx)
+	create("control-plane", true, conf.ControlPlane.AsWorkerPool, conf.ControlPlane.Location, conf.ControlPlane.Nodes, n, conf, client, ctx)
 
 	// Create worker pools
 	for _, pool := range conf.WorkerPools {
-		create(pool.Name, false, true, pool.Nodes, n, conf, client, ctx)
+		create(pool.Name, false, true, pool.Location, pool.Nodes, n, conf, client, ctx)
 	}
 }
 
@@ -23,6 +23,7 @@ func create(
 	name string,
 	isControlPlane bool,
 	isWorker bool,
+	location config.Location,
 	nodes int,
 	network *hcloud.Network,
 	conf config.Config,
@@ -33,6 +34,6 @@ func create(
 
 	for i := 0; i < nodes; i++ {
 		nodeName := fmt.Sprintf("%s-node-%d", name, i+1)
-		server.Create(nodeName, isControlPlane, isWorker, network, placementGroup, conf, client, ctx)
+		server.Create(nodeName, isControlPlane, isWorker, location, network, placementGroup, conf, client, ctx)
 	}
 }
