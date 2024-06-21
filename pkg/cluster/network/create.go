@@ -17,7 +17,7 @@ func getIpRange(s string) *net.IPNet {
 	return ipRange
 }
 
-func Create(ctx context.Context, client *hcloud.Client, conf config.Config) {
+func Create(conf config.Config, client *hcloud.Client, ctx context.Context) *hcloud.Network {
 	network, _, err := client.Network.Create(ctx, hcloud.NetworkCreateOpts{
 		Name:    getName(conf),
 		IPRange: getIpRange("10.0.0.0/16"),
@@ -39,4 +39,6 @@ func Create(ctx context.Context, client *hcloud.Client, conf config.Config) {
 	if err != nil {
 		log.Fatalf("error adding subnet to network: %s", err)
 	}
+
+	return network
 }

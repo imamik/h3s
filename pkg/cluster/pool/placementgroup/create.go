@@ -8,7 +8,7 @@ import (
 	"log"
 )
 
-func Create(name string, ctx context.Context, client *hcloud.Client, conf config.Config) hcloud.PlacementGroupCreateResult {
+func Create(name string, conf config.Config, client *hcloud.Client, ctx context.Context) hcloud.PlacementGroupCreateResult {
 	placementGroupResp, _, err := client.PlacementGroup.Create(ctx, hcloud.PlacementGroupCreateOpts{
 		Name:   utils.GetName(name, conf),
 		Type:   hcloud.PlacementGroupTypeSpread,
