@@ -3,16 +3,18 @@ package config
 import "github.com/hetznercloud/hcloud-go/v2/hcloud"
 
 type NodePool struct {
-	Name     string   `yaml:"name"`
-	Nodes    int      `yaml:"nodes"`
-	Location Location `yaml:"location"`
+	Name         string        `yaml:"name"`
+	Nodes        int           `yaml:"nodes"`
+	Location     Location      `yaml:"location"`
+	InstanceType CloudInstance `yaml:"serverType"`
 }
 
 type ControlPlane struct {
-	Nodes        int      `yaml:"nodes"`
-	Location     Location `yaml:"location"`
-	AsWorkerPool bool     `yaml:"asWorkerPool,omitempty"`
-	LoadBalancer bool     `yaml:"loadBalancer,omitempty"`
+	Nodes        int           `yaml:"nodes"`
+	Location     Location      `yaml:"location"`
+	InstanceType CloudInstance `yaml:"serverType"`
+	AsWorkerPool bool          `yaml:"asWorkerPool,omitempty"`
+	LoadBalancer bool          `yaml:"loadBalancer,omitempty"`
 }
 
 type Config struct {
