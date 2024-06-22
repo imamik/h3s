@@ -5,7 +5,7 @@ import (
 	"hcloud-k3s-cli/pkg/cluster/pool/placementgroup"
 	"hcloud-k3s-cli/pkg/cluster/pool/server"
 	"hcloud-k3s-cli/pkg/config"
-	"log"
+	"hcloud-k3s-cli/pkg/utils/logger"
 )
 
 func Delete(ctx clustercontext.ClusterContext) {
@@ -19,10 +19,10 @@ func Delete(ctx clustercontext.ClusterContext) {
 }
 
 func deletePool(ctx clustercontext.ClusterContext, pool config.NodePool) {
-	log.Println("Deleting pool", pool.Name)
+	logger.LogResourceEvent(logger.Pool, logger.Delete, ctx.GetName(pool.Name), logger.Initialized)
 	for i := 0; i < pool.Nodes; i++ {
 		server.Delete(ctx, pool, i)
 	}
 	placementgroup.Delete(ctx, pool)
-	log.Println("Deleted pool", pool.Name)
+	logger.LogResourceEvent(logger.Pool, logger.Delete, ctx.GetName(pool.Name), logger.Success)
 }

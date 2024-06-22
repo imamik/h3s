@@ -3,33 +3,28 @@ package sshkey
 import (
 	"github.com/hetznercloud/hcloud-go/v2/hcloud"
 	"hcloud-k3s-cli/pkg/cluster/clustercontext"
-	"log"
+	"hcloud-k3s-cli/pkg/utils/logger"
 )
 
 func create(ctx clustercontext.ClusterContext) *hcloud.SSHKey {
 	publicKey, err := readLocalPublicKeyFromFile(ctx)
 	if err != nil {
-		log.Println("error reading public key:", err)
-		return nil
+		logger.LogError(err)
 	}
 
 	sshKeyName := getName(ctx)
-	log.Println("Creating ssh key - " + sshKeyName)
+	logger.LogResourceEvent(logger.SSHKey, logger.Create, sshKeyName, logger.Initialized)
 
 	sshKey, _, err := ctx.Client.SSHKey.Create(ctx.Context, hcloud.SSHKeyCreateOpts{
 		Name:      sshKeyName,
 		PublicKey: publicKey,
 		Labels:    ctx.GetLabels(),
 	})
-	if err != nil {
-		log.Println("error creating ssh key: ", err)
-	}
-	if sshKey == nil {
-		log.Println("ssh key not created")
-		return nil
+	if err != nil || sshKey == nil {
+		logger.LogResourceEvent(logger.SSHKey, logger.Create, sshKeyName, logger.Failure, err)
 	}
 
-	log.Println("SSH key created - " + sshKey.Name)
+	logger.LogResourceEvent(logger.SSHKey, logger.Create, sshKeyName, logger.Success)
 	return sshKey
 }
 

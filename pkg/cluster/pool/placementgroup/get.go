@@ -4,7 +4,7 @@ import (
 	"github.com/hetznercloud/hcloud-go/v2/hcloud"
 	"hcloud-k3s-cli/pkg/cluster/clustercontext"
 	"hcloud-k3s-cli/pkg/config"
-	"log"
+	"hcloud-k3s-cli/pkg/utils/logger"
 )
 
 func Get(
@@ -12,17 +12,13 @@ func Get(
 	pool config.NodePool,
 ) *hcloud.PlacementGroup {
 	name := getName(ctx, pool)
-	log.Println("Getting placement group - " + name)
+	logger.LogResourceEvent(logger.PlacementGroup, logger.Get, name, logger.Initialized)
 
 	placementGroup, _, err := ctx.Client.PlacementGroup.GetByName(ctx.Context, name)
-	if err != nil {
-		log.Println("error getting placement group:", err)
-	}
-	if placementGroup == nil {
-		log.Println("placement group not found:", name)
-		return nil
+	if err != nil || placementGroup == nil {
+		logger.LogResourceEvent(logger.PlacementGroup, logger.Get, name, logger.Failure, err)
 	}
 
-	log.Println("Placement group found - " + placementGroup.Name)
+	logger.LogResourceEvent(logger.PlacementGroup, logger.Get, name, logger.Success)
 	return placementGroup
 }

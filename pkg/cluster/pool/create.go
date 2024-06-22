@@ -6,7 +6,7 @@ import (
 	"hcloud-k3s-cli/pkg/cluster/pool/placementgroup"
 	"hcloud-k3s-cli/pkg/cluster/pool/server"
 	"hcloud-k3s-cli/pkg/config"
-	"log"
+	"hcloud-k3s-cli/pkg/utils/logger"
 )
 
 func CreatePools(
@@ -45,7 +45,7 @@ func create(
 	isControlPlane bool,
 	isWorker bool,
 ) {
-	log.Println("Creating pool - " + pool.Name)
+	logger.LogResourceEvent(logger.Pool, logger.Create, ctx.GetName(pool.Name), logger.Initialized)
 
 	placementGroup := placementgroup.Create(ctx, pool)
 
@@ -62,5 +62,5 @@ func create(
 		)
 	}
 
-	log.Println("Pool created - " + pool.Name)
+	logger.LogResourceEvent(logger.Pool, logger.Create, ctx.GetName(pool.Name), logger.Success)
 }

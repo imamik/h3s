@@ -4,7 +4,7 @@ import (
 	"github.com/hetznercloud/hcloud-go/v2/hcloud"
 	"hcloud-k3s-cli/pkg/cluster/clustercontext"
 	"hcloud-k3s-cli/pkg/config"
-	"log"
+	"hcloud-k3s-cli/pkg/utils/logger"
 )
 
 func create(
@@ -12,7 +12,7 @@ func create(
 	pool config.NodePool,
 ) *hcloud.PlacementGroup {
 	placementGroupName := getName(ctx, pool)
-	log.Println("Creating placement group - " + placementGroupName)
+	logger.LogResourceEvent(logger.PlacementGroup, logger.Create, placementGroupName, logger.Initialized)
 
 	placementGroupResp, _, err := ctx.Client.PlacementGroup.Create(ctx.Context, hcloud.PlacementGroupCreateOpts{
 		Name:   placementGroupName,
@@ -20,10 +20,13 @@ func create(
 		Labels: ctx.GetLabels(),
 	})
 	if err != nil {
-		log.Println("error creating placement group: ", err)
+		logger.LogResourceEvent(logger.PlacementGroup, logger.Create, placementGroupName, logger.Failure, err)
+	}
+	if placementGroupResp.PlacementGroup == nil {
+		logger.LogResourceEvent(logger.PlacementGroup, logger.Create, placementGroupName, logger.Failure, "Empty Response")
 	}
 
-	log.Println("Placement group created - ", placementGroupName)
+	logger.LogResourceEvent(logger.PlacementGroup, logger.Create, placementGroupName, logger.Success)
 	return placementGroupResp.PlacementGroup
 }
 

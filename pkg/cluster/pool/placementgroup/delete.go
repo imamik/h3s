@@ -3,7 +3,7 @@ package placementgroup
 import (
 	"hcloud-k3s-cli/pkg/cluster/clustercontext"
 	"hcloud-k3s-cli/pkg/config"
-	"log"
+	"hcloud-k3s-cli/pkg/utils/logger"
 )
 
 func Delete(
@@ -15,12 +15,12 @@ func Delete(
 		return
 	}
 
-	log.Println("Deleting placement group - " + placementGroup.Name)
+	logger.LogResourceEvent(logger.PlacementGroup, logger.Delete, placementGroup.Name, logger.Initialized)
 
 	_, err := ctx.Client.PlacementGroup.Delete(ctx.Context, placementGroup)
 	if err != nil {
-		log.Println("error deleting placement group: ", err)
+		logger.LogResourceEvent(logger.PlacementGroup, logger.Delete, placementGroup.Name, logger.Failure, err)
 	}
 
-	log.Println("Placement group deleted - " + placementGroup.Name)
+	logger.LogResourceEvent(logger.PlacementGroup, logger.Delete, placementGroup.Name, logger.Success)
 }

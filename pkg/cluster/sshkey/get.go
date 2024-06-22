@@ -3,22 +3,18 @@ package sshkey
 import (
 	"github.com/hetznercloud/hcloud-go/v2/hcloud"
 	"hcloud-k3s-cli/pkg/cluster/clustercontext"
-	"log"
+	"hcloud-k3s-cli/pkg/utils/logger"
 )
 
 func Get(ctx clustercontext.ClusterContext) *hcloud.SSHKey {
 	sshKeyName := getName(ctx)
-	log.Println("Getting ssh key - " + sshKeyName)
+	logger.LogResourceEvent(logger.SSHKey, logger.Get, sshKeyName, logger.Initialized)
 
 	sshKey, _, err := ctx.Client.SSHKey.GetByName(ctx.Context, sshKeyName)
-	if err != nil {
-		log.Println("error getting ssh key:", err)
-	}
-	if sshKey == nil {
-		log.Println("ssh key not found:", sshKeyName)
-		return nil
+	if err != nil || sshKey == nil {
+		logger.LogResourceEvent(logger.SSHKey, logger.Get, sshKeyName, logger.Failure, err)
 	}
 
-	log.Println("SSH key found - " + sshKey.Name)
+	logger.LogResourceEvent(logger.SSHKey, logger.Get, sshKeyName, logger.Success)
 	return sshKey
 }

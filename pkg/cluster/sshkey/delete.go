@@ -2,7 +2,7 @@ package sshkey
 
 import (
 	"hcloud-k3s-cli/pkg/cluster/clustercontext"
-	"log"
+	"hcloud-k3s-cli/pkg/utils/logger"
 )
 
 func Delete(ctx clustercontext.ClusterContext) {
@@ -12,12 +12,12 @@ func Delete(ctx clustercontext.ClusterContext) {
 		return
 	}
 
-	log.Println("Deleting ssh key -", sshKey.Name)
+	logger.LogResourceEvent(logger.SSHKey, logger.Delete, sshKey.Name, logger.Initialized)
 
 	_, err := ctx.Client.SSHKey.Delete(ctx.Context, sshKey)
 	if err != nil {
-		log.Println("error deleting ssh key:", err)
+		logger.LogResourceEvent(logger.SSHKey, logger.Delete, sshKey.Name, logger.Failure, err)
 	}
 
-	log.Println("SSH key deleted -", sshKey.Name)
+	logger.LogResourceEvent(logger.SSHKey, logger.Delete, sshKey.Name, logger.Success)
 }

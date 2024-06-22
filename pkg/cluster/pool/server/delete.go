@@ -3,7 +3,7 @@ package server
 import (
 	"hcloud-k3s-cli/pkg/cluster/clustercontext"
 	"hcloud-k3s-cli/pkg/config"
-	"log"
+	"hcloud-k3s-cli/pkg/utils/logger"
 )
 
 func Delete(
@@ -17,12 +17,12 @@ func Delete(
 		return
 	}
 
-	log.Println("Deleting server - " + server.Name)
+	logger.LogResourceEvent(logger.Server, logger.Delete, server.Name, logger.Initialized)
 
 	_, _, err := ctx.Client.Server.DeleteWithResult(ctx.Context, server)
 	if err != nil {
-		log.Printf("error deleting server: %s", err)
+		logger.LogResourceEvent(logger.Server, logger.Delete, server.Name, logger.Failure, err)
 	}
 
-	log.Println("Server deleted - " + server.Name)
+	logger.LogResourceEvent(logger.Server, logger.Delete, server.Name, logger.Success)
 }

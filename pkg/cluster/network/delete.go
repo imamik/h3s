@@ -2,7 +2,7 @@ package network
 
 import (
 	"hcloud-k3s-cli/pkg/cluster/clustercontext"
-	"log"
+	"hcloud-k3s-cli/pkg/utils/logger"
 )
 
 func Delete(ctx clustercontext.ClusterContext) {
@@ -11,12 +11,12 @@ func Delete(ctx clustercontext.ClusterContext) {
 		return
 	}
 
-	log.Println("Deleting network - ", network.Name)
+	logger.LogResourceEvent(logger.Network, logger.Delete, network.Name, logger.Initialized)
 
 	_, err := ctx.Client.Network.Delete(ctx.Context, network)
 	if err != nil {
-		log.Println("error deleting network: ", err)
+		logger.LogResourceEvent(logger.Network, logger.Delete, network.Name, logger.Failure, err)
 	}
 
-	log.Println("Network deleted - ", network.Name)
+	logger.LogResourceEvent(logger.Network, logger.Delete, network.Name, logger.Success)
 }

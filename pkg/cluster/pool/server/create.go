@@ -4,7 +4,7 @@ import (
 	"github.com/hetznercloud/hcloud-go/v2/hcloud"
 	"hcloud-k3s-cli/pkg/cluster/clustercontext"
 	"hcloud-k3s-cli/pkg/config"
-	"log"
+	"hcloud-k3s-cli/pkg/utils/logger"
 	"strconv"
 )
 
@@ -36,7 +36,7 @@ func create(
 	isWorker bool,
 ) *hcloud.Server {
 	name := getName(ctx, pool, i)
-	log.Println("Creating server - " + name)
+	logger.LogResourceEvent(logger.Server, logger.Create, name, logger.Initialized)
 
 	image := &hcloud.Image{Name: "ubuntu-24.04"}
 	serverType := &hcloud.ServerType{Name: string(pool.Instance)}
@@ -64,9 +64,12 @@ func create(
 		}),
 	})
 	if err != nil {
-		log.Println("error creating server %s: %s", name, err)
+		logger.LogResourceEvent(logger.Server, logger.Create, name, logger.Failure, err)
+	}
+	if server.Server == nil {
+		logger.LogResourceEvent(logger.Server, logger.Create, name, logger.Failure, "Empty Response")
 	}
 
-	log.Println("Server created - " + name)
+	logger.LogResourceEvent(logger.Server, logger.Create, name, logger.Success)
 	return server.Server
 }

@@ -3,22 +3,18 @@ package network
 import (
 	"github.com/hetznercloud/hcloud-go/v2/hcloud"
 	"hcloud-k3s-cli/pkg/cluster/clustercontext"
-	"log"
+	"hcloud-k3s-cli/pkg/utils/logger"
 )
 
 func Get(ctx clustercontext.ClusterContext) *hcloud.Network {
 	networkName := getName(ctx)
-	log.Println("Getting network - " + networkName)
+	logger.LogResourceEvent(logger.Network, logger.Get, networkName, logger.Initialized)
 
 	network, _, err := ctx.Client.Network.GetByName(ctx.Context, networkName)
-	if err != nil {
-		log.Println("error getting network:", err)
-	}
-	if network == nil {
-		log.Println("network not found:", networkName)
-		return nil
+	if err != nil || network == nil {
+		logger.LogResourceEvent(logger.Network, logger.Get, networkName, logger.Failure, err)
 	}
 
-	log.Println("Network found - " + network.Name)
+	logger.LogResourceEvent(logger.Network, logger.Get, networkName, logger.Success)
 	return network
 }

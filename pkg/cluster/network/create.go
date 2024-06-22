@@ -3,7 +3,7 @@ package network
 import (
 	"github.com/hetznercloud/hcloud-go/v2/hcloud"
 	"hcloud-k3s-cli/pkg/cluster/clustercontext"
-	"log"
+	"hcloud-k3s-cli/pkg/utils/logger"
 	"net"
 )
 
@@ -18,26 +18,27 @@ func Create(ctx clustercontext.ClusterContext) *hcloud.Network {
 func getIpRange(s string) *net.IPNet {
 	_, ipRange, err := net.ParseCIDR(s)
 	if err != nil {
-		log.Println("invalid IP range: %s", err)
+		logger.LogError("Invalid IP Range", err)
 	}
 	return ipRange
 }
 
 func create(ctx clustercontext.ClusterContext) *hcloud.Network {
 	networkName := getName(ctx)
-	log.Println("Creating network - ", networkName)
+
+	logger.LogResourceEvent(logger.Network, logger.Create, networkName, logger.Initialized)
 
 	network, _, err := ctx.Client.Network.Create(ctx.Context, hcloud.NetworkCreateOpts{
 		Name:    networkName,
 		IPRange: getIpRange("10.0.0.0/16"),
 		Labels:  ctx.GetLabels(),
 	})
-	if err != nil {
-		log.Println("error creating network: ", err)
+	if err != nil || network == nil {
+		logger.LogResourceEvent(logger.Network, logger.Create, networkName, logger.Failure, err)
 	}
 
-	log.Println("Network created - " + networkName)
-	log.Println("Adding subnet to network - " + networkName)
+	logger.LogResourceEvent(logger.Network, logger.Create, networkName, logger.Success)
+	logger.LogResourceEvent(logger.Subnet, logger.Create, networkName, logger.Initialized)
 
 	subnet := hcloud.NetworkSubnet{
 		Type:        hcloud.NetworkSubnetTypeServer,
@@ -45,14 +46,14 @@ func create(ctx clustercontext.ClusterContext) *hcloud.Network {
 		NetworkZone: ctx.Config.NetworkZone,
 	}
 
-	_, _, err = ctx.Client.Network.AddSubnet(ctx.Context, network, hcloud.NetworkAddSubnetOpts{
+	subNet, _, err := ctx.Client.Network.AddSubnet(ctx.Context, network, hcloud.NetworkAddSubnetOpts{
 		Subnet: subnet,
 	})
-	if err != nil {
-		log.Println("error adding subnet to network: ", err)
+	if err != nil || subNet == nil {
+		logger.LogResourceEvent(logger.Network, logger.Create, networkName, logger.Failure, err)
 	}
 
-	log.Println("Subnet added to network - " + networkName)
+	logger.LogResourceEvent(logger.Network, logger.Create, networkName, logger.Success)
 
 	return network
 }
