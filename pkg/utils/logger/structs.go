@@ -3,6 +3,8 @@ package logger
 type LogResource string
 
 const (
+	Cluster LogResource = "Cluster"
+
 	Network LogResource = "Network"
 	Subnet  LogResource = "Subnet"
 

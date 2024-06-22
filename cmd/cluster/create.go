@@ -1,23 +1,22 @@
 package cluster
 
 import (
-	"fmt"
 	"github.com/spf13/cobra"
-	"hcloud-k3s-cli/pkg/config"
-	"hcloud-k3s-cli/pkg/resources"
-	"hcloud-k3s-cli/pkg/utils/yaml"
+	"hcloud-k3s-cli/pkg/clustercontext"
+	"hcloud-k3s-cli/pkg/k3s/install"
+	"hcloud-k3s-cli/pkg/resources/server"
 )
 
 var Create = &cobra.Command{
 	Use:   "create",
 	Short: "Create a new resources",
 	Run: func(cmd *cobra.Command, args []string) {
-		var conf config.Config
-		err := yaml.Load("hcloud-k3s.yaml", &conf)
-		if err != nil {
-			fmt.Println(err)
-			return
+		ctx := clustercontext.Context()
+		// cluster.Create(ctx)
+		servers := server.GetAll(ctx)
+
+		for _, server := range servers {
+			install.Install(ctx, server)
 		}
-		resources.Create(conf)
 	},
 }
