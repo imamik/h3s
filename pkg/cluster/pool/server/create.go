@@ -9,14 +9,35 @@ import (
 )
 
 func Create(
+	ctx clustercontext.ClusterContext,
+	sshKey *hcloud.SSHKey,
+	network *hcloud.Network,
+	placementGroup *hcloud.PlacementGroup,
 	pool config.NodePool,
 	i int,
 	isControlPlane bool,
 	isWorker bool,
-	placementGroup hcloud.PlacementGroupCreateResult,
+) *hcloud.Server {
+	server := Get(ctx, pool, i)
+	if server == nil {
+		server = create(ctx, sshKey, network, placementGroup, pool, i, isControlPlane, isWorker)
+	}
+	return server
+}
+
+func create(
 	ctx clustercontext.ClusterContext,
-) hcloud.ServerCreateResult {
-	name := getName(pool, i, ctx)
+	sshKey *hcloud.SSHKey,
+	network *hcloud.Network,
+	placementGroup *hcloud.PlacementGroup,
+	pool config.NodePool,
+	i int,
+	isControlPlane bool,
+	isWorker bool,
+) *hcloud.Server {
+	name := getName(ctx, pool, i)
+	log.Println("Creating server - " + name)
+
 	image := &hcloud.Image{Name: "ubuntu-24.04"}
 	serverType := &hcloud.ServerType{Name: string(pool.Instance)}
 	location := &hcloud.Location{Name: string(pool.Location)}
@@ -24,8 +45,8 @@ func Create(
 		EnableIPv4: false,
 		EnableIPv6: false,
 	}
-	networks := []*hcloud.Network{ctx.Network}
-	sshKeys := []*hcloud.SSHKey{}
+	networks := []*hcloud.Network{network}
+	sshKeys := []*hcloud.SSHKey{sshKey}
 
 	server, _, err := ctx.Client.Server.Create(ctx.Context, hcloud.ServerCreateOpts{
 		Name:           name,
@@ -33,7 +54,7 @@ func Create(
 		Image:          image,
 		Location:       location,
 		Networks:       networks,
-		PlacementGroup: placementGroup.PlacementGroup,
+		PlacementGroup: placementGroup,
 		SSHKeys:        sshKeys,
 		PublicNet:      publicNet,
 		Labels: ctx.GetLabels(map[string]string{
@@ -43,7 +64,9 @@ func Create(
 		}),
 	})
 	if err != nil {
-		log.Fatalf("error creating server %s: %s", name, err)
+		log.Println("error creating server %s: %s", name, err)
 	}
-	return server
+
+	log.Println("Server created - " + name)
+	return server.Server
 }

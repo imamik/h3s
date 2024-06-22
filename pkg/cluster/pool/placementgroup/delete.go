@@ -6,11 +6,21 @@ import (
 	"log"
 )
 
-func Delete(pool config.NodePool, ctx clustercontext.ClusterContext) {
-	placementGroup := Get(pool, ctx)
+func Delete(
+	ctx clustercontext.ClusterContext,
+	pool config.NodePool,
+) {
+	placementGroup := Get(ctx, pool)
+	if placementGroup == nil {
+		return
+	}
+
+	log.Println("Deleting placement group - " + placementGroup.Name)
 
 	_, err := ctx.Client.PlacementGroup.Delete(ctx.Context, placementGroup)
 	if err != nil {
-		log.Fatalf("error deleting placement group: %s", err)
+		log.Println("error deleting placement group: ", err)
 	}
+
+	log.Println("Placement group deleted - " + placementGroup.Name)
 }

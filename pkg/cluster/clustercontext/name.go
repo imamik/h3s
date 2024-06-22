@@ -7,7 +7,7 @@ import (
 
 func buildGetNameFunc(conf config.Config) func(...string) string {
 	return func(names ...string) string {
-		names = append([]string{conf.Name}, names...)
+		names = append([]string{conf.Name, "k3s"}, names...)
 		return strings.Join(names, "-")
 	}
 }

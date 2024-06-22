@@ -5,6 +5,9 @@ import (
 	"hcloud-k3s-cli/pkg/config"
 )
 
-func getName(pool config.NodePool, ctx clustercontext.ClusterContext) string {
+func getName(
+	ctx clustercontext.ClusterContext,
+	pool config.NodePool,
+) string {
 	return ctx.GetName(pool.Name, "pool")
 }

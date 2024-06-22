@@ -25,6 +25,16 @@ func Survey(k3sReleases []releases.Release) (config.Config, error) {
 		Value(&conf.K3sVersion).
 		Run()
 
+	conf.SSHKeyPaths.PrivateKeyPath = "$HOME/.ssh/id_ed25519"
+
+	huh.NewInput().
+		Title("SHH Private Key Path").
+		Description("Path to the private key to use for SSH").
+		Value(&conf.SSHKeyPaths.PrivateKeyPath).
+		Run()
+
+	conf.SSHKeyPaths.PublicKeyPath = conf.SSHKeyPaths.PrivateKeyPath + ".pub"
+
 	huh.NewSelect[hcloud.NetworkZone]().
 		Title("Network Zone").
 		Description("The network zone to deploy the cluster in").

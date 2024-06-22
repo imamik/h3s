@@ -7,11 +7,11 @@ import (
 )
 
 type ClusterContext struct {
-	Config    config.Config
-	Context   context.Context
+	Config  config.Config
+	Context context.Context
+
 	GetName   func(...string) string
 	GetLabels func(...map[string]string) map[string]string
-	Client    *hcloud.Client
-	Network   *hcloud.Network
-	SSH       *hcloud.SSHKey
+
+	Client *hcloud.Client
 }

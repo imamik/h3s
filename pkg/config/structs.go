@@ -10,16 +10,22 @@ type NodePool struct {
 }
 
 type ControlPlane struct {
+	AsWorkerPool bool     `yaml:"as_worker_pool,omitempty"`
+	LoadBalancer bool     `yaml:"load_balancer,omitempty"`
 	Pool         NodePool `yaml:"pool"`
-	AsWorkerPool bool     `yaml:"asWorkerPool,omitempty"`
-	LoadBalancer bool     `yaml:"loadBalancer,omitempty"`
+}
+
+type SSHKeyPaths struct {
+	PrivateKeyPath string `yaml:"private_key_path"`
+	PublicKeyPath  string `yaml:"public_key_path"`
 }
 
 type Config struct {
 	Name                 string             `yaml:"name"`
-	K3sVersion           string             `yaml:"k3sVersion"`
-	NetworkZone          hcloud.NetworkZone `yaml:"networkZone"`
-	ControlPlane         ControlPlane       `yaml:"controlPlane"`
-	WorkerPools          []NodePool         `yaml:"workerPools"`
-	CombinedLoadBalancer bool               `yaml:"combinedLoadBalancer"`
+	K3sVersion           string             `yaml:"k3s_version"`
+	SSHKeyPaths          SSHKeyPaths        `yaml:"ssh_key_paths"`
+	NetworkZone          hcloud.NetworkZone `yaml:"network_zone"`
+	ControlPlane         ControlPlane       `yaml:"control_plane"`
+	WorkerPools          []NodePool         `yaml:"worker_pools"`
+	CombinedLoadBalancer bool               `yaml:"combined_load_balancer,omitempty"`
 }

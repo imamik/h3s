@@ -7,14 +7,22 @@ import (
 )
 
 func Delete(
+	ctx clustercontext.ClusterContext,
 	pool config.NodePool,
 	i int,
-	ctx clustercontext.ClusterContext,
 ) {
-	server := Get(pool, i, ctx)
+	server := Get(ctx, pool, i)
+
+	if server == nil {
+		return
+	}
+
+	log.Println("Deleting server - " + server.Name)
 
 	_, _, err := ctx.Client.Server.DeleteWithResult(ctx.Context, server)
 	if err != nil {
-		log.Fatalf("error deleting server: %s", err)
+		log.Printf("error deleting server: %s", err)
 	}
+
+	log.Println("Server deleted - " + server.Name)
 }

@@ -7,9 +7,18 @@ import (
 )
 
 func Get(ctx clustercontext.ClusterContext) *hcloud.Network {
-	network, _, err := ctx.Client.Network.GetByName(ctx.Context, getName(ctx))
+	networkName := getName(ctx)
+	log.Println("Getting network - " + networkName)
+
+	network, _, err := ctx.Client.Network.GetByName(ctx.Context, networkName)
 	if err != nil {
-		log.Fatalf("error getting network: %s", err)
+		log.Println("error getting network:", err)
 	}
+	if network == nil {
+		log.Println("network not found:", networkName)
+		return nil
+	}
+
+	log.Println("Network found - " + network.Name)
 	return network
 }

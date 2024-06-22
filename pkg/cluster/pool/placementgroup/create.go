@@ -7,15 +7,33 @@ import (
 	"log"
 )
 
-func Create(pool config.NodePool, ctx clustercontext.ClusterContext) hcloud.PlacementGroupCreateResult {
+func create(
+	ctx clustercontext.ClusterContext,
+	pool config.NodePool,
+) *hcloud.PlacementGroup {
+	placementGroupName := getName(ctx, pool)
+	log.Println("Creating placement group - " + placementGroupName)
+
 	placementGroupResp, _, err := ctx.Client.PlacementGroup.Create(ctx.Context, hcloud.PlacementGroupCreateOpts{
-		Name:   getName(pool, ctx),
+		Name:   placementGroupName,
 		Type:   hcloud.PlacementGroupTypeSpread,
 		Labels: ctx.GetLabels(),
 	})
 	if err != nil {
-		log.Fatalf("error creating placement group: %s", err)
+		log.Println("error creating placement group: ", err)
 	}
 
-	return placementGroupResp
+	log.Println("Placement group created - ", placementGroupName)
+	return placementGroupResp.PlacementGroup
+}
+
+func Create(
+	ctx clustercontext.ClusterContext,
+	pool config.NodePool,
+) *hcloud.PlacementGroup {
+	placementGroup := Get(ctx, pool)
+	if placementGroup == nil {
+		placementGroup = create(ctx, pool)
+	}
+	return placementGroup
 }

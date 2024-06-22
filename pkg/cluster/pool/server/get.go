@@ -7,10 +7,24 @@ import (
 	"log"
 )
 
-func Get(pool config.NodePool, i int, ctx clustercontext.ClusterContext) *hcloud.Server {
-	server, _, err := ctx.Client.Server.GetByName(ctx.Context, getName(pool, i, ctx))
+func Get(
+	ctx clustercontext.ClusterContext,
+	pool config.NodePool,
+	i int,
+) *hcloud.Server {
+	serverName := getName(ctx, pool, i)
+	log.Println("Getting server - " + serverName)
+
+	server, _, err := ctx.Client.Server.GetByName(ctx.Context, serverName)
 	if err != nil {
-		log.Fatalf("error getting placement group: %s", err)
+		log.Printf("error getting server: %s", err)
+		return nil
 	}
+	if server == nil {
+		log.Printf("server not found: %s", serverName)
+		return nil
+	}
+
+	log.Println("Server found - " + server.Name)
 	return server
 }
