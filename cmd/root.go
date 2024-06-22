@@ -3,8 +3,8 @@ package cmd
 import (
 	"fmt"
 	"github.com/spf13/cobra"
-	"hcloud-k3s-cli/cmd/cfg"
 	"hcloud-k3s-cli/cmd/cluster"
+	"hcloud-k3s-cli/cmd/config"
 	"hcloud-k3s-cli/cmd/k3s"
 	"os"
 )
@@ -19,7 +19,7 @@ var rootCmd = &cobra.Command{
 
 func init() {
 	rootCmd.AddCommand(k3s.K3s)
-	rootCmd.AddCommand(cfg.Cfg)
+	rootCmd.AddCommand(config.Config)
 	rootCmd.AddCommand(cluster.Cluster)
 }
 

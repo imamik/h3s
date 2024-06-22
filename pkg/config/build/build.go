@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"hcloud-k3s-cli/pkg/config/build/survey"
 	"hcloud-k3s-cli/pkg/k3s/releases"
+	"hcloud-k3s-cli/pkg/utils/yaml"
 )
 
 func Build(k3sReleases []releases.Release) {
@@ -15,7 +16,7 @@ func Build(k3sReleases []releases.Release) {
 		return
 	}
 
-	err = save(conf, "hcloud-k3s.yaml")
+	err = yaml.Save(conf, "hcloud-k3s.yaml")
 	if err != nil {
 		fmt.Println(err)
 		return

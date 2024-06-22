@@ -2,6 +2,7 @@ package cluster
 
 import (
 	"context"
+	"fmt"
 	"hcloud-k3s-cli/pkg/cluster/network"
 	"hcloud-k3s-cli/pkg/cluster/pool"
 	"hcloud-k3s-cli/pkg/cluster/utils"
@@ -11,6 +12,8 @@ import (
 func Destroy(conf config.Config) {
 	ctx := context.Background()
 	client := utils.GetClient()
+
+	fmt.Printf("Destroying Cluster %s", conf.Name)
 
 	network.Delete(ctx, client, conf)
 	pool.Delete(conf, client, ctx)
