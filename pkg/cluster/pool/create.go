@@ -47,7 +47,7 @@ func create(
 ) {
 	logger.LogResourceEvent(logger.Pool, logger.Create, ctx.GetName(pool.Name), logger.Initialized)
 
-	placementGroup := placementgroup.Create(ctx, pool)
+	placementGroup := placementgroup.Create(ctx, pool, isControlPlane, isWorker)
 
 	for i := 0; i < pool.Nodes; i++ {
 		server.Create(

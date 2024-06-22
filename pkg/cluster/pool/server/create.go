@@ -58,9 +58,10 @@ func create(
 		SSHKeys:        sshKeys,
 		PublicNet:      publicNet,
 		Labels: ctx.GetLabels(map[string]string{
-			"pool":           pool.Name,
-			"isControlPlane": strconv.FormatBool(isControlPlane),
-			"isWorker":       strconv.FormatBool(isWorker),
+			"pool":             pool.Name,
+			"node":             strconv.Itoa(i),
+			"is_control_plane": strconv.FormatBool(isControlPlane),
+			"is_worker":        strconv.FormatBool(isWorker),
 		}),
 	})
 	if err != nil {
