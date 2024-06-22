@@ -3,10 +3,12 @@ package config
 import "github.com/hetznercloud/hcloud-go/v2/hcloud"
 
 type NodePool struct {
-	Name     string        `yaml:"name"`
-	Nodes    int           `yaml:"nodes"`
-	Location Location      `yaml:"location"`
-	Instance CloudInstance `yaml:"instance"`
+	Name       string        `yaml:"name"`
+	Nodes      int           `yaml:"nodes"`
+	Location   Location      `yaml:"location"`
+	Instance   CloudInstance `yaml:"instance"`
+	EnableIPv4 bool          `yaml:"enable_ipv4,omitempty"`
+	EnableIPv6 bool          `yaml:"enable_ipv6,omitempty"`
 }
 
 type ControlPlane struct {

@@ -49,7 +49,7 @@ func Survey(k3sReleases []releases.Release) (config.Config, error) {
 	var controlPlaneNodesString string
 	huh.NewInput().
 		Title("Nodes").
-		Description("Number of control plane controlPlaneNodes. Must be an uneven number").
+		Description("Number of control plane nodes. Must be an uneven number").
 		Value(&controlPlaneNodesString).
 		Validate(config.IsUnevenNumberString).
 		CharLimit(1).
@@ -57,6 +57,18 @@ func Survey(k3sReleases []releases.Release) (config.Config, error) {
 
 	controlPlaneNodes, _ := strconv.Atoi(controlPlaneNodesString)
 	conf.ControlPlane.Pool.Nodes = controlPlaneNodes
+
+	huh.NewConfirm().
+		Title("Enable IPv4").
+		Description("Enable IPv4 for the nodes in this pool").
+		Value(&conf.ControlPlane.Pool.EnableIPv4).
+		Run()
+
+	huh.NewConfirm().
+		Title("Enable IPv6").
+		Description("Enable IPv6 for the nodes in this pool").
+		Value(&conf.ControlPlane.Pool.EnableIPv6).
+		Run()
 
 	huh.NewConfirm().
 		Title("Control Plane Load Balancer").
