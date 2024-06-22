@@ -2,6 +2,7 @@ package cluster
 
 import (
 	"context"
+	"fmt"
 	"hcloud-k3s-cli/pkg/cluster/network"
 	"hcloud-k3s-cli/pkg/cluster/pool"
 	"hcloud-k3s-cli/pkg/cluster/utils"
@@ -10,10 +11,11 @@ import (
 
 func Create(conf config.Config) {
 	ctx := context.Background()
-	client := utils.GetClient()
+	client := utils.GetClient(conf)
+
+	fmt.Printf("Creating Cluster %s", conf.Name)
 
 	n := network.Create(conf, client, ctx)
-
 	pool.CreatePools(n, conf, client, ctx)
 
 	// Step 4: Create Firewall

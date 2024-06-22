@@ -1,6 +1,7 @@
 package file
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 )
@@ -23,6 +24,7 @@ func Create(filePath string) error {
 		}
 	}
 
+	fmt.Println("Creating file", absPath)
 	file, err := os.Create(absPath)
 	if err != nil {
 		return err

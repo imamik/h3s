@@ -11,7 +11,9 @@ import (
 
 func Destroy(conf config.Config) {
 	ctx := context.Background()
-	client := utils.GetClient()
+	client := utils.GetClient(conf)
+
+	fmt.Printf("Destroying Cluster %s", conf.Name)
 
 	fmt.Printf("Destroying Cluster %s", conf.Name)
 
