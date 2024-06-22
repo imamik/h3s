@@ -1,10 +1,9 @@
 package network
 
 import (
-	"hcloud-k3s-cli/pkg/cluster/utils"
-	"hcloud-k3s-cli/pkg/config"
+	"hcloud-k3s-cli/pkg/cluster/clustercontext"
 )
 
-func getName(conf config.Config) string {
-	return utils.GetName("network", conf)
+func getName(ctx clustercontext.ClusterContext) string {
+	return ctx.GetName("network")
 }

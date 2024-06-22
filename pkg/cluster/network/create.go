@@ -1,10 +1,8 @@
 package network
 
 import (
-	"context"
 	"github.com/hetznercloud/hcloud-go/v2/hcloud"
-	"hcloud-k3s-cli/pkg/cluster/utils"
-	"hcloud-k3s-cli/pkg/config"
+	"hcloud-k3s-cli/pkg/cluster/clustercontext"
 	"log"
 	"net"
 )
@@ -17,11 +15,11 @@ func getIpRange(s string) *net.IPNet {
 	return ipRange
 }
 
-func Create(conf config.Config, client *hcloud.Client, ctx context.Context) *hcloud.Network {
-	network, _, err := client.Network.Create(ctx, hcloud.NetworkCreateOpts{
-		Name:    getName(conf),
+func Create(ctx clustercontext.ClusterContext) *hcloud.Network {
+	network, _, err := ctx.Client.Network.Create(ctx.Context, hcloud.NetworkCreateOpts{
+		Name:    getName(ctx),
 		IPRange: getIpRange("10.0.0.0/16"),
-		Labels:  utils.GetLabels(conf),
+		Labels:  ctx.GetLabels(),
 	})
 	if err != nil {
 		log.Fatalf("error creating network: %s", err)
@@ -30,10 +28,10 @@ func Create(conf config.Config, client *hcloud.Client, ctx context.Context) *hcl
 	subnet := hcloud.NetworkSubnet{
 		Type:        hcloud.NetworkSubnetTypeServer,
 		IPRange:     getIpRange("10.0.0.0/16"),
-		NetworkZone: conf.NetworkZone,
+		NetworkZone: ctx.Config.NetworkZone,
 	}
 
-	_, _, err = client.Network.AddSubnet(ctx, network, hcloud.NetworkAddSubnetOpts{
+	_, _, err = ctx.Client.Network.AddSubnet(ctx.Context, network, hcloud.NetworkAddSubnetOpts{
 		Subnet: subnet,
 	})
 	if err != nil {

@@ -1,21 +1,19 @@
 package pool
 
 import (
-	"context"
-	"fmt"
-	"github.com/hetznercloud/hcloud-go/v2/hcloud"
+	"hcloud-k3s-cli/pkg/cluster/clustercontext"
 	"hcloud-k3s-cli/pkg/cluster/pool/placementgroup"
 	"hcloud-k3s-cli/pkg/cluster/pool/server"
 	"hcloud-k3s-cli/pkg/config"
 )
 
-func CreatePools(n *hcloud.Network, conf config.Config, client *hcloud.Client, ctx context.Context) {
+func CreatePools(ctx clustercontext.ClusterContext) {
 	// Create control plane pool
-	create(conf.ControlPlane.Pool, true, conf.ControlPlane.AsWorkerPool, n, conf, client, ctx)
+	create(ctx.Config.ControlPlane.Pool, true, ctx.Config.ControlPlane.AsWorkerPool, ctx)
 
 	// Create worker pools
-	for _, pool := range conf.WorkerPools {
-		create(pool, false, true, n, conf, client, ctx)
+	for _, pool := range ctx.Config.WorkerPools {
+		create(pool, false, true, ctx)
 	}
 }
 
@@ -23,18 +21,11 @@ func create(
 	pool config.NodePool,
 	isControlPlane bool,
 	isWorker bool,
-	network *hcloud.Network,
-	conf config.Config,
-	client *hcloud.Client,
-	ctx context.Context,
+	ctx clustercontext.ClusterContext,
 ) {
-	placementGroup := placementgroup.Create(pool.Name+"-pool", conf, client, ctx)
+	placementGroup := placementgroup.Create(pool, ctx)
 
 	for i := 0; i < pool.Nodes; i++ {
-		nodeName := fmt.Sprintf("%s-node-%d", pool.Name, i+1)
-		server.Create(
-			nodeName, isControlPlane, isWorker, pool,
-			network, placementGroup, conf, client, ctx,
-		)
+		server.Create(pool, i, isControlPlane, isWorker, placementGroup, ctx)
 	}
 }

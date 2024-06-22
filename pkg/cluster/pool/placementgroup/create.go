@@ -1,18 +1,17 @@
 package placementgroup
 
 import (
-	"context"
 	"github.com/hetznercloud/hcloud-go/v2/hcloud"
-	"hcloud-k3s-cli/pkg/cluster/utils"
+	"hcloud-k3s-cli/pkg/cluster/clustercontext"
 	"hcloud-k3s-cli/pkg/config"
 	"log"
 )
 
-func Create(name string, conf config.Config, client *hcloud.Client, ctx context.Context) hcloud.PlacementGroupCreateResult {
-	placementGroupResp, _, err := client.PlacementGroup.Create(ctx, hcloud.PlacementGroupCreateOpts{
-		Name:   utils.GetName(name, conf),
+func Create(pool config.NodePool, ctx clustercontext.ClusterContext) hcloud.PlacementGroupCreateResult {
+	placementGroupResp, _, err := ctx.Client.PlacementGroup.Create(ctx.Context, hcloud.PlacementGroupCreateOpts{
+		Name:   getName(pool, ctx),
 		Type:   hcloud.PlacementGroupTypeSpread,
-		Labels: utils.GetLabels(conf),
+		Labels: ctx.GetLabels(),
 	})
 	if err != nil {
 		log.Fatalf("error creating placement group: %s", err)

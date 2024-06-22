@@ -1,17 +1,16 @@
 package network
 
 import (
-	"context"
-	"github.com/hetznercloud/hcloud-go/v2/hcloud"
-	"hcloud-k3s-cli/pkg/config"
+	"hcloud-k3s-cli/pkg/cluster/clustercontext"
 	"log"
 )
 
-func Delete(ctx context.Context, client *hcloud.Client, conf config.Config) {
-	network := Get(ctx, client, conf)
+func Delete(ctx clustercontext.ClusterContext) {
+	network := Get(ctx)
 
-	_, err := client.Network.Delete(ctx, network)
+	_, err := ctx.Client.Network.Delete(ctx.Context, network)
 	if err != nil {
 		log.Fatalf("error deleting network: %s", err)
 	}
+	ctx.Network = nil
 }
