@@ -17,7 +17,6 @@ func GetClient(conf config.Config) *hcloud.Client {
 		fmt.Println("Option 2: Set the environment variable HCLOUD_TOKEN")
 		os.Exit(1)
 	}
-	// print the first 5 characters of the token
 	fmt.Printf("Using Hetzner Cloud Token: '%s...'\n", cred.HCloudToken[:10])
 	return hcloud.NewClient(hcloud.WithToken(cred.HCloudToken))
 }

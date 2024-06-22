@@ -16,7 +16,7 @@ func getLocation(title string, description string, networkZone hcloud.NetworkZon
 			Description(description).
 			Options(
 				huh.NewOption("Nürnberg (nbg1)", config.Nuernberg),
-				huh.NewOption("Falkenstein (fasn1)", config.Falkenstein),
+				huh.NewOption("Falkenstein (fsn1)", config.Falkenstein),
 				huh.NewOption("Helsinki (hel1)", config.Helsinki),
 			).
 			Value(&location).

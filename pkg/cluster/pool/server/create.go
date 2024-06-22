@@ -13,29 +13,35 @@ func Create(
 	name string,
 	isControlPlane bool,
 	isWorker bool,
-	location config.Location,
-	instance config.CloudInstance,
+	pool config.NodePool,
 	network *hcloud.Network,
 	placementGroup hcloud.PlacementGroupCreateResult,
 	conf config.Config,
 	client *hcloud.Client,
 	ctx context.Context,
 ) hcloud.ServerCreateResult {
-	image := &hcloud.Image{Name: "ubuntu-20.04"}
-	serverType := &hcloud.ServerType{Name: string(instance)}
-	datacenter := &hcloud.Datacenter{
-		Location: &hcloud.Location{Name: string(location)},
+	name = utils.GetName(name, conf)
+	image := &hcloud.Image{Name: "ubuntu-24.04"}
+	serverType := &hcloud.ServerType{Name: string(pool.Instance)}
+	location := &hcloud.Location{Name: string(pool.Location)}
+	publicNet := &hcloud.ServerCreatePublicNet{
+		EnableIPv4: false,
+		EnableIPv6: false,
 	}
+	networks := []*hcloud.Network{network}
+	sshKeys := []*hcloud.SSHKey{}
 
 	server, _, err := client.Server.Create(ctx, hcloud.ServerCreateOpts{
-		Name:           utils.GetName(name, conf),
+		Name:           name,
 		ServerType:     serverType,
 		Image:          image,
-		Datacenter:     datacenter,
-		Networks:       []*hcloud.Network{network},
+		Location:       location,
+		Networks:       networks,
 		PlacementGroup: placementGroup.PlacementGroup,
-		SSHKeys:        []*hcloud.SSHKey{},
+		SSHKeys:        sshKeys,
+		PublicNet:      publicNet,
 		Labels: utils.GetLabels(conf, map[string]string{
+			"pool":           pool.Name,
 			"isControlPlane": strconv.FormatBool(isControlPlane),
 			"isWorker":       strconv.FormatBool(isWorker),
 		}),

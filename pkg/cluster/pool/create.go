@@ -33,7 +33,7 @@ func create(
 	for i := 0; i < pool.Nodes; i++ {
 		nodeName := fmt.Sprintf("%s-node-%d", pool.Name, i+1)
 		server.Create(
-			nodeName, isControlPlane, isWorker, pool.Location, pool.Instance,
+			nodeName, isControlPlane, isWorker, pool,
 			network, placementGroup, conf, client, ctx,
 		)
 	}
