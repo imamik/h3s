@@ -1,7 +1,7 @@
 package network
 
 import (
-	"hcloud-k3s-cli/pkg/cluster/clustercontext"
+	"hcloud-k3s-cli/pkg/resources/clustercontext"
 	"hcloud-k3s-cli/pkg/utils/logger"
 )
 

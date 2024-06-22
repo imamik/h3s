@@ -2,8 +2,8 @@ package server
 
 import (
 	"github.com/hetznercloud/hcloud-go/v2/hcloud"
-	"hcloud-k3s-cli/pkg/cluster/clustercontext"
 	"hcloud-k3s-cli/pkg/config"
+	"hcloud-k3s-cli/pkg/resources/clustercontext"
 	"hcloud-k3s-cli/pkg/utils/logger"
 	"strconv"
 )

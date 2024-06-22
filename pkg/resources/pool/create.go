@@ -2,10 +2,10 @@ package pool
 
 import (
 	"github.com/hetznercloud/hcloud-go/v2/hcloud"
-	"hcloud-k3s-cli/pkg/cluster/clustercontext"
-	"hcloud-k3s-cli/pkg/cluster/pool/placementgroup"
-	"hcloud-k3s-cli/pkg/cluster/pool/server"
 	"hcloud-k3s-cli/pkg/config"
+	"hcloud-k3s-cli/pkg/resources/clustercontext"
+	"hcloud-k3s-cli/pkg/resources/pool/placementgroup"
+	"hcloud-k3s-cli/pkg/resources/pool/server"
 	"hcloud-k3s-cli/pkg/utils/logger"
 )
 

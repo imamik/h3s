@@ -1,12 +1,12 @@
-package cluster
+package resources
 
 import (
 	"fmt"
-	"hcloud-k3s-cli/pkg/cluster/clustercontext"
-	"hcloud-k3s-cli/pkg/cluster/network"
-	"hcloud-k3s-cli/pkg/cluster/pool"
-	"hcloud-k3s-cli/pkg/cluster/sshkey"
 	"hcloud-k3s-cli/pkg/config"
+	"hcloud-k3s-cli/pkg/resources/clustercontext"
+	"hcloud-k3s-cli/pkg/resources/network"
+	"hcloud-k3s-cli/pkg/resources/pool"
+	"hcloud-k3s-cli/pkg/resources/sshkey"
 )
 
 func Destroy(conf config.Config) {

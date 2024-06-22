@@ -1,10 +1,10 @@
 package pool
 
 import (
-	"hcloud-k3s-cli/pkg/cluster/clustercontext"
-	"hcloud-k3s-cli/pkg/cluster/pool/placementgroup"
-	"hcloud-k3s-cli/pkg/cluster/pool/server"
 	"hcloud-k3s-cli/pkg/config"
+	"hcloud-k3s-cli/pkg/resources/clustercontext"
+	"hcloud-k3s-cli/pkg/resources/pool/placementgroup"
+	"hcloud-k3s-cli/pkg/resources/pool/server"
 	"hcloud-k3s-cli/pkg/utils/logger"
 )
 
