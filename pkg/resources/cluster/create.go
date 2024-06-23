@@ -2,9 +2,9 @@ package cluster
 
 import (
 	"hcloud-k3s-cli/pkg/clustercontext"
-	"hcloud-k3s-cli/pkg/resources/cluster/network"
-	"hcloud-k3s-cli/pkg/resources/cluster/pool"
-	"hcloud-k3s-cli/pkg/resources/cluster/sshkey"
+	"hcloud-k3s-cli/pkg/resources/network"
+	"hcloud-k3s-cli/pkg/resources/pool"
+	"hcloud-k3s-cli/pkg/resources/sshkey"
 	"hcloud-k3s-cli/pkg/utils/logger"
 )
 

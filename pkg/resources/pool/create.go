@@ -4,8 +4,8 @@ import (
 	"github.com/hetznercloud/hcloud-go/v2/hcloud"
 	"hcloud-k3s-cli/pkg/clustercontext"
 	"hcloud-k3s-cli/pkg/config"
-	"hcloud-k3s-cli/pkg/resources/cluster/pool/placementgroup"
-	"hcloud-k3s-cli/pkg/resources/cluster/pool/server"
+	"hcloud-k3s-cli/pkg/resources/placementgroup"
+	"hcloud-k3s-cli/pkg/resources/server"
 	"hcloud-k3s-cli/pkg/utils/logger"
 )
 
