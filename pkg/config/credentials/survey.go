@@ -1,6 +1,8 @@
 package credentials
 
 import (
+	"crypto/rand"
+	"encoding/hex"
 	"github.com/charmbracelet/huh"
 	"hcloud-k3s-cli/pkg/config"
 )
@@ -18,6 +20,12 @@ func surveyName() string {
 	return name
 }
 
+func generateToken(length int) string {
+	bytes := make([]byte, length)
+	_, _ = rand.Read(bytes)
+	return hex.EncodeToString(bytes)
+}
+
 func surveyCredentials() ProjectCredentials {
 	var projectCredentials ProjectCredentials
 
@@ -27,6 +35,8 @@ func surveyCredentials() ProjectCredentials {
 		Validate(ValidateHCloudToken).
 		Value(&projectCredentials.HCloudToken).
 		Run()
+
+	projectCredentials.K3sToken = generateToken(32)
 
 	return projectCredentials
 
