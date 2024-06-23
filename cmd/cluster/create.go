@@ -5,7 +5,6 @@ import (
 	"hcloud-k3s-cli/pkg/clustercontext"
 	"hcloud-k3s-cli/pkg/k3s/install"
 	"hcloud-k3s-cli/pkg/resources/cluster"
-	"hcloud-k3s-cli/pkg/resources/server"
 )
 
 var Create = &cobra.Command{
@@ -14,10 +13,6 @@ var Create = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		ctx := clustercontext.Context()
 		cluster.Create(ctx)
-		servers := server.GetAll(ctx)
-
-		for _, server := range servers {
-			install.Install(ctx, server)
-		}
+		install.Install(ctx)
 	},
 }

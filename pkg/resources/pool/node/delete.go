@@ -1,4 +1,4 @@
-package server
+package node
 
 import (
 	"hcloud-k3s-cli/pkg/clustercontext"

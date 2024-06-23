@@ -1,10 +1,23 @@
 package ssh
 
 import (
+	"github.com/hetznercloud/hcloud-go/v2/hcloud"
 	"github.com/melbahja/goph"
+	"hcloud-k3s-cli/pkg/clustercontext"
 	"hcloud-k3s-cli/pkg/utils/file"
 	"log"
 )
+
+func Client(
+	ctx clustercontext.ClusterContext,
+	gate *hcloud.Server,
+) *goph.Client {
+	gateWayIp := gate.PublicNet.IPv4.IP.String()
+	privateKeyPath := ctx.Config.SSHKeyPaths.PrivateKeyPath
+	client := getClient(gateWayIp, privateKeyPath, "")
+	uploadCertsToServer(ctx, client)
+	return client
+}
 
 func getClient(
 	ip string,

@@ -1,4 +1,4 @@
-package server
+package node
 
 import (
 	"github.com/hetznercloud/hcloud-go/v2/hcloud"

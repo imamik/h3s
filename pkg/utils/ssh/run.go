@@ -8,12 +8,6 @@ import (
 )
 
 func run(client *goph.Client, command string) {
-	defer func(client *goph.Client) {
-		err := client.Close()
-		if err != nil {
-			log.Fatal(err)
-		}
-	}(client)
 
 	// Create a new command
 	cmd, err := client.Command(command)
