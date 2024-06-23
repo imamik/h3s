@@ -28,6 +28,6 @@ type Config struct {
 	SSHKeyPaths          SSHKeyPaths        `yaml:"ssh_key_paths"`
 	NetworkZone          hcloud.NetworkZone `yaml:"network_zone"`
 	ControlPlane         ControlPlane       `yaml:"control_plane"`
-	WorkerPools          []NodePool         `yaml:"worker_pools"`
+	WorkerPools          *[]NodePool        `yaml:"worker_pools,omitempty"`
 	CombinedLoadBalancer bool               `yaml:"combined_load_balancer,omitempty"`
 }

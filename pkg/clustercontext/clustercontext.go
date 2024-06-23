@@ -11,10 +11,11 @@ func Context() ClusterContext {
 	projectCredentials, _ := credentials.Get(conf)
 
 	return ClusterContext{
-		Config:    conf,
-		Client:    GetClient(projectCredentials),
-		Context:   context.Background(),
-		GetName:   buildGetNameFunc(conf),
-		GetLabels: buildGetLabelsFunc(conf),
+		Config:      conf,
+		Credentials: projectCredentials,
+		Client:      GetClient(projectCredentials),
+		Context:     context.Background(),
+		GetName:     buildGetNameFunc(conf),
+		GetLabels:   buildGetLabelsFunc(conf),
 	}
 }

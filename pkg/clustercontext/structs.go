@@ -4,11 +4,13 @@ import (
 	"context"
 	"github.com/hetznercloud/hcloud-go/v2/hcloud"
 	"hcloud-k3s-cli/pkg/config"
+	"hcloud-k3s-cli/pkg/config/credentials"
 )
 
 type ClusterContext struct {
-	Config  config.Config
-	Context context.Context
+	Config      config.Config
+	Credentials credentials.ProjectCredentials
+	Context     context.Context
 
 	GetName   func(...string) string
 	GetLabels func(...map[string]string) map[string]string

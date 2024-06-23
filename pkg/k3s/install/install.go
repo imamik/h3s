@@ -5,6 +5,7 @@ import (
 	"github.com/hetznercloud/hcloud-go/v2/hcloud"
 	"github.com/melbahja/goph"
 	"hcloud-k3s-cli/pkg/clustercontext"
+	"hcloud-k3s-cli/pkg/k3s/install/command"
 	"hcloud-k3s-cli/pkg/resources/gateway"
 	"hcloud-k3s-cli/pkg/resources/server"
 	"hcloud-k3s-cli/pkg/utils/ssh"
@@ -19,6 +20,16 @@ func Install(
 		return
 	}
 
+	var controlPlaneNodes []*hcloud.Server
+	var workerNodes []*hcloud.Server
+	for _, node := range nodes {
+		if node.Labels["is_control_plane"] == "true" {
+			controlPlaneNodes = append(controlPlaneNodes, node)
+		} else {
+			workerNodes = append(workerNodes, node)
+		}
+	}
+
 	gate := gateway.Create(ctx)
 	client := ssh.Client(ctx, gate)
 
@@ -29,24 +40,17 @@ func Install(
 		}
 	}(client)
 
-	for _, node := range nodes {
-		installOnNode(ctx, client, node)
+	for _, node := range controlPlaneNodes {
+		cmd := command.ControlPlane(ctx, controlPlaneNodes, node)
+		fmt.Printf("Installing controle plane k3s on %s\n", node.Name)
+		ssh.Execute(ctx, client, node, cmd)
+	}
+
+	for _, node := range workerNodes {
+		cmd := command.Worker(ctx, controlPlaneNodes)
+		fmt.Printf("Installing worker k3s on %s\n", node.Name)
+		ssh.Execute(ctx, client, node, cmd)
 	}
 
 	gateway.Delete(ctx)
-}
-
-func installOnNode(
-	ctx clustercontext.ClusterContext,
-	client *goph.Client,
-	node *hcloud.Server,
-) {
-	version := ctx.Config.K3sVersion
-	command := fmt.Sprintf("curl -sfL https://get.k3s.io | INSTALL_K3S_VERSION=%s sh -", version)
-
-	//isControlPlane := node.Labels["is_control_plane"] == "true"
-	//isWorker := node.Labels["is_worker"] == "true"
-
-	fmt.Printf("Installing k3s on %s\n", node.Name)
-	ssh.Execute(ctx, client, node, command)
 }
