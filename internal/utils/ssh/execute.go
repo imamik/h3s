@@ -35,6 +35,7 @@ func Execute(
 	}
 
 	// Connect to proxy
+	fmt.Printf("Connecting to proxy (%s)\n", proxyIp)
 	proxyConn, err := ssh.Dial("tcp", proxyIp+":22", sshConfig)
 	if err != nil {
 		return "", fmt.Errorf("unable to connect to proxy: %w", err)
@@ -47,12 +48,14 @@ func Execute(
 	}(proxyConn)
 
 	// Create a tunnel to the remote server via the proxy
+	fmt.Printf("Creating tunnel to remote (%s)\n", remoteIp)
 	tunnel, err := proxyConn.Dial("tcp", remoteIp+":22")
 	if err != nil {
 		return "", fmt.Errorf("unable to create tunnel to remote: %w", err)
 	}
 
 	// Establish SSH connection to remote server through the tunnel
+	fmt.Printf("Establishing connection to remote (%s)\n", remoteIp)
 	clientConn, chans, reqs, err := ssh.NewClientConn(tunnel, remoteIp+":22", sshConfig)
 	if err != nil {
 		return "", fmt.Errorf("unable to establish connection to remote: %w", err)
@@ -66,6 +69,17 @@ func Execute(
 	}(client)
 
 	// Run command on remote server
+	fmt.Printf(`
+
+=================================================================================
+=========================== Running command on remote ===========================
+=================================================================================
+
+Command: %v
+
+=================================================================================
+
+`, command)
 	session, err := client.NewSession()
 	if err != nil {
 		return "", fmt.Errorf("unable to create session on remote: %w", err)
@@ -105,5 +119,12 @@ func Execute(
 		return "", fmt.Errorf("command execution failed: %w", err)
 	}
 
+	fmt.Println(`
+
+=================================================================================
+=================================================================================
+=================================================================================
+
+`, command)
 	return "", nil
 }

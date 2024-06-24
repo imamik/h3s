@@ -6,15 +6,25 @@ import (
 	"hcloud-k3s-cli/internal/utils/logger"
 )
 
-func Create(ctx clustercontext.ClusterContext, network *hcloud.Network, balancerType Type) *hcloud.LoadBalancer {
+func Create(
+	ctx clustercontext.ClusterContext,
+	network *hcloud.Network,
+	targets []hcloud.LoadBalancerCreateOptsTarget,
+	balancerType Type,
+) *hcloud.LoadBalancer {
 	balancer := Get(ctx, balancerType)
 	if balancer == nil {
-		balancer = create(ctx, network, balancerType)
+		balancer = create(ctx, network, targets, balancerType)
 	}
 	return balancer
 }
 
-func create(ctx clustercontext.ClusterContext, network *hcloud.Network, balancerType Type) *hcloud.LoadBalancer {
+func create(
+	ctx clustercontext.ClusterContext,
+	network *hcloud.Network,
+	targets []hcloud.LoadBalancerCreateOptsTarget,
+	balancerType Type,
+) *hcloud.LoadBalancer {
 	name := getName(ctx, balancerType)
 
 	logger.LogResourceEvent(logger.LoadBalancer, logger.Create, name, logger.Initialized)
@@ -40,18 +50,20 @@ func create(ctx clustercontext.ClusterContext, network *hcloud.Network, balancer
 	labels := ctx.GetLabels(map[string]string{
 		"type": string(balancerType),
 	})
-	location := &hcloud.Location{Name: string(ctx.Config.ControlPlane.Pool.Location)}
+	location := hcloud.Location{Name: string(ctx.Config.ControlPlane.Pool.Location)}
 
-	balancer, _, err := ctx.Client.LoadBalancer.Create(ctx.Context, hcloud.LoadBalancerCreateOpts{
+	opts := hcloud.LoadBalancerCreateOpts{
 		Name:             name,
-		NetworkZone:      ctx.Config.NetworkZone,
+		Targets:          targets,
+		Location:         &location,
 		Network:          network,
-		Location:         location,
 		Algorithm:        &algorithm,
 		LoadBalancerType: &loadBalancerType,
 		Services:         services,
 		Labels:           labels,
-	})
+	}
+
+	balancer, _, err := ctx.Client.LoadBalancer.Create(ctx.Context, opts)
 	if err != nil || balancer.LoadBalancer == nil {
 		logger.LogResourceEvent(logger.LoadBalancer, logger.Create, name, logger.Failure, err)
 	}

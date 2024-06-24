@@ -5,6 +5,7 @@ import (
 	"github.com/hetznercloud/hcloud-go/v2/hcloud"
 	"hcloud-k3s-cli/internal/clustercontext"
 	"hcloud-k3s-cli/internal/k3s/install/command"
+	"hcloud-k3s-cli/internal/resources/pool/node"
 	"hcloud-k3s-cli/internal/resources/proxy"
 	"hcloud-k3s-cli/internal/resources/server"
 	"hcloud-k3s-cli/internal/utils/ssh"
@@ -17,11 +18,11 @@ func Install(
 
 	var controlPlaneNodes []*hcloud.Server
 	var workerNodes []*hcloud.Server
-	for _, node := range nodes {
-		if node.Labels["is_control_plane"] == "true" {
-			controlPlaneNodes = append(controlPlaneNodes, node)
-		} else if node.Labels["is_worker"] == "true" {
-			workerNodes = append(workerNodes, node)
+	for _, n := range nodes {
+		if node.IsControlPlaneNode(n) {
+			controlPlaneNodes = append(controlPlaneNodes, n)
+		} else if node.IsWorkerNode(n) {
+			workerNodes = append(workerNodes, n)
 		}
 	}
 

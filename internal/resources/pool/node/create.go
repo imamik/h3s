@@ -38,10 +38,10 @@ func create(
 	name := getName(ctx, pool, i)
 	logger.LogResourceEvent(logger.Server, logger.Create, name, logger.Initialized)
 
-	image := &hcloud.Image{Name: "ubuntu-24.04"}
-	serverType := &hcloud.ServerType{Name: string(pool.Instance)}
-	location := &hcloud.Location{Name: string(pool.Location)}
-	publicNet := &hcloud.ServerCreatePublicNet{
+	image := hcloud.Image{Name: "ubuntu-24.04"}
+	serverType := hcloud.ServerType{Name: string(pool.Instance)}
+	location := hcloud.Location{Name: string(pool.Location)}
+	publicNet := hcloud.ServerCreatePublicNet{
 		EnableIPv4: pool.EnableIPv4,
 		EnableIPv6: pool.EnableIPv6,
 	}
@@ -50,13 +50,13 @@ func create(
 
 	server, _, err := ctx.Client.Server.Create(ctx.Context, hcloud.ServerCreateOpts{
 		Name:           name,
-		ServerType:     serverType,
-		Image:          image,
-		Location:       location,
+		ServerType:     &serverType,
+		Image:          &image,
+		Location:       &location,
 		Networks:       networks,
 		PlacementGroup: placementGroup,
 		SSHKeys:        sshKeys,
-		PublicNet:      publicNet,
+		PublicNet:      &publicNet,
 		Labels: ctx.GetLabels(map[string]string{
 			"pool":                 pool.Name,
 			"node":                 strconv.Itoa(i),
