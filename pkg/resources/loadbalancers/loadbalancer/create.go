@@ -19,19 +19,36 @@ func create(ctx clustercontext.ClusterContext, network *hcloud.Network, balancer
 
 	logger.LogResourceEvent(logger.LoadBalancer, logger.Create, name, logger.Initialized)
 
+	services := []hcloud.LoadBalancerCreateOptsService{
+		{
+			Protocol:        hcloud.LoadBalancerServiceProtocolHTTP,
+			ListenPort:      hcloud.Ptr(80),
+			DestinationPort: hcloud.Ptr(80),
+		},
+		{
+			Protocol:        hcloud.LoadBalancerServiceProtocolTCP,
+			ListenPort:      hcloud.Ptr(6443),
+			DestinationPort: hcloud.Ptr(6443),
+		},
+	}
+	algorithm := hcloud.LoadBalancerAlgorithm{
+		Type: "round_robin",
+	}
+	loadBalancerType := hcloud.LoadBalancerType{
+		Name: "lb11",
+	}
+	labels := ctx.GetLabels(map[string]string{
+		"type": string(balancerType),
+	})
+
 	balancer, _, err := ctx.Client.LoadBalancer.Create(ctx.Context, hcloud.LoadBalancerCreateOpts{
-		Name:        name,
-		NetworkZone: ctx.Config.NetworkZone,
-		Network:     network,
-		Algorithm: &hcloud.LoadBalancerAlgorithm{
-			Type: "round_robin",
-		},
-		LoadBalancerType: &hcloud.LoadBalancerType{
-			Name: "lb11",
-		},
-		Labels: ctx.GetLabels(map[string]string{
-			"type": string(balancerType),
-		}),
+		Name:             name,
+		NetworkZone:      ctx.Config.NetworkZone,
+		Network:          network,
+		Algorithm:        &algorithm,
+		LoadBalancerType: &loadBalancerType,
+		Services:         services,
+		Labels:           labels,
 	})
 	if err != nil || balancer.LoadBalancer == nil {
 		logger.LogResourceEvent(logger.LoadBalancer, logger.Create, name, logger.Failure, err)
