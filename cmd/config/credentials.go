@@ -2,7 +2,7 @@ package config
 
 import (
 	"github.com/spf13/cobra"
-	"hcloud-k3s-cli/pkg/config/credentials"
+	"hcloud-k3s-cli/internal/config/credentials"
 )
 
 var Credentials = &cobra.Command{

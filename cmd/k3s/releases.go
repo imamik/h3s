@@ -2,7 +2,7 @@ package k3s
 
 import (
 	"github.com/spf13/cobra"
-	"hcloud-k3s-cli/pkg/k3s/releases"
+	"hcloud-k3s-cli/internal/k3s/releases"
 )
 
 var (

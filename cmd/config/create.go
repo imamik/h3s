@@ -3,8 +3,8 @@ package config
 import (
 	"fmt"
 	"github.com/spf13/cobra"
-	"hcloud-k3s-cli/pkg/config/build"
-	"hcloud-k3s-cli/pkg/k3s/releases"
+	"hcloud-k3s-cli/internal/config/build"
+	"hcloud-k3s-cli/internal/k3s/releases"
 )
 
 var Create = &cobra.Command{
