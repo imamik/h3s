@@ -13,6 +13,7 @@ var Create = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		ctx := clustercontext.Context()
 		cluster.Create(ctx)
+
 		install.Install(ctx)
 	},
 }

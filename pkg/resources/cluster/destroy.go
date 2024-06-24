@@ -4,6 +4,7 @@ import (
 	"hcloud-k3s-cli/pkg/clustercontext"
 	"hcloud-k3s-cli/pkg/resources/network"
 	"hcloud-k3s-cli/pkg/resources/pool"
+	"hcloud-k3s-cli/pkg/resources/proxy"
 	"hcloud-k3s-cli/pkg/resources/sshkey"
 	"hcloud-k3s-cli/pkg/utils/logger"
 )
@@ -14,6 +15,7 @@ func Destroy(ctx clustercontext.ClusterContext) {
 	pool.Delete(ctx)
 	network.Delete(ctx)
 	sshkey.Delete(ctx)
+	proxy.Delete(ctx)
 
 	logger.LogResourceEvent(logger.Cluster, logger.Delete, ctx.Config.Name, logger.Success)
 }

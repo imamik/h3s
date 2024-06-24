@@ -1,4 +1,4 @@
-package gateway
+package proxy
 
 import (
 	"github.com/hetznercloud/hcloud-go/v2/hcloud"
@@ -8,7 +8,7 @@ import (
 )
 
 func getName(ctx clustercontext.ClusterContext) string {
-	return ctx.GetName("gateway")
+	return ctx.GetName("proxy")
 }
 
 func getServer(ctx clustercontext.ClusterContext) (*hcloud.Server, error) {
@@ -57,7 +57,7 @@ func createServer(
 		SSHKeys:    sshKeys,
 		PublicNet:  publicNet,
 		Labels: ctx.GetLabels(map[string]string{
-			"is_gateway": "true",
+			"is_proxy": "true",
 		}),
 	})
 	if err != nil {

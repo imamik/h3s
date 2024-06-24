@@ -1,4 +1,4 @@
-package gateway
+package proxy
 
 import (
 	"github.com/hetznercloud/hcloud-go/v2/hcloud"
