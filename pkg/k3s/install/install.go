@@ -54,12 +54,14 @@ func Install(
 		cmd := command.ControlPlane(ctx, controlPlaneNodes, node)
 		fmt.Printf("Installing controle plane k3s on %s\n", node.Name)
 		ssh.Execute(ctx, p, node, cmd)
+		ctx.Client.Server.Reboot(ctx.Context, node) // make sure to reboot the server after installation
 	}
 
 	for _, node := range workerNodes {
 		cmd := command.Worker(ctx, controlPlaneNodes)
 		fmt.Printf("Installing worker k3s on %s\n", node.Name)
 		ssh.Execute(ctx, p, node, cmd)
+		ctx.Client.Server.Reboot(ctx.Context, node) // make sure to reboot the server after installation
 	}
 
 	proxy.Delete(ctx)

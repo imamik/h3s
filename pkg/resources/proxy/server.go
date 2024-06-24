@@ -73,7 +73,7 @@ func createServer(
 
 func deleteServer(ctx clustercontext.ClusterContext) {
 	server, err := getServer(ctx)
-	if err != nil {
+	if err != nil || server == nil {
 		return
 	}
 
