@@ -50,10 +50,10 @@ func create(ctx clustercontext.ClusterContext) *hcloud.Network {
 		Subnet: subnet,
 	})
 	if err != nil || subNet == nil {
-		logger.LogResourceEvent(logger.Network, logger.Create, networkName, logger.Failure, err)
+		logger.LogResourceEvent(logger.Subnet, logger.Create, networkName, logger.Failure, err)
 	}
 
-	logger.LogResourceEvent(logger.Network, logger.Create, networkName, logger.Success)
+	logger.LogResourceEvent(logger.Subnet, logger.Create, networkName, logger.Success)
 
 	return network
 }

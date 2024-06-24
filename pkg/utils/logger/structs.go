@@ -13,6 +13,7 @@ const (
 	Pool           LogResource = "Pool"
 	PlacementGroup LogResource = "Placement Group"
 	Server         LogResource = "Server"
+	LoadBalancer   LogResource = "Load Balancer"
 )
 
 type LogCrudMethod string

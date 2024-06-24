@@ -2,6 +2,7 @@ package cluster
 
 import (
 	"hcloud-k3s-cli/pkg/clustercontext"
+	"hcloud-k3s-cli/pkg/resources/loadbalancers"
 	"hcloud-k3s-cli/pkg/resources/network"
 	"hcloud-k3s-cli/pkg/resources/pool"
 	"hcloud-k3s-cli/pkg/resources/proxy"
@@ -16,6 +17,7 @@ func Destroy(ctx clustercontext.ClusterContext) {
 	network.Delete(ctx)
 	sshkey.Delete(ctx)
 	proxy.Delete(ctx)
+	loadbalancers.Delete(ctx)
 
 	logger.LogResourceEvent(logger.Cluster, logger.Delete, ctx.Config.Name, logger.Success)
 }

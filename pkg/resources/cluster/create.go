@@ -2,6 +2,7 @@ package cluster
 
 import (
 	"hcloud-k3s-cli/pkg/clustercontext"
+	"hcloud-k3s-cli/pkg/resources/loadbalancers"
 	"hcloud-k3s-cli/pkg/resources/network"
 	"hcloud-k3s-cli/pkg/resources/pool"
 	"hcloud-k3s-cli/pkg/resources/sshkey"
@@ -13,7 +14,8 @@ func Create(ctx clustercontext.ClusterContext) {
 
 	sshKey := sshkey.Create(ctx)
 	net := network.Create(ctx)
-	pool.CreatePools(ctx, sshKey, net)
+	nodes := pool.CreatePools(ctx, sshKey, net)
+	loadbalancers.Create(ctx, net, nodes)
 
 	logger.LogResourceEvent(logger.Cluster, logger.Create, ctx.Config.Name, logger.Success)
 }

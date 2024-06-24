@@ -13,9 +13,9 @@ func CreatePools(
 	ctx clustercontext.ClusterContext,
 	sshKey *hcloud.SSHKey,
 	network *hcloud.Network,
-) {
+) []*hcloud.Server {
 	// Create control plane pool
-	create(
+	nodes := create(
 		ctx,
 		sshKey,
 		network,
@@ -26,7 +26,7 @@ func CreatePools(
 
 	// Create worker pools
 	for _, pool := range ctx.Config.WorkerPools {
-		create(
+		workerNodes := create(
 			ctx,
 			sshKey,
 			network,
@@ -34,7 +34,10 @@ func CreatePools(
 			false,
 			true,
 		)
+		nodes = append(nodes, workerNodes...)
 	}
+
+	return nodes
 }
 
 func create(
@@ -44,13 +47,14 @@ func create(
 	pool config.NodePool,
 	isControlPlane bool,
 	isWorker bool,
-) {
+) []*hcloud.Server {
 	logger.LogResourceEvent(logger.Pool, logger.Create, ctx.GetName(pool.Name), logger.Initialized)
 
 	placementGroup := placementgroup.Create(ctx, pool, isControlPlane, isWorker)
+	var nodes []*hcloud.Server
 
 	for i := 0; i < pool.Nodes; i++ {
-		node.Create(
+		n := node.Create(
 			ctx,
 			sshKey,
 			network,
@@ -60,7 +64,9 @@ func create(
 			isControlPlane,
 			isWorker,
 		)
+		nodes = append(nodes, n)
 	}
 
 	logger.LogResourceEvent(logger.Pool, logger.Create, ctx.GetName(pool.Name), logger.Success)
+	return nodes
 }
