@@ -5,6 +5,8 @@ type LogResource string
 const (
 	Cluster LogResource = "Cluster"
 
+	Image LogResource = "Image"
+
 	Network LogResource = "Network"
 	Subnet  LogResource = "Subnet"
 
