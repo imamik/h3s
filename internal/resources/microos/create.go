@@ -12,7 +12,7 @@ import (
 func Create(
 	ctx clustercontext.ClusterContext,
 	architecture hcloud.Architecture,
-	l config.Location,
+	location config.Location,
 ) *hcloud.Image {
 	img, err := image.Get(ctx, architecture)
 	if err == nil && img != nil {
@@ -21,8 +21,11 @@ func Create(
 
 	// Prepare server to create image from
 	sshKey := sshkey.Create(ctx)
-	s := server.Create(ctx, sshKey, architecture, l)
+	s := server.Create(ctx, architecture, sshKey, location)
 	server.RescueMode(ctx, sshKey, s)
+
+	// Setup Image - Download Image & Install Dependencies etc.
+	image.Provision(ctx, architecture, s)
 
 	// Create snapshot/image
 	server.Shutdown(ctx, s)

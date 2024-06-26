@@ -38,10 +38,10 @@ func LogResourceEvent(
 	var logLine []any
 	logLine = append(
 		logLine,
-		normalize(actionStr, 20),
-		normalize(string(resource), 20),
+		normalize(actionStr, 24),
+		normalize(string(resource), 24),
 		normalize(id, 48),
-		normalize(string(status), 16),
+		normalize(string(status), 24),
 	)
 
 	for _, e := range err {

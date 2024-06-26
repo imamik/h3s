@@ -17,8 +17,8 @@ const (
 
 func Create(
 	ctx clustercontext.ClusterContext,
-	sshKey *hcloud.SSHKey,
 	architecture hcloud.Architecture,
+	sshKey *hcloud.SSHKey,
 	l config.Location,
 ) *hcloud.Server {
 	name := getName(ctx, architecture)

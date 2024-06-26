@@ -14,7 +14,7 @@ func Create(
 	name := getName(ctx, architecture)
 	logger.LogResourceEvent(logger.Image, logger.Create, name, logger.Initialized)
 	logger.LogResourceEvent(logger.Image, "...", name, logger.Initialized)
-	logger.LogResourceEvent(logger.Image, "This can take some time", name, logger.Success)
+	logger.LogResourceEvent(logger.Image, "This will take time", name, logger.Success)
 
 	res, _, err := ctx.Client.Server.CreateImage(ctx.Context, server, &hcloud.ServerCreateImageOpts{
 		Type: hcloud.ImageTypeSnapshot,
