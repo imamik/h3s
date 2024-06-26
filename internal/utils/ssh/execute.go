@@ -91,11 +91,13 @@ Command: %v
 		}
 	}(session)
 
+	var output = ""
 	stdoutPipe, err := session.StdoutPipe()
 	if err != nil {
 		return "", fmt.Errorf("unable to create stdout pipe: %w", err)
 	}
 
+	var errorOutput = ""
 	stderrPipe, err := session.StderrPipe()
 	if err != nil {
 		return "", fmt.Errorf("unable to create stderr pipe: %w", err)
@@ -104,6 +106,7 @@ Command: %v
 	go func() {
 		scanner := bufio.NewScanner(stdoutPipe)
 		for scanner.Scan() {
+			output += scanner.Text() + "\n"
 			fmt.Println(scanner.Text())
 		}
 	}()
@@ -111,12 +114,13 @@ Command: %v
 	go func() {
 		scanner := bufio.NewScanner(stderrPipe)
 		for scanner.Scan() {
+			errorOutput += scanner.Text()
 			fmt.Println(scanner.Text())
 		}
 	}()
 
 	if err := session.Run(command); err != nil {
-		return "", fmt.Errorf("command execution failed: %w", err)
+		return "", fmt.Errorf("command execution failed: %w, %s", err, errorOutput)
 	}
 
 	fmt.Println(`
@@ -126,5 +130,5 @@ Command: %v
 =================================================================================
 
 `, command)
-	return "", nil
+	return output, nil
 }

@@ -2,3 +2,6 @@
 
 hcloud-k3s
 hcloud-k3s.yaml
+
+k3s.yaml
+kubeconfig.yaml
