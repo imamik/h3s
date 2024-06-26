@@ -48,7 +48,7 @@ func create(
 	networks := []*hcloud.Network{network}
 	sshKeys := []*hcloud.SSHKey{sshKey}
 
-	server, _, err := ctx.Client.Server.Create(ctx.Context, hcloud.ServerCreateOpts{
+	res, _, err := ctx.Client.Server.Create(ctx.Context, hcloud.ServerCreateOpts{
 		Name:           name,
 		ServerType:     &serverType,
 		Image:          &image,
@@ -67,10 +67,16 @@ func create(
 	if err != nil {
 		logger.LogResourceEvent(logger.Server, logger.Create, name, logger.Failure, err)
 	}
-	if server.Server == nil {
+	if res.Server == nil {
 		logger.LogResourceEvent(logger.Server, logger.Create, name, logger.Failure, "Empty Response")
+	}
+	if err := ctx.Client.Action.WaitFor(ctx.Context, res.Action); err != nil {
+		logger.LogResourceEvent(logger.Server, logger.Create, name, logger.Failure, err)
+	}
+	if err := ctx.Client.Action.WaitFor(ctx.Context, res.NextActions...); err != nil {
+		logger.LogResourceEvent(logger.Server, logger.Create, name, logger.Failure, err)
 	}
 
 	logger.LogResourceEvent(logger.Server, logger.Create, name, logger.Success)
-	return server.Server
+	return res.Server
 }

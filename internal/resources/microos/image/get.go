@@ -10,12 +10,28 @@ func Get(ctx clustercontext.ClusterContext, architecture hcloud.Architecture) (*
 	name := getName(ctx, architecture)
 	logger.LogResourceEvent(logger.Image, logger.Get, name, logger.Initialized)
 
-	snapshot, _, err := ctx.Client.Image.GetForArchitecture(ctx.Context, name, architecture)
+	options := hcloud.ImageListOpts{
+		Type:         []hcloud.ImageType{hcloud.ImageTypeSnapshot},
+		Architecture: []hcloud.Architecture{architecture},
+	}
+
+	images, err := ctx.Client.Image.AllWithOpts(ctx.Context, options)
+
 	if err != nil {
 		logger.LogResourceEvent(logger.Image, logger.Get, name, logger.Failure, err)
 		return nil, err
 	}
 
 	logger.LogResourceEvent(logger.Image, logger.Get, name, logger.Success)
-	return snapshot, nil
+
+	// Find the correct image
+	var image *hcloud.Image
+	description := getName(ctx, architecture)
+	for _, img := range images {
+		if img.Description == description {
+			image = img
+			break
+		}
+	}
+	return image, nil
 }

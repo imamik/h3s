@@ -18,15 +18,27 @@ func LogError(err ...any) {
 
 func LogResourceEvent(
 	resource LogResource,
-	method LogCrudMethod,
+	action interface{},
 	id string,
 	status LogCrudStatus,
 	err ...any,
 ) {
+	var actionStr string
+
+	switch v := action.(type) {
+	case LogCrudMethod:
+		actionStr = string(v)
+	case string:
+		actionStr = v
+	default:
+		log.Println("Invalid method type")
+		return
+	}
+
 	var logLine []any
 	logLine = append(
 		logLine,
-		normalize(string(method), 10),
+		normalize(actionStr, 20),
 		normalize(string(resource), 20),
 		normalize(id, 48),
 		normalize(string(status), 16),

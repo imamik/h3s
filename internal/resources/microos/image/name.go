@@ -5,6 +5,9 @@ import (
 	"hcloud-k3s-cli/internal/clustercontext"
 )
 
-func getName(ctx clustercontext.ClusterContext, architecture hcloud.Architecture) string {
+func getName(
+	ctx clustercontext.ClusterContext,
+	architecture hcloud.Architecture,
+) string {
 	return ctx.GetName("microos", string(architecture))
 }

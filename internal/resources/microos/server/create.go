@@ -7,6 +7,14 @@ import (
 	"hcloud-k3s-cli/internal/utils/logger"
 )
 
+const (
+	// ARMInstanceType CAX11 is the server type for ARM architecture
+	ARMInstanceType = config.CAX11
+	// X86InstanceType CX22 is the server type for x86 architecture
+	X86InstanceType = config.CX22
+	LinuxImage      = "ubuntu-24.04"
+)
+
 func Create(
 	ctx clustercontext.ClusterContext,
 	sshKey *hcloud.SSHKey,
@@ -16,11 +24,11 @@ func Create(
 	name := getName(ctx, architecture)
 	logger.LogResourceEvent(logger.Server, logger.Create, name, logger.Initialized)
 
-	image := &hcloud.Image{Name: "ubuntu-24.04"}
+	image := &hcloud.Image{Name: LinuxImage}
 
-	instance := config.CAX11
+	instance := ARMInstanceType
 	if architecture == hcloud.ArchitectureX86 {
-		instance = config.CX22
+		instance = X86InstanceType
 	}
 	serverType := &hcloud.ServerType{Name: string(instance)}
 	location := &hcloud.Location{Name: string(l)}
@@ -47,6 +55,13 @@ func Create(
 	}
 	if res.Server == nil {
 		logger.LogResourceEvent(logger.Server, logger.Create, name, logger.Failure, "Empty Response")
+	}
+
+	if err := ctx.Client.Action.WaitFor(ctx.Context, res.Action); err != nil {
+		logger.LogResourceEvent(logger.Server, logger.Create, name, logger.Failure, err)
+	}
+	if err := ctx.Client.Action.WaitFor(ctx.Context, res.NextActions...); err != nil {
+		logger.LogResourceEvent(logger.Server, logger.Create, name, logger.Failure, err)
 	}
 
 	logger.LogResourceEvent(logger.Server, logger.Create, name, logger.Success)

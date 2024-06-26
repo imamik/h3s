@@ -7,14 +7,12 @@ import (
 	"hcloud-k3s-cli/internal/resources/network"
 	"hcloud-k3s-cli/internal/resources/sshkey"
 	"hcloud-k3s-cli/internal/utils/logger"
-	"hcloud-k3s-cli/internal/utils/ping"
 )
 
 func Create(ctx clustercontext.ClusterContext) *hcloud.Server {
 	net := network.Get(ctx)
 	sshKey := sshkey.Get(ctx)
 	proxy := createServer(ctx, sshKey, net)
-	ping.Ping(proxy)
 	return proxy
 }
 
@@ -58,6 +56,12 @@ func createServer(
 	}
 	if res.Server == nil {
 		logger.LogResourceEvent(logger.Server, logger.Create, name, logger.Failure, "Empty Response")
+	}
+	if err := ctx.Client.Action.WaitFor(ctx.Context, res.Action); err != nil {
+		logger.LogResourceEvent(logger.Server, logger.Create, name, logger.Failure, err)
+	}
+	if err := ctx.Client.Action.WaitFor(ctx.Context, res.NextActions...); err != nil {
+		logger.LogResourceEvent(logger.Server, logger.Create, name, logger.Failure, err)
 	}
 
 	logger.LogResourceEvent(logger.Server, logger.Create, name, logger.Success)

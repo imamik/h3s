@@ -18,9 +18,18 @@ func Create(
 	if err == nil && img != nil {
 		return img
 	}
+
+	// Prepare server to create image from
 	sshKey := sshkey.Create(ctx)
 	s := server.Create(ctx, sshKey, architecture, l)
-	img = image.Create(ctx, s)
+	server.RescueMode(ctx, sshKey, s)
+
+	// Create snapshot/image
+	server.Shutdown(ctx, s)
+	img = image.Create(ctx, s, architecture)
+
+	// Clean up
 	server.Delete(ctx, architecture)
+
 	return img
 }
