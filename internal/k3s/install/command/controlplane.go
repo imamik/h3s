@@ -8,12 +8,12 @@ import (
 	"text/template"
 )
 
-func apiServerIP(controlPlaneNodes []*hcloud.Server) string {
-	return controlPlaneNodes[0].PublicNet.IPv4.IP.String()
+func apiServerIP(lb *hcloud.LoadBalancer) string {
+	return lb.PrivateNet[0].IP.String()
 }
 
-func tlsSans(controlPlaneNodes []*hcloud.Server) string {
-	sans := fmt.Sprintf("--tls-san=%s", apiServerIP(controlPlaneNodes))
+func tlsSans(lb *hcloud.LoadBalancer, controlPlaneNodes []*hcloud.Server) string {
+	sans := fmt.Sprintf("--tls-san=%s", apiServerIP(lb))
 	for _, node := range controlPlaneNodes {
 		sans += fmt.Sprintf(" --tls-san=%s", node.PrivateNet[0].IP.String())
 	}
@@ -22,6 +22,7 @@ func tlsSans(controlPlaneNodes []*hcloud.Server) string {
 
 func ControlPlane(
 	ctx clustercontext.ClusterContext,
+	lb *hcloud.LoadBalancer,
 	controlPlaneNodes []*hcloud.Server,
 	node *hcloud.Server,
 ) string {
@@ -31,12 +32,12 @@ func ControlPlane(
 	if controlPlaneNodes[0].ID == node.ID {
 		server = "--cluster-init"
 	} else {
-		server = fmt.Sprintf("--server https://%s:6443", apiServerIP(controlPlaneNodes))
+		server = fmt.Sprintf("--server https://%s:6443", apiServerIP(lb))
 	}
 
 	templateVars := make(map[string]interface{})
 	templateVars["Server"] = server
-	templateVars["TLSSans"] = tlsSans(controlPlaneNodes)
+	templateVars["TLSSans"] = tlsSans(lb, controlPlaneNodes)
 	templateVars["K3sVersion"] = ctx.Config.K3sVersion
 	templateVars["K3sToken"] = ctx.Credentials.K3sToken
 	//templateVars["ExtraArgs"] = fmt.Sprintf(

@@ -5,6 +5,7 @@ import (
 	"github.com/hetznercloud/hcloud-go/v2/hcloud"
 	"hcloud-k3s-cli/internal/clustercontext"
 	"hcloud-k3s-cli/internal/k3s/install/command"
+	"hcloud-k3s-cli/internal/resources/loadbalancers/loadbalancer"
 	"hcloud-k3s-cli/internal/resources/pool/node"
 	"hcloud-k3s-cli/internal/resources/proxy"
 	"hcloud-k3s-cli/internal/resources/server"
@@ -15,6 +16,12 @@ func Install(
 	ctx clustercontext.ClusterContext,
 ) {
 	nodes := server.GetAll(ctx)
+
+	balancerType := loadbalancer.ControlPlane
+	if ctx.Config.CombinedLoadBalancer {
+		balancerType = loadbalancer.Combined
+	}
+	lb := loadbalancer.Get(ctx, balancerType)
 
 	var controlPlaneNodes []*hcloud.Server
 	var workerNodes []*hcloud.Server
@@ -29,13 +36,13 @@ func Install(
 	p := proxy.Create(ctx)
 
 	for _, node := range controlPlaneNodes {
-		cmd := command.ControlPlane(ctx, controlPlaneNodes, node)
+		cmd := command.ControlPlane(ctx, lb, controlPlaneNodes, node)
 		fmt.Printf("Installing controle plane k3s on %s\n", node.Name)
 		ssh.Execute(ctx, p, node, cmd)
 	}
 
 	for _, node := range workerNodes {
-		cmd := command.Worker(ctx, controlPlaneNodes)
+		cmd := command.Worker(ctx, lb)
 		fmt.Printf("Installing worker k3s on %s\n", node.Name)
 		ssh.Execute(ctx, p, node, cmd)
 	}
