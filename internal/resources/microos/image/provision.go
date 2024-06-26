@@ -1,10 +1,12 @@
 package image
 
 import (
-	"fmt"
 	"github.com/hetznercloud/hcloud-go/v2/hcloud"
 	"hcloud-k3s-cli/internal/clustercontext"
 	"hcloud-k3s-cli/internal/resources/microos/image/commands"
+	"hcloud-k3s-cli/internal/utils/logger"
+	"hcloud-k3s-cli/internal/utils/ping"
+	"time"
 )
 
 func Provision(
@@ -18,15 +20,21 @@ func Provision(
 	execute(ctx, server, commands.CleanUp(), 5, false)
 }
 
-func execute(ctx clustercontext.ClusterContext,
+func execute(
+	ctx clustercontext.ClusterContext,
 	server *hcloud.Server,
 	cmd string,
 	pauseBeforeSeconds int,
 	expectDisconnect bool,
 ) {
-	fmt.Printf(`
-=============== Executing command on server ===============
-%s
-===========================================================
-`, cmd)
+	if pauseBeforeSeconds > 0 {
+		logger.LogResourceEvent(logger.Server, "Execute", server.Name, logger.Initialized, "Waiting for %d sec", pauseBeforeSeconds)
+		time.Sleep(time.Duration(pauseBeforeSeconds) * time.Second)
+	}
+
+	if expectDisconnect {
+		logger.LogResourceEvent(logger.Server, "Execute", server.Name, logger.Initialized, "Expecting disconnect")
+		time.Sleep(5 * time.Second)
+		ping.Ping(server)
+	}
 }

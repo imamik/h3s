@@ -1,7 +1,6 @@
 package install
 
 import (
-	"fmt"
 	"github.com/hetznercloud/hcloud-go/v2/hcloud"
 	"hcloud-k3s-cli/internal/clustercontext"
 	"hcloud-k3s-cli/internal/k3s/install/command"
@@ -9,6 +8,7 @@ import (
 	"hcloud-k3s-cli/internal/resources/pool/node"
 	"hcloud-k3s-cli/internal/resources/proxy"
 	"hcloud-k3s-cli/internal/resources/server"
+	"hcloud-k3s-cli/internal/utils/logger"
 	"hcloud-k3s-cli/internal/utils/ssh"
 )
 
@@ -35,16 +35,16 @@ func Install(
 
 	p := proxy.Create(ctx)
 
-	for _, node := range controlPlaneNodes {
-		cmd := command.ControlPlane(ctx, lb, controlPlaneNodes, node)
-		fmt.Printf("Installing controle plane k3s on %s\n", node.Name)
-		ssh.Execute(ctx, p, node, cmd)
+	for _, n := range controlPlaneNodes {
+		cmd := command.ControlPlane(ctx, lb, controlPlaneNodes, n)
+		logger.LogResourceEvent(logger.Server, "Install Control Plane", n.Name, logger.Initialized)
+		ssh.Execute(ctx, p, n, cmd)
 	}
 
-	for _, node := range workerNodes {
+	for _, n := range workerNodes {
 		cmd := command.Worker(ctx, lb)
-		fmt.Printf("Installing worker k3s on %s\n", node.Name)
-		ssh.Execute(ctx, p, node, cmd)
+		logger.LogResourceEvent(logger.Server, "Install Worker", n.Name, logger.Initialized)
+		ssh.Execute(ctx, p, n, cmd)
 	}
 
 	proxy.Delete(ctx)
