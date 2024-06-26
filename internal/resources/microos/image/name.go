@@ -1,4 +1,4 @@
-package server
+package image
 
 import (
 	"github.com/hetznercloud/hcloud-go/v2/hcloud"
@@ -6,5 +6,5 @@ import (
 )
 
 func getName(ctx clustercontext.ClusterContext, architecture hcloud.Architecture) string {
-	return ctx.GetName("snapshot", "server", string(architecture))
+	return ctx.GetName("microos", string(architecture))
 }

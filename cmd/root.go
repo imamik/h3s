@@ -5,8 +5,8 @@ import (
 	"github.com/spf13/cobra"
 	"hcloud-k3s-cli/cmd/cluster"
 	"hcloud-k3s-cli/cmd/config"
-	"hcloud-k3s-cli/cmd/image"
 	"hcloud-k3s-cli/cmd/k3s"
+	"hcloud-k3s-cli/cmd/microos"
 	"os"
 )
 
@@ -22,7 +22,7 @@ func init() {
 	rootCmd.AddCommand(k3s.K3s)
 	rootCmd.AddCommand(config.Config)
 	rootCmd.AddCommand(cluster.Cluster)
-	rootCmd.AddCommand(image.Image)
+	rootCmd.AddCommand(microos.Image)
 }
 
 func Execute() {

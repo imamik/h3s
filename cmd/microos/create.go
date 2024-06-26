@@ -1,17 +1,17 @@
-package image
+package microos
 
 import (
 	"github.com/spf13/cobra"
 	"hcloud-k3s-cli/internal/clustercontext"
 	"hcloud-k3s-cli/internal/config"
-	"hcloud-k3s-cli/internal/resources/image"
+	"hcloud-k3s-cli/internal/resources/microos"
 	"log"
 	"sync"
 )
 
 var Create = &cobra.Command{
 	Use:   "create",
-	Short: "Create MicroOS snapshot/image",
+	Short: "Create MicroOS snapshot/microos",
 	Run: func(cmd *cobra.Command, args []string) {
 		if !arm && !x86 && !all {
 			log.Fatalf("Please specify at least one architecture to delete by using --arm or --all or both")
@@ -27,7 +27,7 @@ var Create = &cobra.Command{
 			wg.Add(1)
 			go func() {
 				defer wg.Done()
-				image.Create(ctx, "arm", loc)
+				microos.Create(ctx, "arm", loc)
 			}()
 		}
 
@@ -35,7 +35,7 @@ var Create = &cobra.Command{
 			wg.Add(1)
 			go func() {
 				defer wg.Done()
-				image.Create(ctx, "x86", loc)
+				microos.Create(ctx, "x86", loc)
 			}()
 		}
 

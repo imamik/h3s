@@ -1,4 +1,4 @@
-package image
+package microos
 
 import (
 	"github.com/spf13/cobra"
@@ -12,7 +12,7 @@ var (
 )
 
 var Image = &cobra.Command{
-	Use:   "image",
+	Use:   "microos",
 	Short: "Utils for MicroOS snapshots/images",
 }
 
