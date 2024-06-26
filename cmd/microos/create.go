@@ -46,5 +46,6 @@ var Create = &cobra.Command{
 func init() {
 	Create.Flags().BoolVar(&arm, "arm", false, "")
 	Create.Flags().BoolVar(&x86, "x86", false, "")
+	Create.Flags().BoolVar(&all, "all", false, "")
 	Create.Flags().StringVar(&l, "location", string(config.Nuernberg), "")
 }
