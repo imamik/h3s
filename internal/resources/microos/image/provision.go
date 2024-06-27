@@ -28,6 +28,8 @@ func execute(
 	pauseBeforeSeconds time.Duration,
 	expectDisconnect bool,
 ) {
+	ping.Ping(server, 5)
+
 	if pauseBeforeSeconds > 0 {
 		logger.LogResourceEvent(
 			logger.Server,
@@ -40,8 +42,6 @@ func execute(
 		time.Sleep(pauseBeforeSeconds * time.Second)
 	}
 
-	ping.Ping(server)
-
 	_, err := ssh.ExecuteWithPassword(server, rootPassword, cmd)
 	if err != nil {
 		logger.LogResourceEvent(logger.Server, "Execute", server.Name, logger.Failure, err)
@@ -51,6 +51,6 @@ func execute(
 	if expectDisconnect {
 		logger.LogResourceEvent(logger.Server, "Execute", server.Name, logger.Initialized, "Expecting disconnect")
 		time.Sleep(5 * time.Second)
-		ping.Ping(server)
+		ping.Ping(server, 5)
 	}
 }

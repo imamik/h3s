@@ -18,22 +18,18 @@ const (
 func Create(
 	ctx clustercontext.ClusterContext,
 	architecture hcloud.Architecture,
-	sshKey *hcloud.SSHKey,
-	net *hcloud.Network,
 	location config.Location,
 ) *hcloud.Server {
 	server := Get(ctx, architecture)
 	if server != nil {
 		return server
 	}
-	return create(ctx, architecture, sshKey, net, location)
+	return create(ctx, architecture, location)
 }
 
 func create(
 	ctx clustercontext.ClusterContext,
 	architecture hcloud.Architecture,
-	sshKey *hcloud.SSHKey,
-	net *hcloud.Network,
 	l config.Location,
 ) *hcloud.Server {
 	name := getName(ctx, architecture)
@@ -51,9 +47,7 @@ func create(
 		Name:       name,
 		Image:      image,
 		ServerType: &serverType,
-		Networks:   []*hcloud.Network{net},
 		Location:   &hcloud.Location{Name: string(l)},
-		SSHKeys:    []*hcloud.SSHKey{sshKey},
 		PublicNet: &hcloud.ServerCreatePublicNet{
 			EnableIPv4: true,
 			EnableIPv6: true,
