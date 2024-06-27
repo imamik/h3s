@@ -8,7 +8,6 @@ var (
 	all bool
 	arm bool
 	x86 bool
-	l   string
 )
 
 var Image = &cobra.Command{

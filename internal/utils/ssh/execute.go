@@ -1,37 +1,54 @@
 package ssh
 
 import (
-	"bufio"
 	"fmt"
 	"github.com/hetznercloud/hcloud-go/v2/hcloud"
 	"golang.org/x/crypto/ssh"
 	"hcloud-k3s-cli/internal/clustercontext"
-	"io"
+	"hcloud-k3s-cli/internal/utils/ip"
+	"log"
 )
 
-func Execute(
+func ExecuteWithPassword(
+	remote *hcloud.Server,
+	rootPassword string,
+	command string,
+) (string, error) {
+	remoteIp := ip.FirstAvailable(remote)
+
+	// SSH client configuration
+	sshConfig, err := ConfigPass(rootPassword)
+	if err != nil {
+		return "", fmt.Errorf("unable to create SSH config: %w", err)
+	}
+
+	// Connect to the remote server
+	client, err := ssh.Dial("tcp", remoteIp+":22", sshConfig)
+	if err != nil {
+		log.Fatalf("Failed to dial: %s", err)
+	}
+
+	res, err := Run(client, command)
+	if err != nil {
+		return "", err
+	}
+
+	return res, nil
+}
+
+func ExecuteViaProxy(
 	ctx clustercontext.ClusterContext,
 	proxy *hcloud.Server,
 	remote *hcloud.Server,
 	command string,
 ) (string, error) {
-	user := "root"
-	proxyIp := proxy.PublicNet.IPv4.IP.String()
-	remoteIp := remote.PrivateNet[0].IP.String()
-
-	// Load private key
-	key, err := ReadPrivateKeyFromFile(ctx)
-
-	signer, err := ssh.ParsePrivateKey([]byte(key))
-	if err != nil {
-		return "", fmt.Errorf("unable to parse private key: %w", err)
-	}
+	proxyIp := ip.FirstAvailable(proxy)
+	remoteIp := ip.FirstAvailable(remote)
 
 	// SSH client configuration
-	sshConfig := &ssh.ClientConfig{
-		User:            user,
-		Auth:            []ssh.AuthMethod{ssh.PublicKeys(signer)},
-		HostKeyCallback: ssh.InsecureIgnoreHostKey(),
+	sshConfig, err := ConfigSsh(ctx)
+	if err != nil {
+		return "", fmt.Errorf("unable to create SSH config: %w", err)
 	}
 
 	// Connect to proxy
@@ -61,74 +78,12 @@ func Execute(
 		return "", fmt.Errorf("unable to establish connection to remote: %w", err)
 	}
 	client := ssh.NewClient(clientConn, chans, reqs)
-	defer func(client *ssh.Client) {
-		err := client.Close()
-		if err != nil {
-			fmt.Printf("unable to close client connection: %v\n", err)
-		}
-	}(client)
 
-	// Run command on remote server
-	fmt.Printf(`
-
-=================================================================================
-=========================== Running command on remote ===========================
-=================================================================================
-
-Command: %v
-
-=================================================================================
-
-`, command)
-	session, err := client.NewSession()
+	res, err := Run(client, command)
 	if err != nil {
-		return "", fmt.Errorf("unable to create session on remote: %w", err)
-	}
-	defer func(session *ssh.Session) {
-		err := session.Close()
-		if err != nil && err != io.EOF {
-			fmt.Printf("unable to close session: %v\n", err)
-		}
-	}(session)
-
-	var output = ""
-	stdoutPipe, err := session.StdoutPipe()
-	if err != nil {
-		return "", fmt.Errorf("unable to create stdout pipe: %w", err)
+		return "", err
 	}
 
-	var errorOutput = ""
-	stderrPipe, err := session.StderrPipe()
-	if err != nil {
-		return "", fmt.Errorf("unable to create stderr pipe: %w", err)
-	}
+	return res, nil
 
-	go func() {
-		scanner := bufio.NewScanner(stdoutPipe)
-		for scanner.Scan() {
-			output += scanner.Text() + "\n"
-			fmt.Println(scanner.Text())
-		}
-	}()
-
-	go func() {
-		scanner := bufio.NewScanner(stderrPipe)
-		for scanner.Scan() {
-			errorOutput += scanner.Text()
-			fmt.Println(scanner.Text())
-		}
-	}()
-
-	if err := session.Run(command); err != nil {
-		return "", fmt.Errorf("command execution failed: %w, %s", err, errorOutput)
-	}
-
-	fmt.Println(`
-
-=================================================================================
-=================================================================================
-=================================================================================
-
-`, command)
-	return output, nil
 }

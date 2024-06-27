@@ -1,35 +1,51 @@
 package image
 
 import (
+	"fmt"
 	"github.com/hetznercloud/hcloud-go/v2/hcloud"
-	"hcloud-k3s-cli/internal/clustercontext"
 	"hcloud-k3s-cli/internal/resources/microos/image/commands"
 	"hcloud-k3s-cli/internal/utils/logger"
 	"hcloud-k3s-cli/internal/utils/ping"
+	"hcloud-k3s-cli/internal/utils/ssh"
 	"time"
 )
 
 func Provision(
-	ctx clustercontext.ClusterContext,
 	architecture hcloud.Architecture,
 	server *hcloud.Server,
+	rootPassword string,
 ) {
-	execute(ctx, server, commands.DownloadImage(architecture), 0, false)
-	execute(ctx, server, commands.WriteImage(), 0, true)
-	execute(ctx, server, commands.Packages(), 5, true)
-	execute(ctx, server, commands.CleanUp(), 5, false)
+	execute(server, rootPassword, commands.DownloadImage(architecture), 0, false)
+	execute(server, rootPassword, commands.WriteImage(), 0, true)
+	execute(server, rootPassword, commands.Packages(), 5, true)
+	execute(server, rootPassword, commands.CleanUp(), 5, false)
 }
 
 func execute(
-	ctx clustercontext.ClusterContext,
 	server *hcloud.Server,
+	rootPassword string,
 	cmd string,
-	pauseBeforeSeconds int,
+	pauseBeforeSeconds time.Duration,
 	expectDisconnect bool,
 ) {
 	if pauseBeforeSeconds > 0 {
-		logger.LogResourceEvent(logger.Server, "Execute", server.Name, logger.Initialized, "Waiting for %d sec", pauseBeforeSeconds)
-		time.Sleep(time.Duration(pauseBeforeSeconds) * time.Second)
+		logger.LogResourceEvent(
+			logger.Server,
+			"Execute",
+			server.Name,
+			logger.Initialized,
+			fmt.Sprintf("Waiting for %d sec", pauseBeforeSeconds),
+			pauseBeforeSeconds,
+		)
+		time.Sleep(pauseBeforeSeconds * time.Second)
+	}
+
+	ping.Ping(server)
+
+	_, err := ssh.ExecuteWithPassword(server, rootPassword, cmd)
+	if err != nil {
+		logger.LogResourceEvent(logger.Server, "Execute", server.Name, logger.Failure, err)
+		return
 	}
 
 	if expectDisconnect {

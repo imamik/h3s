@@ -19,6 +19,21 @@ func Create(
 	ctx clustercontext.ClusterContext,
 	architecture hcloud.Architecture,
 	sshKey *hcloud.SSHKey,
+	net *hcloud.Network,
+	location config.Location,
+) *hcloud.Server {
+	server := Get(ctx, architecture)
+	if server != nil {
+		return server
+	}
+	return create(ctx, architecture, sshKey, net, location)
+}
+
+func create(
+	ctx clustercontext.ClusterContext,
+	architecture hcloud.Architecture,
+	sshKey *hcloud.SSHKey,
+	net *hcloud.Network,
 	l config.Location,
 ) *hcloud.Server {
 	name := getName(ctx, architecture)
@@ -30,21 +45,19 @@ func Create(
 	if architecture == hcloud.ArchitectureX86 {
 		instance = X86InstanceType
 	}
-	serverType := &hcloud.ServerType{Name: string(instance)}
-	location := &hcloud.Location{Name: string(l)}
-	publicNet := &hcloud.ServerCreatePublicNet{
-		EnableIPv4: true,
-		EnableIPv6: true,
-	}
-	sshKeys := []*hcloud.SSHKey{sshKey}
+	serverType := hcloud.ServerType{Name: string(instance)}
 
 	res, _, err := ctx.Client.Server.Create(ctx.Context, hcloud.ServerCreateOpts{
 		Name:       name,
-		ServerType: serverType,
 		Image:      image,
-		Location:   location,
-		SSHKeys:    sshKeys,
-		PublicNet:  publicNet,
+		ServerType: &serverType,
+		Networks:   []*hcloud.Network{net},
+		Location:   &hcloud.Location{Name: string(l)},
+		SSHKeys:    []*hcloud.SSHKey{sshKey},
+		PublicNet: &hcloud.ServerCreatePublicNet{
+			EnableIPv4: true,
+			EnableIPv6: true,
+		},
 		Labels: ctx.GetLabels(map[string]string{
 			"is_image_creator": "true",
 			"architecture":     string(architecture),

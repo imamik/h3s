@@ -8,7 +8,7 @@ import (
 
 const RescueModeLog = "Set Rescue Mode"
 
-func RescueMode(ctx clustercontext.ClusterContext, sshKey *hcloud.SSHKey, server *hcloud.Server) {
+func RescueMode(ctx clustercontext.ClusterContext, sshKey *hcloud.SSHKey, server *hcloud.Server) string {
 	logger.LogResourceEvent(logger.Server, RescueModeLog, server.Name, logger.Initialized)
 
 	res, _, err := ctx.Client.Server.EnableRescue(ctx.Context, server, hcloud.ServerEnableRescueOpts{
@@ -25,5 +25,7 @@ func RescueMode(ctx clustercontext.ClusterContext, sshKey *hcloud.SSHKey, server
 	logger.LogResourceEvent(logger.Server, RescueModeLog, server.Name, logger.Success)
 
 	Reboot(ctx, server)
+
+	return res.RootPassword
 
 }

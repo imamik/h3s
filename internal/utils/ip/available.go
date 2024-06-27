@@ -5,7 +5,7 @@ import (
 	"net/netip"
 )
 
-func FirstAvailableIP(server *hcloud.Server) string {
+func FirstAvailable(server *hcloud.Server) string {
 	switch {
 	case !server.PublicNet.IPv4.IsUnspecified():
 		return server.PublicNet.IPv4.IP.String()
