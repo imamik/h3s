@@ -18,36 +18,36 @@ const (
 func Create(
 	ctx clustercontext.ClusterContext,
 	architecture hcloud.Architecture,
+	sshKey *hcloud.SSHKey,
 	location config.Location,
 ) *hcloud.Server {
 	server := Get(ctx, architecture)
 	if server != nil {
 		return server
 	}
-	return create(ctx, architecture, location)
+	return create(ctx, architecture, sshKey, location)
 }
 
 func create(
 	ctx clustercontext.ClusterContext,
 	architecture hcloud.Architecture,
+	sshKey *hcloud.SSHKey,
 	l config.Location,
 ) *hcloud.Server {
 	name := getName(ctx, architecture)
 	logger.LogResourceEvent(logger.Server, logger.Create, name, logger.Initialized)
 
-	image := &hcloud.Image{Name: LinuxImage}
-
 	instance := ARMInstanceType
 	if architecture == hcloud.ArchitectureX86 {
 		instance = X86InstanceType
 	}
-	serverType := hcloud.ServerType{Name: string(instance)}
 
 	res, _, err := ctx.Client.Server.Create(ctx.Context, hcloud.ServerCreateOpts{
 		Name:       name,
-		Image:      image,
-		ServerType: &serverType,
+		Image:      &hcloud.Image{Name: LinuxImage},
+		ServerType: &hcloud.ServerType{Name: string(instance)},
 		Location:   &hcloud.Location{Name: string(l)},
+		SSHKeys:    []*hcloud.SSHKey{sshKey},
 		PublicNet: &hcloud.ServerCreatePublicNet{
 			EnableIPv4: true,
 			EnableIPv6: true,

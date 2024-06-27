@@ -3,6 +3,7 @@ package ping
 import (
 	"fmt"
 	"github.com/hetznercloud/hcloud-go/v2/hcloud"
+	"hcloud-k3s-cli/internal/utils/logger"
 	"os/exec"
 	"time"
 )
@@ -13,14 +14,14 @@ func Ping(server *hcloud.Server, timeout time.Duration) {
 
 	for {
 		if isServerAvailable(ip) {
-			fmt.Printf("Server %s is available.\n", ip)
+			logger.LogResourceEvent(logger.Server, "Available", server.Name, logger.Success)
 			break
 		}
-		fmt.Printf("Server %s (%s) is not available. Retrying in %s seconds...\n", server.Name, ip, timeout)
-		time.Sleep(timeout * time.Second)
+		logger.LogResourceEvent(logger.Server, "Not Available", server.Name, logger.Failure, fmt.Sprintf("Retry in %s", timeout))
+		time.Sleep(timeout)
 	}
 
-	time.Sleep(timeout * time.Second)
+	time.Sleep(timeout)
 }
 
 // isServerAvailable uses the system ping command to check if the server is available.

@@ -5,6 +5,7 @@ import (
 	"hcloud-k3s-cli/internal/clustercontext"
 	"hcloud-k3s-cli/internal/resources/microos/image"
 	"hcloud-k3s-cli/internal/resources/microos/server"
+	"hcloud-k3s-cli/internal/resources/sshkey"
 )
 
 func Create(
@@ -17,18 +18,17 @@ func Create(
 	}
 
 	// Prepare server to create image from
-	s := server.Create(ctx, architecture, ctx.Config.ControlPlane.Pool.Location)
-	rootPassword := server.RescueMode(ctx, s)
+	sshKey := sshkey.Create(ctx)
+	s := server.Create(ctx, architecture, sshKey, ctx.Config.ControlPlane.Pool.Location)
+	defer server.Delete(ctx, architecture) // Cleanup on success AND failure
+	server.RescueMode(ctx, sshKey, s)
 
 	// Setup Image - Download Image & Install Dependencies etc.
-	image.Provision(architecture, s, rootPassword)
+	image.Provision(ctx, architecture, s)
 
 	// Create snapshot/image
 	server.Shutdown(ctx, s)
 	img = image.Create(ctx, s, architecture)
-
-	// Clean up
-	server.Delete(ctx, architecture)
 
 	return img
 }

@@ -32,6 +32,7 @@ func Install(ctx clustercontext.ClusterContext) {
 	}
 
 	proxyServer := proxy.Create(ctx)
+	defer proxy.Delete(ctx)
 
 	for i, remote := range controlPlaneNodes {
 		cmd := commands.ControlPlane(ctx, lb, controlPlaneNodes, remote)
@@ -48,5 +49,4 @@ func Install(ctx clustercontext.ClusterContext) {
 		ssh.ExecuteViaProxy(ctx, proxyServer, remote, cmd)
 	}
 
-	proxy.Delete(ctx)
 }

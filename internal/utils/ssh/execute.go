@@ -6,24 +6,40 @@ import (
 	"golang.org/x/crypto/ssh"
 	"hcloud-k3s-cli/internal/clustercontext"
 	"hcloud-k3s-cli/internal/utils/ip"
+	"hcloud-k3s-cli/internal/utils/logger"
 	"log"
+	"time"
 )
 
-func ExecuteWithPassword(
+func dialWithRetries(ip string, sshConfig *ssh.ClientConfig, retryInterval time.Duration, maxRetries int) (*ssh.Client, error) {
+	for i := 0; i < maxRetries; i++ {
+		c, err := ssh.Dial("tcp", ip+":22", sshConfig)
+		if err == nil && c != nil {
+			return c, err
+		}
+		logger.LogResourceEvent(logger.Server, "SSH", ip, logger.Failure, err)
+		retryBackoff := time.Duration(i+1) * retryInterval
+		log.Printf("Failed to dial: %s, retrying in %s", err, retryBackoff)
+		time.Sleep(retryBackoff)
+	}
+	return nil, fmt.Errorf("failed to dial %s after %d retries", ip, maxRetries)
+}
+
+func ExecuteWithSsh(
+	ctx clustercontext.ClusterContext,
 	remote *hcloud.Server,
-	rootPassword string,
 	command string,
 ) (string, error) {
 	remoteIp := ip.FirstAvailable(remote)
 
 	// SSH client configuration
-	sshConfig, err := ConfigPass(rootPassword)
+	sshConfig, err := ConfigSsh(ctx)
 	if err != nil {
 		return "", fmt.Errorf("unable to create SSH config: %w", err)
 	}
 
 	// Connect to the remote server
-	client, err := ssh.Dial("tcp", remoteIp+":22", sshConfig)
+	client, err := dialWithRetries(remoteIp, sshConfig, 5*time.Second, 5)
 	if err != nil {
 		log.Fatalf("Failed to dial: %s", err)
 	}
