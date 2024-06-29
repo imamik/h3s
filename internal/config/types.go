@@ -1,7 +1,5 @@
 package config
 
-import "github.com/hetznercloud/hcloud-go/v2/hcloud"
-
 type Location string
 
 const (
@@ -45,10 +43,7 @@ const (
 	CCX63 CloudInstance = "ccx63"
 )
 
-func GetArchitecture(instance CloudInstance) hcloud.Architecture {
-	if instance[:3] == "cax" {
-		return hcloud.ArchitectureARM
-	} else {
-		return hcloud.ArchitectureX86
-	}
+type Architectures struct {
+	ARM bool
+	X86 bool
 }

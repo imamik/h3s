@@ -4,12 +4,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var (
-	all bool
-	arm bool
-	x86 bool
-)
-
 var Image = &cobra.Command{
 	Use:   "microos",
 	Short: "Utils for MicroOS snapshots/images",

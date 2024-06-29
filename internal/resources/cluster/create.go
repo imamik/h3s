@@ -3,6 +3,7 @@ package cluster
 import (
 	"hcloud-k3s-cli/internal/clustercontext"
 	"hcloud-k3s-cli/internal/resources/loadbalancers"
+	"hcloud-k3s-cli/internal/resources/microos"
 	"hcloud-k3s-cli/internal/resources/network"
 	"hcloud-k3s-cli/internal/resources/pool"
 	"hcloud-k3s-cli/internal/resources/server"
@@ -15,6 +16,7 @@ func Create(ctx clustercontext.ClusterContext) {
 
 	sshKey := sshkey.Create(ctx)
 	net := network.Create(ctx)
+	microos.Create(ctx)
 	pool.CreatePools(ctx, sshKey, net)
 
 	nodes := server.GetAll(ctx)

@@ -4,7 +4,7 @@ import (
 	"github.com/hetznercloud/hcloud-go/v2/hcloud"
 	"hcloud-k3s-cli/internal/clustercontext"
 	"hcloud-k3s-cli/internal/config"
-	"hcloud-k3s-cli/internal/resources/microos"
+	"hcloud-k3s-cli/internal/resources/microos/image"
 	"hcloud-k3s-cli/internal/resources/pool/node"
 	"hcloud-k3s-cli/internal/resources/pool/placementgroup"
 	"hcloud-k3s-cli/internal/utils/logger"
@@ -16,33 +16,56 @@ func CreatePools(
 	sshKey *hcloud.SSHKey,
 	network *hcloud.Network,
 ) []*hcloud.Server {
-	// Create control plane pool
-	nodes := create(
-		ctx,
-		sshKey,
-		network,
-		ctx.Config.ControlPlane.Pool,
-		true,
-		ctx.Config.ControlPlane.AsWorkerPool,
-	)
+	// Create a channel to collect the nodes & setup a WaitGroup
+	nodeCh := make(chan []*hcloud.Server)
+	var wg sync.WaitGroup
 
-	// Create worker pools
-	for _, pool := range ctx.Config.WorkerPools {
-		workerNodes := create(
+	// Create control plane pool in a goroutine
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		nodeCh <- CreatePool(
 			ctx,
 			sshKey,
 			network,
-			pool,
-			false,
+			ctx.Config.ControlPlane.Pool,
 			true,
+			ctx.Config.ControlPlane.AsWorkerPool,
 		)
-		nodes = append(nodes, workerNodes...)
+	}()
+
+	// Create worker pools in separate goroutines
+	for _, pool := range ctx.Config.WorkerPools {
+		wg.Add(1)
+		go func(pool config.NodePool) {
+			defer wg.Done()
+			nodeCh <- CreatePool(
+				ctx,
+				sshKey,
+				network,
+				pool,
+				false,
+				true,
+			)
+		}(pool)
+	}
+
+	// Wait for all goroutines to finish & close the channel
+	go func() {
+		wg.Wait()
+		close(nodeCh)
+	}()
+
+	// Collect the nodes from the channel
+	var nodes []*hcloud.Server
+	for n := range nodeCh {
+		nodes = append(nodes, n...)
 	}
 
 	return nodes
 }
 
-func create(
+func CreatePool(
 	ctx clustercontext.ClusterContext,
 	sshKey *hcloud.SSHKey,
 	network *hcloud.Network,
@@ -52,9 +75,12 @@ func create(
 ) []*hcloud.Server {
 	logger.LogResourceEvent(logger.Pool, logger.Create, ctx.GetName(pool.Name), logger.Initialized)
 
-	architecture := config.GetArchitecture(pool.Instance)
 	// img := hcloud.Image{Name: "ubuntu-24.04"}
-	img := microos.Create(ctx, architecture)
+	img, err := image.Get(ctx, config.GetArchitecture(pool.Instance))
+	if err != nil {
+		logger.LogResourceEvent(logger.Pool, logger.Create, ctx.GetName(pool.Name), logger.Failure)
+		return nil
+	}
 
 	placementGroup := placementgroup.Create(ctx, pool, isControlPlane, isWorker)
 
@@ -67,7 +93,7 @@ func create(
 		wg.Add(1) // Increment the WaitGroup counter
 		go func(i int) {
 			defer wg.Done() // Decrement the counter when the goroutine completes
-			n := node.Create(
+			nodeCh <- node.Create(
 				ctx,
 				sshKey,
 				network,
@@ -78,7 +104,6 @@ func create(
 				isControlPlane,
 				isWorker,
 			)
-			nodeCh <- n // Send the created node to the channel
 		}(i)
 	}
 

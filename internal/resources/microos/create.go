@@ -3,13 +3,42 @@ package microos
 import (
 	"github.com/hetznercloud/hcloud-go/v2/hcloud"
 	"hcloud-k3s-cli/internal/clustercontext"
+	"hcloud-k3s-cli/internal/config"
 	"hcloud-k3s-cli/internal/resources/microos/image"
 	"hcloud-k3s-cli/internal/resources/microos/server"
 	"hcloud-k3s-cli/internal/resources/sshkey"
+	"sync"
 )
 
-func Create(
+func Create(ctx clustercontext.ClusterContext) {
+	// Prepare server to create image from
+	sshKey := sshkey.Create(ctx)
+	architectures := config.GetArchitectures(ctx.Config)
+
+	var wg sync.WaitGroup
+
+	if architectures.ARM {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			create(ctx, sshKey, hcloud.ArchitectureARM)
+		}()
+	}
+
+	if architectures.X86 {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			create(ctx, sshKey, hcloud.ArchitectureX86)
+		}()
+	}
+
+	wg.Wait()
+}
+
+func create(
 	ctx clustercontext.ClusterContext,
+	sshKey *hcloud.SSHKey,
 	architecture hcloud.Architecture,
 ) *hcloud.Image {
 	img, err := image.Get(ctx, architecture)
@@ -17,8 +46,6 @@ func Create(
 		return img
 	}
 
-	// Prepare server to create image from
-	sshKey := sshkey.Create(ctx)
 	s := server.Create(ctx, architecture, sshKey, ctx.Config.ControlPlane.Pool.Location)
 	defer server.Delete(ctx, architecture) // Cleanup on success AND failure
 	server.RescueMode(ctx, sshKey, s)
