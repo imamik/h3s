@@ -4,6 +4,7 @@ import (
 	"github.com/hetznercloud/hcloud-go/v2/hcloud"
 	"hcloud-k3s-cli/internal/clustercontext"
 	"hcloud-k3s-cli/internal/config"
+	"hcloud-k3s-cli/internal/resources/microos/image"
 	"hcloud-k3s-cli/internal/resources/network"
 	"hcloud-k3s-cli/internal/resources/sshkey"
 	"hcloud-k3s-cli/internal/utils/logger"
@@ -12,7 +13,9 @@ import (
 func Create(ctx clustercontext.ClusterContext) *hcloud.Server {
 	net := network.Get(ctx)
 	sshKey := sshkey.Get(ctx)
-	proxy := createServer(ctx, sshKey, net)
+
+	img, _ := image.Get(ctx, hcloud.ArchitectureARM)
+	proxy := createServer(ctx, sshKey, net, img)
 	return proxy
 }
 
@@ -20,6 +23,7 @@ func createServer(
 	ctx clustercontext.ClusterContext,
 	sshKey *hcloud.SSHKey,
 	network *hcloud.Network,
+	image *hcloud.Image,
 ) *hcloud.Server {
 	server, err := getServer(ctx)
 	if err == nil && server != nil {
@@ -29,7 +33,6 @@ func createServer(
 	name := getName(ctx)
 	logger.LogResourceEvent(logger.Server, logger.Create, name, logger.Initialized)
 
-	image := &hcloud.Image{Name: "ubuntu-24.04"}
 	serverType := &hcloud.ServerType{Name: string(config.CAX11)}
 	location := &hcloud.Location{Name: string(ctx.Config.ControlPlane.Pool.Location)}
 	publicNet := &hcloud.ServerCreatePublicNet{

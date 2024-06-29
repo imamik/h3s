@@ -1,6 +1,7 @@
 package microos
 
 import (
+	"github.com/hetznercloud/hcloud-go/v2/hcloud"
 	"github.com/spf13/cobra"
 	"hcloud-k3s-cli/internal/clustercontext"
 	"hcloud-k3s-cli/internal/resources/microos"
@@ -24,7 +25,7 @@ var Create = &cobra.Command{
 			wg.Add(1)
 			go func() {
 				defer wg.Done()
-				microos.Create(ctx, "arm")
+				microos.Create(ctx, hcloud.ArchitectureARM)
 			}()
 		}
 
@@ -32,7 +33,7 @@ var Create = &cobra.Command{
 			wg.Add(1)
 			go func() {
 				defer wg.Done()
-				microos.Create(ctx, "x86")
+				microos.Create(ctx, hcloud.ArchitectureX86)
 			}()
 		}
 

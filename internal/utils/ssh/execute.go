@@ -56,7 +56,7 @@ func ExecuteViaProxy(
 
 	// Connect to proxy
 	fmt.Printf("Connecting to proxy (%s)\n", proxyIp)
-	proxyConn, err := ssh.Dial("tcp", proxyIp+":22", sshConfig)
+	proxyConn, err := dialWithRetries(proxyIp, sshConfig, 5*time.Second, 5)
 	if err != nil {
 		return "", fmt.Errorf("unable to connect to proxy: %w", err)
 	}

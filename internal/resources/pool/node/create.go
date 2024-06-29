@@ -12,6 +12,7 @@ func Create(
 	ctx clustercontext.ClusterContext,
 	sshKey *hcloud.SSHKey,
 	network *hcloud.Network,
+	image *hcloud.Image,
 	placementGroup *hcloud.PlacementGroup,
 	pool config.NodePool,
 	i int,
@@ -20,7 +21,7 @@ func Create(
 ) *hcloud.Server {
 	server := Get(ctx, pool, i)
 	if server == nil {
-		server = create(ctx, sshKey, network, placementGroup, pool, i, isControlPlane, isWorker)
+		server = create(ctx, sshKey, network, image, placementGroup, pool, i, isControlPlane, isWorker)
 	}
 	return server
 }
@@ -29,6 +30,7 @@ func create(
 	ctx clustercontext.ClusterContext,
 	sshKey *hcloud.SSHKey,
 	network *hcloud.Network,
+	image *hcloud.Image,
 	placementGroup *hcloud.PlacementGroup,
 	pool config.NodePool,
 	i int,
@@ -38,7 +40,6 @@ func create(
 	name := getName(ctx, pool, i)
 	logger.LogResourceEvent(logger.Server, logger.Create, name, logger.Initialized)
 
-	image := hcloud.Image{Name: "ubuntu-24.04"}
 	serverType := hcloud.ServerType{Name: string(pool.Instance)}
 	location := hcloud.Location{Name: string(pool.Location)}
 	publicNet := hcloud.ServerCreatePublicNet{
@@ -51,7 +52,7 @@ func create(
 	res, _, err := ctx.Client.Server.Create(ctx.Context, hcloud.ServerCreateOpts{
 		Name:           name,
 		ServerType:     &serverType,
-		Image:          &image,
+		Image:          image,
 		Location:       &location,
 		Networks:       networks,
 		PlacementGroup: placementGroup,
