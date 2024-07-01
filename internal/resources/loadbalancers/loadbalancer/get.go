@@ -10,11 +10,11 @@ func Get(ctx clustercontext.ClusterContext, balancerType Type) *hcloud.LoadBalan
 	balancer := getName(ctx, balancerType)
 	logger.LogResourceEvent(logger.LoadBalancer, logger.Get, balancer, logger.Initialized)
 
-	network, _, err := ctx.Client.LoadBalancer.GetByName(ctx.Context, balancer)
-	if err != nil || network == nil {
+	lb, _, err := ctx.Client.LoadBalancer.GetByName(ctx.Context, balancer)
+	if err != nil || lb == nil {
 		logger.LogResourceEvent(logger.LoadBalancer, logger.Get, balancer, logger.Failure, err)
 	}
 
 	logger.LogResourceEvent(logger.LoadBalancer, logger.Get, balancer, logger.Success)
-	return network
+	return lb
 }
