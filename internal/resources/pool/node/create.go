@@ -1,6 +1,7 @@
 package node
 
 import (
+	"fmt"
 	"github.com/hetznercloud/hcloud-go/v2/hcloud"
 	"hcloud-k3s-cli/internal/clustercontext"
 	"hcloud-k3s-cli/internal/config"
@@ -50,14 +51,16 @@ func create(
 	networks := []*hcloud.Network{network}
 	sshKeys := []*hcloud.SSHKey{sshKey}
 
-	cloudInit := userdata.CloudInitConfig{
+	usrData := userdata.GenerateCloudInitConfig(userdata.CloudInitConfig{
 		Hostname:        name,
 		SSHPort:         22,
 		SSHMaxAuthTries: 5,
 		SSHAuthorizedKeys: []string{
 			sshKey.PublicKey,
 		},
-	}
+	})
+
+	fmt.Printf("\n\n====================================\nUser Data:\n\n%s\n\n====================================\n\n", usrData)
 
 	res, _, err := ctx.Client.Server.Create(ctx.Context, hcloud.ServerCreateOpts{
 		Name:           name,
@@ -68,7 +71,7 @@ func create(
 		PlacementGroup: placementGroup,
 		SSHKeys:        sshKeys,
 		PublicNet:      &publicNet,
-		UserData:       userdata.GenerateCloudInitConfig(cloudInit),
+		UserData:       usrData,
 		Labels: ctx.GetLabels(map[string]string{
 			"pool":                 pool.Name,
 			"node":                 strconv.Itoa(i),
