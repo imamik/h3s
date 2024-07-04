@@ -13,9 +13,11 @@ set -ex
 
 # prepare the k3s config directory
 mkdir -p /etc/rancher/k3s
+
 # move the config file into place and adjust permissions
 echo "{{ .ConfigYaml }}" > /etc/rancher/k3s/config.yaml
 chmod 0600 /etc/rancher/k3s/config.yaml
+
 # if the server has already been initialized just stop here
 [ -e /etc/rancher/k3s/k3s.yaml ] && exit 0
 

@@ -1,6 +1,7 @@
 package install
 
 import (
+	"fmt"
 	"github.com/hetznercloud/hcloud-go/v2/hcloud"
 	"hcloud-k3s-cli/internal/clustercontext"
 	"hcloud-k3s-cli/internal/k3s/install/commands"
@@ -36,6 +37,7 @@ func Install(ctx clustercontext.ClusterContext) {
 
 	for i, remote := range controlPlaneNodes {
 		cmd := commands.ControlPlane(ctx, lb, controlPlaneNodes, remote)
+		fmt.Printf("\n\n==============\n\n%s\n\n==============\n\n", cmd)
 		logger.LogResourceEvent(logger.Server, "Install Control Plane", remote.Name, logger.Initialized)
 		ssh.ExecuteViaProxy(ctx, proxyServer, remote, cmd)
 		if i == 0 {
