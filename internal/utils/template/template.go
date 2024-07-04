@@ -7,7 +7,7 @@ import (
 
 func CompileTemplate(
 	tpl string,
-	templateVars map[string]interface{},
+	templateVars interface{},
 ) string {
 	commandTemplate := template.Must(template.New("tpl").Parse(tpl))
 

@@ -2,7 +2,7 @@ package commands
 
 import (
 	"hcloud-k3s-cli/internal/clustercontext"
-	"hcloud-k3s-cli/internal/k3s/install/template"
+	"hcloud-k3s-cli/internal/utils/template"
 	"strings"
 )
 
