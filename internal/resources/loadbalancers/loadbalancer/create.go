@@ -63,12 +63,19 @@ func create(
 		Labels:           labels,
 	}
 
-	balancer, _, err := ctx.Client.LoadBalancer.Create(ctx.Context, opts)
-	if err != nil || balancer.LoadBalancer == nil {
+	res, _, err := ctx.Client.LoadBalancer.Create(ctx.Context, opts)
+
+	if err != nil {
+		logger.LogResourceEvent(logger.LoadBalancer, logger.Create, name, logger.Failure, err)
+	}
+	if res.LoadBalancer == nil {
+		logger.LogResourceEvent(logger.LoadBalancer, logger.Create, name, logger.Failure, "Empty response")
+	}
+	if err := ctx.Client.Action.WaitFor(ctx.Context, res.Action); err != nil {
 		logger.LogResourceEvent(logger.LoadBalancer, logger.Create, name, logger.Failure, err)
 	}
 
 	logger.LogResourceEvent(logger.LoadBalancer, logger.Create, name, logger.Success)
 
-	return balancer.LoadBalancer
+	return res.LoadBalancer
 }

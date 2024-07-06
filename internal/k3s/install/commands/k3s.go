@@ -21,14 +21,9 @@ func getMinorVersion(version string) string {
 	}
 }
 
-func K3sCommand(ctx clustercontext.ClusterContext) string {
+func K3sInstall(ctx clustercontext.ClusterContext) string {
 	tplArr := []string{
-		"curl -sfL https://get.k3s.io |",
-		"INSTALL_K3S_SKIP_START=true",
-		"INSTALL_K3S_SKIP_SELINUX_RPM=true",
-		"INSTALL_K3S_CHANNEL={{ .InitialK3sChannel }}",
-		"INSTALL_K3S_EXEC='server {{ .K3sExecServerArgs }}'",
-		"sh -",
+		"curl -sfL https://get.k3s.io | INSTALL_K3S_SKIP_START=true INSTALL_K3S_SKIP_SELINUX_RPM=true INSTALL_K3S_CHANNEL={{ .InitialK3sChannel }} INSTALL_K3S_EXEC='server {{ .K3sExecServerArgs }}' sh -",
 	}
 	tpl := strings.Join(tplArr, " ")
 
@@ -39,4 +34,22 @@ func K3sCommand(ctx clustercontext.ClusterContext) string {
 		"InitialK3sChannel": k3sChannel,
 		"K3sExecServerArgs": k3sExecServerArgs,
 	})
+}
+
+func K3sStart() string {
+	return `
+systemctl start k3s 2> /dev/null
+
+# prepare the needed directories
+mkdir -p /var/post_install /var/user_kustomize
+
+# wait for the server to be ready
+timeout 360 bash <<EOF
+	until systemctl status k3s > /dev/null; do
+		systemctl start k3s 2> /dev/null
+		echo "Waiting for the k3s server to start..."
+		sleep 3
+	done
+EOF
+`
 }

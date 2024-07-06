@@ -49,7 +49,14 @@ runcmd:
 - ["sh", "-c", "echo '/var/swapfile swap swap defaults 0 0' >> /etc/fstab"]
 {{- end}}
 `, map[string]interface{}{
-		"WriteFilesCommon": generateWriteFilesCommon(config),
-		"RunCmdCommon":     generateRunCmdCommon(config),
+		"Hostname":          config.Hostname,
+		"SSHAuthorizedKeys": config.SSHAuthorizedKeys,
+		"SwapSize":          config.SwapSize,
+		"SSHPort":           config.SSHPort,
+		"SSHMaxAuthTries":   config.SSHMaxAuthTries,
+		"K3sRegistries":     config.K3sRegistries,
+		"DNSServers":        config.DNSServers,
+		"WriteFilesCommon":  generateWriteFilesCommon(config),
+		"RunCmdCommon":      generateRunCmdCommon(config),
 	})
 }

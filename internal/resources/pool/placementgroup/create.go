@@ -14,11 +14,11 @@ func create(
 	isControlPlane bool,
 	isWorker bool,
 ) *hcloud.PlacementGroup {
-	placementGroupName := getName(ctx, pool)
-	logger.LogResourceEvent(logger.PlacementGroup, logger.Create, placementGroupName, logger.Initialized)
+	name := getName(ctx, pool)
+	logger.LogResourceEvent(logger.PlacementGroup, logger.Create, name, logger.Initialized)
 
-	placementGroupResp, _, err := ctx.Client.PlacementGroup.Create(ctx.Context, hcloud.PlacementGroupCreateOpts{
-		Name: placementGroupName,
+	res, _, err := ctx.Client.PlacementGroup.Create(ctx.Context, hcloud.PlacementGroupCreateOpts{
+		Name: name,
 		Type: hcloud.PlacementGroupTypeSpread,
 		Labels: ctx.GetLabels(map[string]string{
 			"pool":             pool.Name,
@@ -28,14 +28,17 @@ func create(
 		}),
 	})
 	if err != nil {
-		logger.LogResourceEvent(logger.PlacementGroup, logger.Create, placementGroupName, logger.Failure, err)
+		logger.LogResourceEvent(logger.PlacementGroup, logger.Create, name, logger.Failure, err)
 	}
-	if placementGroupResp.PlacementGroup == nil {
-		logger.LogResourceEvent(logger.PlacementGroup, logger.Create, placementGroupName, logger.Failure, "Empty Response")
+	if res.PlacementGroup == nil {
+		logger.LogResourceEvent(logger.PlacementGroup, logger.Create, name, logger.Failure, "Empty Response")
+	}
+	if err := ctx.Client.Action.WaitFor(ctx.Context, res.Action); err != nil {
+		logger.LogResourceEvent(logger.PlacementGroup, logger.Create, name, logger.Failure, err)
 	}
 
-	logger.LogResourceEvent(logger.PlacementGroup, logger.Create, placementGroupName, logger.Success)
-	return placementGroupResp.PlacementGroup
+	logger.LogResourceEvent(logger.PlacementGroup, logger.Create, name, logger.Success)
+	return res.PlacementGroup
 }
 
 func Create(

@@ -14,10 +14,12 @@ func getServer(
 	node *hcloud.Server,
 ) string {
 	address := ""
-	if lb != nil {
-		address = lb.PublicNet.IPv4.IP.String()
-	} else {
+	if lb == nil {
 		address = ip.FirstAvailable(node)
+	} else if len(lb.PrivateNet) > 0 {
+		address = lb.PrivateNet[0].IP.String()
+	} else {
+		address = lb.PublicNet.IPv4.IP.String()
 	}
 	return "https://" + address + ":6443"
 }
@@ -27,14 +29,20 @@ func getTlsSan(
 	controlPlaneNodes []*hcloud.Server,
 ) []string {
 	var tlsSan []string
-	if lb != nil {
-		tlsSan = append(tlsSan, lb.PublicNet.IPv4.IP.String())
-		tlsSan = append(tlsSan, lb.PublicNet.IPv6.IP.String())
-	} else {
-		for _, node := range controlPlaneNodes {
-			tlsSan = append(tlsSan, ip.FirstAvailable(node))
-		}
+	for _, node := range controlPlaneNodes {
+		tlsSan = append(tlsSan, ip.FirstAvailable(node))
 	}
+	if lb == nil {
+		return tlsSan
+
+	}
+	tlsSan = append(tlsSan, lb.PublicNet.IPv4.IP.String())
+	tlsSan = append(tlsSan, lb.PublicNet.IPv6.IP.String())
+
+	for _, privateNet := range lb.PrivateNet {
+		tlsSan = append(tlsSan, privateNet.IP.String())
+	}
+
 	return tlsSan
 }
 
@@ -44,20 +52,19 @@ func ControlPlane(
 	controlPlaneNodes []*hcloud.Server,
 	node *hcloud.Server,
 ) string {
+	isFirst := node.ID == controlPlaneNodes[0].ID
 	nodeIp := node.PrivateNet[0].IP.String()
 
-	configYaml := yaml.String(config.K3sServerConfig{
+	configYaml := config.K3sServerConfig{
 		// Node
 		NodeName:  node.Name,
 		NodeLabel: []string{},
 
 		// Server
-		Server: getServer(lb, node),
-		Token:  ctx.Credentials.K3sToken,
+		Token: ctx.Credentials.K3sToken,
 
 		// Cluster
-		ClusterInit: node.ID == controlPlaneNodes[0].ID,
-		NodeTaint:   []string{},
+		NodeTaint: []string{},
 
 		// Disabled Functionality
 		DisableCloudController: true,
@@ -89,17 +96,25 @@ func ControlPlane(
 		DisableNetworkPolicy: false,
 		FlannelBackend:       "vxlan",
 
-		// System
-		SELinux:             true,
-		WriteKubeconfigMode: "0644",
-
+		// Etcd
 		TLSSAN: getTlsSan(lb, controlPlaneNodes),
-	})
+	}
+
+	if isFirst {
+		configYaml.ClusterInit = true
+	} else {
+		configYaml.Server = getServer(lb, node)
+		configYaml.SELinux = true
+		configYaml.WriteKubeconfigMode = "0644"
+	}
+
+	configYamlStr := yaml.String(configYaml)
 	commandArr := []string{
-		PreInstallCommand(configYaml),
-		K3sCommand(ctx),
+		PreInstallCommand(configYamlStr),
+		K3sInstall(ctx),
 		SeLinux(),
 		PostInstall(),
+		K3sStart(),
 	}
 	return strings.Join(commandArr, "\n")
 }
