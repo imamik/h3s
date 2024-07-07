@@ -6,10 +6,12 @@ import (
 	"hcloud-k3s-cli/internal/utils/file"
 	"hcloud-k3s-cli/internal/utils/logger"
 	"hcloud-k3s-cli/internal/utils/ssh"
+	"strings"
 )
 
 func downloadKubeConfig(
 	ctx clustercontext.ClusterContext,
+	lb *hcloud.LoadBalancer,
 	proxy *hcloud.Server,
 	remote *hcloud.Server,
 ) {
@@ -18,6 +20,7 @@ func downloadKubeConfig(
 	if err != nil {
 		logger.LogResourceEvent(logger.Server, "Download kubeconfig", remote.Name, logger.Failure, err)
 	} else {
+		kubeConfig = strings.Replace(kubeConfig, "127.0.0.1", lb.PublicNet.IPv4.IP.String(), 1)
 		err := file.Save([]byte(kubeConfig), "k3s.yaml")
 		if err != nil {
 			logger.LogResourceEvent(logger.Server, "Download kubeconfig", remote.Name, logger.Failure, err)
