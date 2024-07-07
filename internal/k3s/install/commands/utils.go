@@ -1,0 +1,43 @@
+package commands
+
+import (
+	"github.com/hetznercloud/hcloud-go/v2/hcloud"
+	"hcloud-k3s-cli/internal/utils/ip"
+)
+
+func getServer(
+	lb *hcloud.LoadBalancer,
+	node *hcloud.Server,
+) string {
+	address := ""
+	if lb == nil {
+		address = ip.FirstAvailable(node)
+	} else if len(lb.PrivateNet) > 0 {
+		address = lb.PrivateNet[0].IP.String()
+	} else {
+		address = lb.PublicNet.IPv4.IP.String()
+	}
+	return "https://" + address + ":6443"
+}
+
+func getTlsSan(
+	lb *hcloud.LoadBalancer,
+	controlPlaneNodes []*hcloud.Server,
+) []string {
+	var tlsSan []string
+	for _, node := range controlPlaneNodes {
+		tlsSan = append(tlsSan, ip.FirstAvailable(node))
+	}
+	if lb == nil {
+		return tlsSan
+
+	}
+	tlsSan = append(tlsSan, lb.PublicNet.IPv4.IP.String())
+	tlsSan = append(tlsSan, lb.PublicNet.IPv6.IP.String())
+
+	for _, privateNet := range lb.PrivateNet {
+		tlsSan = append(tlsSan, privateNet.IP.String())
+	}
+
+	return tlsSan
+}

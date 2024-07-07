@@ -4,47 +4,9 @@ import (
 	"github.com/hetznercloud/hcloud-go/v2/hcloud"
 	"hcloud-k3s-cli/internal/clustercontext"
 	"hcloud-k3s-cli/internal/k3s/install/config"
-	"hcloud-k3s-cli/internal/utils/ip"
 	"hcloud-k3s-cli/internal/utils/yaml"
 	"strings"
 )
-
-func getServer(
-	lb *hcloud.LoadBalancer,
-	node *hcloud.Server,
-) string {
-	address := ""
-	if lb == nil {
-		address = ip.FirstAvailable(node)
-	} else if len(lb.PrivateNet) > 0 {
-		address = lb.PrivateNet[0].IP.String()
-	} else {
-		address = lb.PublicNet.IPv4.IP.String()
-	}
-	return "https://" + address + ":6443"
-}
-
-func getTlsSan(
-	lb *hcloud.LoadBalancer,
-	controlPlaneNodes []*hcloud.Server,
-) []string {
-	var tlsSan []string
-	for _, node := range controlPlaneNodes {
-		tlsSan = append(tlsSan, ip.FirstAvailable(node))
-	}
-	if lb == nil {
-		return tlsSan
-
-	}
-	tlsSan = append(tlsSan, lb.PublicNet.IPv4.IP.String())
-	tlsSan = append(tlsSan, lb.PublicNet.IPv6.IP.String())
-
-	for _, privateNet := range lb.PrivateNet {
-		tlsSan = append(tlsSan, privateNet.IP.String())
-	}
-
-	return tlsSan
-}
 
 func ControlPlane(
 	ctx clustercontext.ClusterContext,
@@ -103,7 +65,7 @@ func ControlPlane(
 	if isFirst {
 		configYaml.ClusterInit = true
 	} else {
-		configYaml.Server = getServer(lb, node)
+		configYaml.Server = getServer(lb, controlPlaneNodes[0])
 		configYaml.SELinux = true
 		configYaml.WriteKubeconfigMode = "0644"
 	}
@@ -111,10 +73,10 @@ func ControlPlane(
 	configYamlStr := yaml.String(configYaml)
 	commandArr := []string{
 		PreInstallCommand(configYamlStr),
-		K3sInstall(ctx),
+		K3sInstall(ctx, true),
 		SeLinux(),
 		PostInstall(),
-		K3sStart(),
+		K3sStartServer(),
 	}
 	return strings.Join(commandArr, "\n")
 }

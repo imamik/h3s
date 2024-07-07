@@ -1,7 +1,6 @@
 package node
 
 import (
-	"fmt"
 	"github.com/hetznercloud/hcloud-go/v2/hcloud"
 	"hcloud-k3s-cli/internal/clustercontext"
 	"hcloud-k3s-cli/internal/config"
@@ -59,8 +58,6 @@ func create(
 			sshKey.PublicKey,
 		},
 	})
-
-	fmt.Printf("\n\n====================================\nUser Data:\n\n%s\n\n====================================\n\n", usrData)
 
 	res, _, err := ctx.Client.Server.Create(ctx.Context, hcloud.ServerCreateOpts{
 		Name:           name,

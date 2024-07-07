@@ -1,37 +1,55 @@
 package commands
 
 import (
-	"bytes"
 	"github.com/hetznercloud/hcloud-go/v2/hcloud"
 	"hcloud-k3s-cli/internal/clustercontext"
-	"text/template"
+	"hcloud-k3s-cli/internal/k3s/install/config"
+	"hcloud-k3s-cli/internal/utils/yaml"
+	"strings"
 )
 
 func Worker(
 	ctx clustercontext.ClusterContext,
 	lb *hcloud.LoadBalancer,
+	controlPlaneNodes []*hcloud.Server,
+	node *hcloud.Server,
 ) string {
-	var buffer bytes.Buffer
+	nodeIp := node.PrivateNet[0].IP.String()
+	server := getServer(lb, controlPlaneNodes[0])
 
-	tpldata := make(map[string]interface{})
-	tpldata["K3sVersion"] = ctx.Config.K3sVersion
-	tpldata["K3sToken"] = ctx.Credentials.K3sToken
-	tpldata["K3sUrl"] = lb.PrivateNet[0].IP.String()
+	configYaml := config.K3sServerConfig{
+		// Node
+		NodeName:  node.Name,
+		NodeLabel: []string{},
 
-	tpl := `if lscpu | grep Vendor | grep -q Intel; then export FLANNEL_INTERFACE=ens10 ; else export FLANNEL_INTERFACE=enp7s0 ; fi && \
-curl -sfL https://get.k3s.io | K3S_TOKEN="{{ .K3sToken }}" INSTALL_K3S_VERSION="{{ .K3sVersion }}" K3S_URL=https://{{ .K3sUrl }}:6443 INSTALL_K3S_EXEC="agent \
---node-name="$(hostname -f)" \
---kubelet-arg="cloud-provider=external" \
---node-ip=$(hostname -I | awk '{print $2}') \
---node-external-ip=$(hostname -I | awk '{print $1}') \
---flannel-iface=$FLANNEL_INTERFACE" sh -`
+		// Server
+		Token:  ctx.Credentials.K3sToken,
+		Server: server,
 
-	t := template.Must(template.New("tpl").Parse(tpl))
+		// Cluster
+		NodeTaint: []string{},
 
-	err := t.Execute(&buffer, tpldata)
-	if err != nil {
-		panic(err)
+		// Kube
+		KubeletArg: []string{
+			"cloud-provider=external",
+			"volume-plugin-dir=/var/lib/kubelet/volumeplugins",
+		},
+
+		// Network
+		FlannelIface: "eth1",
+		NodeIP:       []string{nodeIp},
+
+		// Security
+		SELinux: true,
 	}
 
-	return buffer.String()
+	configYamlStr := yaml.String(configYaml)
+	commandArr := []string{
+		PreInstallCommand(configYamlStr),
+		K3sInstall(ctx, false),
+		SeLinux(),
+		PostInstall(),
+		K3sStartAgent(),
+	}
+	return strings.Join(commandArr, "\n")
 }
