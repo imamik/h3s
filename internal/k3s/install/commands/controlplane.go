@@ -56,18 +56,24 @@ func ControlPlane(
 
 		// CNI
 		DisableNetworkPolicy: false,
-		FlannelBackend:       "vxlan",
+		FlannelBackend:       "vxlan", // TODO: make this configurable
 
 		// Etcd
 		TLSSAN: getTlsSan(lb, controlPlaneNodes),
+
+		// Security
+		SELinux: true,
 	}
 
 	if isFirst {
 		configYaml.ClusterInit = true
 	} else {
 		configYaml.Server = getServer(lb, controlPlaneNodes[0])
-		configYaml.SELinux = true
 		configYaml.WriteKubeconfigMode = "0644"
+	}
+
+	if !ctx.Config.ControlPlane.AsWorkerPool {
+		configYaml.NodeTaint = []string{"node-role.kubernetes.io/control-plane:NoSchedule"}
 	}
 
 	configYamlStr := yaml.String(configYaml)
@@ -76,7 +82,7 @@ func ControlPlane(
 		K3sInstall(ctx, true),
 		SeLinux(),
 		PostInstall(),
-		K3sStartServer(),
+		K3sStartServer(isFirst),
 	}
 	return strings.Join(commandArr, "\n")
 }

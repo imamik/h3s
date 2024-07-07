@@ -22,10 +22,7 @@ func getMinorVersion(version string) string {
 }
 
 func K3sInstall(ctx clustercontext.ClusterContext, isControlPlane bool) string {
-	tplArr := []string{
-		"curl -sfL https://get.k3s.io | INSTALL_K3S_SKIP_START=true INSTALL_K3S_SKIP_SELINUX_RPM=true INSTALL_K3S_CHANNEL={{ .InitialK3sChannel }} INSTALL_K3S_EXEC='{{ .ServerOrAgent }} {{ .K3sExecServerArgs }}' sh -",
-	}
-	tpl := strings.Join(tplArr, " ")
+	tpl := "curl -sfL https://get.k3s.io | INSTALL_K3S_SKIP_START=true INSTALL_K3S_SKIP_SELINUX_RPM=true INSTALL_K3S_CHANNEL={{ .InitialK3sChannel }} INSTALL_K3S_EXEC='{{ .ServerOrAgent }} {{ .K3sExecServerArgs }}' sh -"
 
 	k3sExecArgs := ""
 	k3sChannel := getMinorVersion(ctx.Config.K3sVersion)
@@ -41,22 +38,39 @@ func K3sInstall(ctx clustercontext.ClusterContext, isControlPlane bool) string {
 	})
 }
 
-func K3sStartServer() string {
-	return `
+func K3sStartServer(initCluster bool) string {
+	until := `
+	until systemctl status k3s > /dev/null; do
+		systemctl start k3s 2> /dev/null
+		echo "Waiting for the k3s server to start..."
+		sleep 3
+	done`
+
+	if initCluster {
+		until += `
+	until [ -e /etc/rancher/k3s/k3s.yaml ]; do
+		echo "Waiting for kubectl config..."
+		sleep 2
+	done
+	until [[ "\$(kubectl get --raw='/readyz' 2> /dev/null)" == "ok" ]]; do
+		echo "Waiting for the cluster to become ready..."
+		sleep 2
+	done
+	`
+	}
+	return template.CompileTemplate(`
 systemctl start k3s 2> /dev/null
 
 # prepare the needed directories
 mkdir -p /var/post_install /var/user_kustomize
 
 # wait for the server to be ready
-timeout 360 bash <<EOF
-	until systemctl status k3s > /dev/null; do
-		systemctl start k3s 2> /dev/null
-		echo "Waiting for the k3s server to start..."
-		sleep 3
-	done
+timeout 120 bash <<EOF
+	{{ .Until }}
 EOF
-`
+`, map[string]interface{}{
+		"Until": until,
+	})
 }
 
 func K3sStartAgent() string {

@@ -25,18 +25,17 @@ func getTlsSan(
 	controlPlaneNodes []*hcloud.Server,
 ) []string {
 	var tlsSan []string
-	for _, node := range controlPlaneNodes {
-		tlsSan = append(tlsSan, ip.FirstAvailable(node))
-	}
+
 	if lb == nil {
-		return tlsSan
-
-	}
-	tlsSan = append(tlsSan, lb.PublicNet.IPv4.IP.String())
-	tlsSan = append(tlsSan, lb.PublicNet.IPv6.IP.String())
-
-	for _, privateNet := range lb.PrivateNet {
-		tlsSan = append(tlsSan, privateNet.IP.String())
+		for _, node := range controlPlaneNodes {
+			tlsSan = append(tlsSan, ip.FirstAvailable(node))
+		}
+	} else {
+		tlsSan = append(tlsSan, lb.PublicNet.IPv4.IP.String())
+		tlsSan = append(tlsSan, lb.PublicNet.IPv6.IP.String())
+		for _, privateNet := range lb.PrivateNet {
+			tlsSan = append(tlsSan, privateNet.IP.String())
+		}
 	}
 
 	return tlsSan
