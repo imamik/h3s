@@ -84,7 +84,6 @@ additionalArguments:
 	for i, line := range lines {
 		lines[i] = "    " + line
 	}
-	// start with the second line
 	values = strings.Join(lines[1:], "\n")
 	return values
 }
@@ -93,7 +92,7 @@ func traefikYaml(
 	ctx clustercontext.ClusterContext,
 	lb *hcloud.LoadBalancer,
 ) string {
-	namspace := "kube-system"
+	namespace := "traefik"
 	version := "29.0.0"
 	imageTag := "v3.1"
 	return template.CompileTemplate(`
@@ -118,9 +117,9 @@ spec:
 {{ .ValuesContent }}
 `,
 		map[string]interface{}{
-			"TargetNamespace": namspace,
+			"TargetNamespace": namespace,
 			"TraefikVersion":  version,
-			"ValuesContent":   valuesContent(ctx, lb, namspace, imageTag),
+			"ValuesContent":   valuesContent(ctx, lb, namespace, imageTag),
 		})
 }
 

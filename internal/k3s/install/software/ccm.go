@@ -6,7 +6,7 @@ import (
 	"hcloud-k3s-cli/internal/utils/template"
 )
 
-func applySecretsCommand(ctx clustercontext.ClusterContext, network *hcloud.Network) string {
+func secretYaml(ctx clustercontext.ClusterContext, network *hcloud.Network) string {
 	return template.CompileTemplate(`
 apiVersion: "v1"
 kind: "Secret"
@@ -22,9 +22,9 @@ stringData:
 	})
 }
 
-const hetznerCCMYaml = "https://github.com/hetznercloud/hcloud-cloud-controller-manager/releases/latest/download/ccm-networks.yaml"
+const hetznerCloudControllerManagerYaml = "https://github.com/hetznercloud/hcloud-cloud-controller-manager/releases/latest/download/ccm-networks.yaml"
 
-func applySecrectsCommand(ctx clustercontext.ClusterContext, network *hcloud.Network) string {
+func settingsYaml(ctx clustercontext.ClusterContext, network *hcloud.Network) string {
 	return template.CompileTemplate(`
 apiVersion: apps/v1
 kind: Deployment
@@ -66,7 +66,7 @@ func InstallHetznerCCM(
 	proxy *hcloud.Server,
 	remote *hcloud.Server,
 ) {
-	ApplyDynamicFile(ctx, proxy, remote, applySecretsCommand(ctx, network))
-	ApplyYaml(ctx, proxy, remote, hetznerCCMYaml)
-	ApplyDynamicFile(ctx, proxy, remote, applySecrectsCommand(ctx, network))
+	ApplyDynamicFile(ctx, proxy, remote, secretYaml(ctx, network))
+	ApplyYaml(ctx, proxy, remote, hetznerCloudControllerManagerYaml)
+	ApplyDynamicFile(ctx, proxy, remote, settingsYaml(ctx, network))
 }
