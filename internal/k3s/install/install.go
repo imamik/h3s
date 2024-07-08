@@ -44,6 +44,8 @@ func Install(ctx clustercontext.ClusterContext) {
 		if i == 0 {
 			downloadKubeConfig(ctx, lb, proxyServer, remote)
 			software.InstallHetznerCCM(ctx, net, proxyServer, remote)
+			software.InstallHetznerCSI(ctx, net, proxyServer, remote)
+			software.InstallTraefik(ctx, lb, proxyServer, remote)
 		}
 	}
 
