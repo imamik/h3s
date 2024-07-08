@@ -4,7 +4,9 @@ import (
 	"github.com/hetznercloud/hcloud-go/v2/hcloud"
 	"hcloud-k3s-cli/internal/clustercontext"
 	"hcloud-k3s-cli/internal/k3s/install/commands"
+	"hcloud-k3s-cli/internal/k3s/install/software"
 	"hcloud-k3s-cli/internal/resources/loadbalancers/loadbalancer"
+	"hcloud-k3s-cli/internal/resources/network"
 	"hcloud-k3s-cli/internal/resources/pool/node"
 	"hcloud-k3s-cli/internal/resources/proxy"
 	"hcloud-k3s-cli/internal/resources/server"
@@ -13,6 +15,7 @@ import (
 )
 
 func Install(ctx clustercontext.ClusterContext) {
+	net := network.Get(ctx)
 	nodes := server.GetAll(ctx)
 
 	balancerType := loadbalancer.ControlPlane
@@ -40,6 +43,7 @@ func Install(ctx clustercontext.ClusterContext) {
 		ssh.ExecuteViaProxy(ctx, proxyServer, remote, cmd)
 		if i == 0 {
 			downloadKubeConfig(ctx, lb, proxyServer, remote)
+			software.InstallHetznerCCM(ctx, net, proxyServer, remote)
 		}
 	}
 
