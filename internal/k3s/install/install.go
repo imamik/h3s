@@ -14,7 +14,7 @@ import (
 	"hcloud-k3s-cli/internal/utils/ssh"
 )
 
-func Install(ctx clustercontext.ClusterContext) {
+func getSetup(ctx clustercontext.ClusterContext) (*hcloud.Network, *hcloud.LoadBalancer, *hcloud.Server, []*hcloud.Server, []*hcloud.Server) {
 	net := network.Get(ctx)
 	nodes := server.GetAll(ctx)
 
@@ -35,7 +35,16 @@ func Install(ctx clustercontext.ClusterContext) {
 	}
 
 	proxyServer := proxy.Create(ctx)
-	defer proxy.Delete(ctx)
+
+	return net, lb, proxyServer, controlPlaneNodes, workerNodes
+}
+
+func Install(ctx clustercontext.ClusterContext, cleanup bool) {
+	net, lb, proxyServer, controlPlaneNodes, workerNodes := getSetup(ctx)
+
+	if cleanup {
+		defer proxy.Delete(ctx)
+	}
 
 	for i, remote := range controlPlaneNodes {
 		cmd := commands.ControlPlane(ctx, lb, controlPlaneNodes, remote)
@@ -43,9 +52,7 @@ func Install(ctx clustercontext.ClusterContext) {
 		ssh.ExecuteViaProxy(ctx, proxyServer, remote, cmd)
 		if i == 0 {
 			downloadKubeConfig(ctx, lb, proxyServer, remote)
-			software.InstallHetznerCCM(ctx, net, proxyServer, remote)
-			software.InstallHetznerCSI(ctx, net, proxyServer, remote)
-			software.InstallTraefik(ctx, lb, proxyServer, remote)
+			software.Install(ctx, net, lb, proxyServer, remote)
 		}
 	}
 
@@ -55,4 +62,14 @@ func Install(ctx clustercontext.ClusterContext) {
 		ssh.ExecuteViaProxy(ctx, proxyServer, remote, cmd)
 	}
 
+}
+
+func InstallSoftware(ctx clustercontext.ClusterContext, cleanup bool) {
+	net, lb, proxyServer, controlPlaneNodes, _ := getSetup(ctx)
+
+	if cleanup {
+		defer proxy.Delete(ctx)
+	}
+
+	software.Install(ctx, net, lb, proxyServer, controlPlaneNodes[0])
 }

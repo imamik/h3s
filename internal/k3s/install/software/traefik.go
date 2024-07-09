@@ -56,20 +56,6 @@ ports:
       trustedIPs:
         - 127.0.0.1/32
         - 10.0.0.0/8
-  kubectl:
-	port: 6443
-    expose:
-      default: true
-    exposedPort: 6443
-    protocol: TCP
-    proxyProtocol:
-      trustedIPs:
-        - 127.0.0.1/32
-        - 10.0.0.0/8
-    forwardedHeaders:
-      trustedIPs:
-        - 127.0.0.1/32
-        - 10.0.0.0/8
 additionalArguments:
   - "--providers.kubernetesingress.ingressendpoint.publishedservice={{ .IngressControllerNamespace }}/traefik"
 `,
@@ -91,17 +77,11 @@ additionalArguments:
 func traefikYaml(
 	ctx clustercontext.ClusterContext,
 	lb *hcloud.LoadBalancer,
+	namespace string,
 ) string {
-	namespace := "traefik"
 	version := "29.0.0"
 	imageTag := "v3.1"
 	return template.CompileTemplate(`
----
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: {{ .TargetNamespace }}
----
 apiVersion: helm.cattle.io/v1
 kind: HelmChart
 metadata:
@@ -123,11 +103,25 @@ spec:
 		})
 }
 
+func initNamespace(namespace string) string {
+	return template.CompileTemplate(`
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: {{ .TargetNamespace }}
+`,
+		map[string]interface{}{
+			"TargetNamespace": namespace,
+		})
+}
+
 func InstallTraefik(
 	ctx clustercontext.ClusterContext,
 	lb *hcloud.LoadBalancer,
 	proxy *hcloud.Server,
 	remote *hcloud.Server,
 ) {
-	ApplyDynamicFile(ctx, proxy, remote, traefikYaml(ctx, lb))
+	namespace := "traefik"
+	ApplyDynamicFile(ctx, proxy, remote, initNamespace(namespace))
+	ApplyDynamicFile(ctx, proxy, remote, traefikYaml(ctx, lb, namespace))
 }
