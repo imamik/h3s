@@ -16,6 +16,9 @@ const (
 	PlacementGroup LogResource = "Placement Group"
 	Server         LogResource = "Server"
 	LoadBalancer   LogResource = "Load Balancer"
+
+	DNSZone   LogResource = "DNS Zone"
+	DNSRecord LogResource = "DNS Record"
 )
 
 type LogCrudMethod string

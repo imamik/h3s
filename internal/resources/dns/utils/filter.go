@@ -1,6 +1,8 @@
-package dns
+package utils
 
-import "hcloud-k3s-cli/internal/resources/dns/api"
+import (
+	"hcloud-k3s-cli/internal/resources/dns/api"
+)
 
 func isRecordExpected(record api.Record, expectedRecords []api.CreateRecordOpts) bool {
 	for _, expectedRecord := range expectedRecords {
@@ -11,8 +13,8 @@ func isRecordExpected(record api.Record, expectedRecords []api.CreateRecordOpts)
 	return false
 }
 
-func filterFound(foundRecords []api.Record) []api.Record {
-	expectedRecords := getExpectedRecords(nil, nil)
+func FilterFoundRecords(foundRecords []api.Record) []api.Record {
+	expectedRecords := GetExpectedRecords(nil, nil)
 
 	var filteredRecords []api.Record
 	for _, foundRecord := range foundRecords {
