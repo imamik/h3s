@@ -2,6 +2,7 @@ package cluster
 
 import (
 	"hcloud-k3s-cli/internal/clustercontext"
+	"hcloud-k3s-cli/internal/resources/dns"
 	"hcloud-k3s-cli/internal/resources/loadbalancers"
 	"hcloud-k3s-cli/internal/resources/network"
 	"hcloud-k3s-cli/internal/resources/pool"
@@ -19,6 +20,7 @@ func Destroy(ctx clustercontext.ClusterContext) {
 	network.Delete(ctx)
 	sshkey.Delete(ctx)
 	proxy.Delete(ctx)
+	dns.Delete(ctx)
 
 	file.Delete("./k3s.yaml")
 

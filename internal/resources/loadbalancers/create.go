@@ -50,7 +50,7 @@ func Create(ctx clustercontext.ClusterContext, network *hcloud.Network, nodes []
 	}
 }
 
-func create(ctx clustercontext.ClusterContext, network *hcloud.Network, nodes []*hcloud.Server, balancerType loadbalancer.Type) {
+func create(ctx clustercontext.ClusterContext, network *hcloud.Network, nodes []*hcloud.Server, balancerType loadbalancer.Type) *hcloud.LoadBalancer {
 	targets := getNodeTargets(balancerType, nodes)
-	loadbalancer.Create(ctx, network, targets, balancerType)
+	return loadbalancer.Create(ctx, network, targets, balancerType)
 }

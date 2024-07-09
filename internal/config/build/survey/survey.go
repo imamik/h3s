@@ -35,6 +35,12 @@ func Survey(k3sReleases []releases.Release) (config.Config, error) {
 
 	conf.SSHKeyPaths.PublicKeyPath = conf.SSHKeyPaths.PrivateKeyPath + ".pub"
 
+	huh.NewInput().
+		Title("Domain").
+		Description("The domain you want to setup (e.g. 'example.com')").
+		Value(&conf.Domain).
+		Run()
+
 	huh.NewSelect[hcloud.NetworkZone]().
 		Title("Network Zone").
 		Description("The network zone to deploy the cluster in").

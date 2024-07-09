@@ -27,6 +27,7 @@ type Config struct {
 	K3sVersion           string             `yaml:"k3s_version"`
 	SSHKeyPaths          SSHKeyPaths        `yaml:"ssh_key_paths"`
 	NetworkZone          hcloud.NetworkZone `yaml:"network_zone"`
+	Domain               string             `yaml:"domain"`
 	ControlPlane         ControlPlane       `yaml:"control_plane"`
 	WorkerPools          []NodePool         `yaml:"worker_pools,omitempty"`
 	CombinedLoadBalancer bool               `yaml:"combined_load_balancer,omitempty"`
