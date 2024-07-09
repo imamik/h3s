@@ -46,17 +46,17 @@ func ControlPlane(
 			"flex-volume-plugin-dir=/var/lib/kubelet/volumeplugins",
 		},
 
+		// Flannel
+		FlannelBackend:       "vxlan", // TODO: make this configurable
+		FlannelIface:         "eth1",
+		DisableNetworkPolicy: false,
+
 		// Network
-		FlannelIface:     "eth1",
 		NodeIP:           []string{nodeIp},
 		AdvertiseAddress: nodeIp,
 		ClusterCIDR:      "10.42.0.0/16",
 		ServiceCIDR:      "10.43.0.0/16",
 		ClusterDNS:       "10.43.0.10",
-
-		// CNI
-		DisableNetworkPolicy: false,
-		FlannelBackend:       "vxlan", // TODO: make this configurable
 
 		// Etcd
 		TLSSAN: getTlsSan(lb, controlPlaneNodes),
