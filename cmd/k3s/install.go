@@ -27,7 +27,7 @@ var InstallSoftware = &cobra.Command{
 }
 
 func init() {
-	InstallSoftware.Flags().BoolVar(&cleanup, "cleanup", false, "Force installation")
-	Install.Flags().BoolVar(&cleanup, "cleanup", false, "Force installation")
+	InstallSoftware.Flags().BoolVar(&cleanup, "cleanup", true, "Force installation")
+	Install.Flags().BoolVar(&cleanup, "cleanup", true, "Force installation")
 	Install.AddCommand(InstallSoftware)
 }
