@@ -8,9 +8,6 @@ func PreInstallCommand(configYaml string) string {
 	return template.CompileTemplate(`
 set -ex
 
-# rename the private network interface to eth1
-/etc/cloud/rename_interface.sh
-
 # prepare the k3s config directory
 mkdir -p /etc/rancher/k3s
 

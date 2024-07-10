@@ -4,38 +4,6 @@ import "hcloud-k3s-cli/internal/utils/template"
 
 func generateWriteFilesCommon(config CloudInitConfig) string {
 	return template.CompileTemplate(`
-# Script to rename the private interface to eth1 and unify NetworkManager connection naming
-- path: /etc/cloud/rename_interface.sh
-  content: |
-    #!/bin/bash
-    set -euo pipefail
-
-    sleep 11
-
-    INTERFACE=$(ip link show | awk '/^3:/{print $2}' | sed 's/://g')
-    MAC=$(cat /sys/class/net/$INTERFACE/address)
-
-    cat <<EOF > /etc/udev/rules.d/70-persistent-net.rules
-    SUBSYSTEM=="net", ACTION=="add", DRIVERS=="?*", ATTR{address}=="$MAC", NAME="eth1"
-    EOF
-
-    ip link set $INTERFACE down
-    ip link set $INTERFACE name eth1
-    ip link set eth1 up
-
-    eth0_connection=$(nmcli -g GENERAL.CONNECTION device show eth0)
-    nmcli connection modify "$eth0_connection" \
-      con-name eth0 \
-      connection.interface-name eth0
-
-    eth1_connection=$(nmcli -g GENERAL.CONNECTION device show eth1)
-    nmcli connection modify "$eth1_connection" \
-      con-name eth1 \
-      connection.interface-name eth1
-
-    systemctl restart NetworkManager
-  permissions: "0744"
-
 # Disable ssh password authentication
 - content: |
     Port {{.SSHPort}}

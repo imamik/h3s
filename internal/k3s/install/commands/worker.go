@@ -4,6 +4,7 @@ import (
 	"github.com/hetznercloud/hcloud-go/v2/hcloud"
 	"hcloud-k3s-cli/internal/clustercontext"
 	"hcloud-k3s-cli/internal/k3s/install/config"
+	"hcloud-k3s-cli/internal/utils/ssh"
 	"hcloud-k3s-cli/internal/utils/yaml"
 	"strings"
 )
@@ -12,10 +13,12 @@ func Worker(
 	ctx clustercontext.ClusterContext,
 	lb *hcloud.LoadBalancer,
 	controlPlaneNodes []*hcloud.Server,
+	proxy *hcloud.Server,
 	node *hcloud.Server,
-) string {
+) {
 	nodeIp := node.PrivateNet[0].IP.String()
 	server := getServer(lb, controlPlaneNodes[0])
+	networkInterface, _ := GetNetworkInterfaceName(ctx, proxy, node)
 
 	configYaml := config.K3sServerConfig{
 		// Node
@@ -36,7 +39,7 @@ func Worker(
 		},
 
 		// Network
-		FlannelIface: "eth1",
+		FlannelIface: networkInterface,
 		NodeIP:       []string{nodeIp},
 
 		// Security
@@ -51,5 +54,5 @@ func Worker(
 		PostInstall(),
 		K3sStartAgent(),
 	}
-	return strings.Join(commandArr, "\n")
+	ssh.ExecuteViaProxy(ctx, proxy, node, strings.Join(commandArr, "\n"))
 }

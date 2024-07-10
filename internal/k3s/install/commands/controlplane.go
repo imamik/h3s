@@ -4,6 +4,7 @@ import (
 	"github.com/hetznercloud/hcloud-go/v2/hcloud"
 	"hcloud-k3s-cli/internal/clustercontext"
 	"hcloud-k3s-cli/internal/k3s/install/config"
+	"hcloud-k3s-cli/internal/utils/ssh"
 	"hcloud-k3s-cli/internal/utils/yaml"
 	"strings"
 )
@@ -12,10 +13,12 @@ func ControlPlane(
 	ctx clustercontext.ClusterContext,
 	lb *hcloud.LoadBalancer,
 	controlPlaneNodes []*hcloud.Server,
+	proxy *hcloud.Server,
 	node *hcloud.Server,
-) string {
+) {
 	isFirst := node.ID == controlPlaneNodes[0].ID
 	nodeIp := node.PrivateNet[0].IP.String()
+	networkInterface, _ := GetNetworkInterfaceName(ctx, proxy, node)
 
 	configYaml := config.K3sServerConfig{
 		// Node
@@ -48,7 +51,7 @@ func ControlPlane(
 
 		// Flannel
 		FlannelBackend:       "vxlan", // TODO: make this configurable
-		FlannelIface:         "eth1",
+		FlannelIface:         networkInterface,
 		DisableNetworkPolicy: false,
 
 		// Network
@@ -84,5 +87,5 @@ func ControlPlane(
 		PostInstall(),
 		K3sStartServer(isFirst),
 	}
-	return strings.Join(commandArr, "\n")
+	ssh.ExecuteViaProxy(ctx, proxy, node, strings.Join(commandArr, "\n"))
 }

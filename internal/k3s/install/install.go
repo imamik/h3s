@@ -10,8 +10,6 @@ import (
 	"hcloud-k3s-cli/internal/resources/pool/node"
 	"hcloud-k3s-cli/internal/resources/proxy"
 	"hcloud-k3s-cli/internal/resources/server"
-	"hcloud-k3s-cli/internal/utils/logger"
-	"hcloud-k3s-cli/internal/utils/ssh"
 )
 
 func getSetup(ctx clustercontext.ClusterContext) (*hcloud.Network, *hcloud.LoadBalancer, *hcloud.Server, []*hcloud.Server, []*hcloud.Server) {
@@ -47,9 +45,7 @@ func Install(ctx clustercontext.ClusterContext, cleanup bool) {
 	}
 
 	for i, remote := range controlPlaneNodes {
-		cmd := commands.ControlPlane(ctx, lb, controlPlaneNodes, remote)
-		logger.LogResourceEvent(logger.Server, "Install Control Plane", remote.Name, logger.Initialized)
-		ssh.ExecuteViaProxy(ctx, proxyServer, remote, cmd)
+		commands.ControlPlane(ctx, lb, controlPlaneNodes, proxyServer, remote)
 		if i == 0 {
 			downloadKubeConfig(ctx, lb, proxyServer, remote)
 			software.Install(ctx, net, lb, proxyServer, remote)
@@ -57,9 +53,7 @@ func Install(ctx clustercontext.ClusterContext, cleanup bool) {
 	}
 
 	for _, remote := range workerNodes {
-		cmd := commands.Worker(ctx, lb, controlPlaneNodes, remote)
-		logger.LogResourceEvent(logger.Server, "Install Worker", remote.Name, logger.Initialized)
-		ssh.ExecuteViaProxy(ctx, proxyServer, remote, cmd)
+		commands.Worker(ctx, lb, controlPlaneNodes, proxyServer, remote)
 	}
 
 }
