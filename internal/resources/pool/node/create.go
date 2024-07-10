@@ -44,8 +44,8 @@ func create(
 	serverType := hcloud.ServerType{Name: string(pool.Instance)}
 	location := hcloud.Location{Name: string(pool.Location)}
 	publicNet := hcloud.ServerCreatePublicNet{
-		EnableIPv4: pool.EnableIPv4,
-		EnableIPv6: pool.EnableIPv6,
+		EnableIPv4: ctx.Config.EnableIPv4,
+		EnableIPv6: ctx.Config.EnableIPv6,
 	}
 	networks := []*hcloud.Network{network}
 	sshKeys := []*hcloud.SSHKey{sshKey}

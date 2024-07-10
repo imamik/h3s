@@ -3,8 +3,8 @@ package network
 import (
 	"github.com/hetznercloud/hcloud-go/v2/hcloud"
 	"hcloud-k3s-cli/internal/clustercontext"
+	"hcloud-k3s-cli/internal/utils/ip"
 	"hcloud-k3s-cli/internal/utils/logger"
-	"net"
 )
 
 func Create(ctx clustercontext.ClusterContext) *hcloud.Network {
@@ -15,14 +15,6 @@ func Create(ctx clustercontext.ClusterContext) *hcloud.Network {
 	return network
 }
 
-func getIpRange(s string) *net.IPNet {
-	_, ipRange, err := net.ParseCIDR(s)
-	if err != nil {
-		logger.LogError("Invalid IP Range", err)
-	}
-	return ipRange
-}
-
 func create(ctx clustercontext.ClusterContext) *hcloud.Network {
 	networkName := getName(ctx)
 
@@ -30,7 +22,7 @@ func create(ctx clustercontext.ClusterContext) *hcloud.Network {
 
 	network, _, err := ctx.Client.Network.Create(ctx.Context, hcloud.NetworkCreateOpts{
 		Name:    networkName,
-		IPRange: getIpRange("10.0.0.0/16"),
+		IPRange: ip.GetIpRange("10.0.0.0/16"),
 		Labels:  ctx.GetLabels(),
 	})
 	if err != nil || network == nil {
@@ -42,7 +34,7 @@ func create(ctx clustercontext.ClusterContext) *hcloud.Network {
 
 	subnet := hcloud.NetworkSubnet{
 		Type:        hcloud.NetworkSubnetTypeServer,
-		IPRange:     getIpRange("10.0.0.0/16"),
+		IPRange:     ip.GetIpRange("10.0.0.0/16"),
 		NetworkZone: ctx.Config.NetworkZone,
 	}
 

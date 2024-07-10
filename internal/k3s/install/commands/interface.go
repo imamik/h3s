@@ -1,7 +1,6 @@
 package commands
 
 import (
-	"fmt"
 	"github.com/hetznercloud/hcloud-go/v2/hcloud"
 	"hcloud-k3s-cli/internal/clustercontext"
 	"hcloud-k3s-cli/internal/utils/ssh"
@@ -19,6 +18,5 @@ func GetNetworkInterfaceName(
 		return "", err
 	}
 	res = strings.TrimSpace(res)
-	fmt.Printf("Network Interface Name: '%s'", res)
 	return res, nil
 }

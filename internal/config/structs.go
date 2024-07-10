@@ -3,12 +3,10 @@ package config
 import "github.com/hetznercloud/hcloud-go/v2/hcloud"
 
 type NodePool struct {
-	Name       string        `yaml:"name"`
-	Nodes      int           `yaml:"nodes"`
-	Location   Location      `yaml:"location"`
-	Instance   CloudInstance `yaml:"instance"`
-	EnableIPv4 bool          `yaml:"enable_ipv4,omitempty"`
-	EnableIPv6 bool          `yaml:"enable_ipv6,omitempty"`
+	Name     string        `yaml:"name"`
+	Nodes    int           `yaml:"nodes"`
+	Location Location      `yaml:"location"`
+	Instance CloudInstance `yaml:"instance"`
 }
 
 type ControlPlane struct {
@@ -28,6 +26,8 @@ type Config struct {
 	SSHKeyPaths          SSHKeyPaths        `yaml:"ssh_key_paths"`
 	NetworkZone          hcloud.NetworkZone `yaml:"network_zone"`
 	Domain               string             `yaml:"domain"`
+	EnableIPv4           bool               `yaml:"enable_ipv4,omitempty"`
+	EnableIPv6           bool               `yaml:"enable_ipv6,omitempty"`
 	ControlPlane         ControlPlane       `yaml:"control_plane"`
 	WorkerPools          []NodePool         `yaml:"worker_pools,omitempty"`
 	CombinedLoadBalancer bool               `yaml:"combined_load_balancer,omitempty"`

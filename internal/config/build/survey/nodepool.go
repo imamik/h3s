@@ -30,18 +30,6 @@ func getNodePool(networkZone hcloud.NetworkZone) config.NodePool {
 	nodePoolNodes, _ := strconv.Atoi(nodePoolNodesString)
 	nodePool.Nodes = nodePoolNodes
 
-	huh.NewConfirm().
-		Title("Enable IPv4").
-		Description("Enable IPv4 for the nodes in this pool").
-		Value(&nodePool.EnableIPv4).
-		Run()
-
-	huh.NewConfirm().
-		Title("Enable IPv6").
-		Description("Enable IPv6 for the nodes in this pool").
-		Value(&nodePool.EnableIPv6).
-		Run()
-
 	nodePool.Location = getLocation(
 		"Location",
 		fmt.Sprintf("Number of nodes in the '%s' pool ", nodePool.Name),

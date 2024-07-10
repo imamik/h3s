@@ -14,8 +14,8 @@ func FirstAvailable(server *hcloud.Server) string {
 		if ok {
 			return network.Next().String()
 		}
-	case len(server.PrivateNet) > 0:
-		return server.PrivateNet[0].IP.String()
+	default:
+		return Private(server)
 	}
 	return ""
 }

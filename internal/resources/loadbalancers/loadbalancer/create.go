@@ -29,18 +29,6 @@ func create(
 
 	logger.LogResourceEvent(logger.LoadBalancer, logger.Create, name, logger.Initialized)
 
-	services := []hcloud.LoadBalancerCreateOptsService{
-		{
-			Protocol:        hcloud.LoadBalancerServiceProtocolHTTP,
-			ListenPort:      hcloud.Ptr(80),
-			DestinationPort: hcloud.Ptr(80),
-		},
-		{
-			Protocol:        hcloud.LoadBalancerServiceProtocolTCP,
-			ListenPort:      hcloud.Ptr(6443),
-			DestinationPort: hcloud.Ptr(6443),
-		},
-	}
 	algorithm := hcloud.LoadBalancerAlgorithm{
 		Type: "round_robin",
 	}
@@ -59,7 +47,6 @@ func create(
 		Network:          network,
 		Algorithm:        &algorithm,
 		LoadBalancerType: &loadBalancerType,
-		Services:         services,
 		Labels:           labels,
 	}
 

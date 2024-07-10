@@ -8,6 +8,8 @@ func PreInstallCommand(configYaml string) string {
 	return template.CompileTemplate(`
 set -ex
 
+ip route add default via 10.0.0.1 || true
+
 # prepare the k3s config directory
 mkdir -p /etc/rancher/k3s
 

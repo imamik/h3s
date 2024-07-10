@@ -6,7 +6,7 @@ func generateWriteFilesCommon(config CloudInitConfig) string {
 	return template.CompileTemplate(`
 # Disable ssh password authentication
 - content: |
-    Port {{.SSHPort}}
+	Port {{.SSHPort}}
     PasswordAuthentication no
     X11Forwarding no
     MaxAuthTries {{.SSHMaxAuthTries}}

@@ -45,7 +45,7 @@ func ExecuteViaProxy(
 	command string,
 ) (string, error) {
 	proxyIp := ip.FirstAvailable(proxy)
-	remoteIp := ip.FirstAvailable(remote)
+	remoteIp := ip.Private(remote)
 	removeKnownHostsEntry(proxyIp)
 
 	// SSH client configuration

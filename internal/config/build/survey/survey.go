@@ -67,13 +67,13 @@ func Survey(k3sReleases []releases.Release) (config.Config, error) {
 	huh.NewConfirm().
 		Title("Enable IPv4").
 		Description("Enable IPv4 for the nodes in this pool").
-		Value(&conf.ControlPlane.Pool.EnableIPv4).
+		Value(&conf.EnableIPv4).
 		Run()
 
 	huh.NewConfirm().
 		Title("Enable IPv6").
 		Description("Enable IPv6 for the nodes in this pool").
-		Value(&conf.ControlPlane.Pool.EnableIPv6).
+		Value(&conf.EnableIPv6).
 		Run()
 
 	huh.NewConfirm().
