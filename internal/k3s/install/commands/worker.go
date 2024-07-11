@@ -18,7 +18,6 @@ func Worker(
 ) {
 	nodeIp := node.PrivateNet[0].IP.String()
 	server := getServer(lb, controlPlaneNodes[0])
-	networkInterface, _ := GetNetworkInterfaceName(ctx, proxy, node)
 
 	configYaml := config.K3sServerConfig{
 		// Node
@@ -39,7 +38,7 @@ func Worker(
 		},
 
 		// Network
-		FlannelIface: networkInterface,
+		FlannelIface: "eth1",
 		NodeIP:       []string{nodeIp},
 
 		// Security

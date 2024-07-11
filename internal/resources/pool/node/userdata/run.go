@@ -37,6 +37,9 @@ func generateRunCmdCommon(config CloudInitConfig) string {
 - [sed, '-i', 's/NUMBER_LIMIT="2-10"/NUMBER_LIMIT="4"/g', /etc/snapper/configs/root]
 - [sed, '-i', 's/NUMBER_LIMIT_IMPORTANT="4-10"/NUMBER_LIMIT_IMPORTANT="3"/g', /etc/snapper/configs/root]
 
+# Allow network interface
+- [chmod, '+x', '/etc/cloud/rename_interface.sh']
+
 # Restart the sshd service to apply the new config
 - [systemctl, 'restart', 'sshd']
 

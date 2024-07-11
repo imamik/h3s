@@ -18,7 +18,6 @@ func ControlPlane(
 ) {
 	isFirst := node.ID == controlPlaneNodes[0].ID
 	nodeIp := node.PrivateNet[0].IP.String()
-	networkInterface, _ := GetNetworkInterfaceName(ctx, proxy, node)
 
 	configYaml := config.K3sServerConfig{
 		// Node
@@ -51,7 +50,7 @@ func ControlPlane(
 
 		// Flannel
 		FlannelBackend:       "vxlan", // TODO: make this configurable
-		FlannelIface:         networkInterface,
+		FlannelIface:         "eth1",
 		DisableNetworkPolicy: false,
 
 		// Network
@@ -81,7 +80,7 @@ func ControlPlane(
 
 	configYamlStr := yaml.String(configYaml)
 	commandArr := []string{
-		PreInstallCommand(configYamlStr),
+		PreInstallCommand(ctx, configYamlStr),
 		K3sInstall(ctx, true),
 		SeLinux(),
 		PostInstall(),

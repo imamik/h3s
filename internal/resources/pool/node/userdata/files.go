@@ -4,6 +4,84 @@ import "hcloud-k3s-cli/internal/utils/template"
 
 func generateWriteFilesCommon(config CloudInitConfig) string {
 	return template.CompileTemplate(`
+# Script to rename the private interface to eth1 and unify NetworkManager connection naming
+- path: /etc/cloud/rename_interface.sh
+  content: |
+    #!/bin/bash
+    set -euo pipefail
+    
+    echo "Starting interface renaming script"
+    
+    echo "Waiting for 10 seconds..."
+    sleep 10
+    
+    echo "Listing all network interfaces:"
+    ip -o link show | awk '{print $2, $9}'
+    
+    echo "Finding the interface that is not lo"
+    INTERFACE=$(ip -o link show | awk '$2 != "lo:" {print $2}' | sed 's/://g' | head -n 1)
+    
+    echo "Detected interface: $INTERFACE"
+    
+    # If no interface found, exit
+    if [ -z "$INTERFACE" ]; then
+        echo "No suitable interface found. Exiting."
+        exit 1
+    fi
+    
+    echo "Getting MAC address for $INTERFACE"
+    MAC=$(cat /sys/class/net/$INTERFACE/address)
+    echo "MAC address: $MAC"
+    
+    echo "Creating udev rule"
+    cat <<EOFudev > /etc/udev/rules.d/70-persistent-net.rules
+    SUBSYSTEM=="net", ACTION=="add", DRIVERS=="?*", ATTR{address}=="$MAC", NAME="eth1"
+    EOFudev
+    echo "udev rule created"
+    
+    if [ "$INTERFACE" != "eth1" ]; then
+        echo "Renaming interface $INTERFACE to eth1"
+        ip link set $INTERFACE down
+        ip link set $INTERFACE name eth1
+        ip link set eth1 up
+        echo "Interface renamed to eth1"
+    else
+        echo "Interface is already named eth1. Skipping renaming step."
+    fi
+    
+    echo "Checking for NetworkManager"
+    if command -v nmcli &> /dev/null; then
+        echo "NetworkManager found. Updating connections"
+        
+        echo "Listing all NetworkManager connections:"
+        nmcli connection show
+    
+        if nmcli connection show | grep -q eth1; then
+            echo "Updating eth1 connection"
+            eth1_connection=$(nmcli -g GENERAL.CONNECTION device show eth1)
+            nmcli connection modify "$eth1_connection" \
+              con-name eth1 \
+              connection.interface-name eth1
+            echo "eth1 connection updated"
+        else
+            echo "Creating new eth1 connection"
+            nmcli connection add type ethernet con-name eth1 ifname eth1
+            echo "New eth1 connection created"
+        fi
+    
+        echo "Restarting NetworkManager"
+        systemctl restart NetworkManager
+        echo "NetworkManager restarted"
+    else
+        echo "NetworkManager not found. Skipping connection updates."
+    fi
+    
+    echo "Interface configuration completed. Current network interfaces:"
+    ip -o link show | awk '{print $2, $9}'
+
+    echo "Interface renaming completed. New interface name: eth1"
+  permissions: "0744"
+
 # Disable ssh password authentication
 - content: |
 	Port {{.SSHPort}}
