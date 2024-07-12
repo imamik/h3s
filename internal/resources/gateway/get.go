@@ -6,7 +6,7 @@ import (
 	"hcloud-k3s-cli/internal/utils/logger"
 )
 
-func getServer(ctx clustercontext.ClusterContext) (*hcloud.Server, error) {
+func Get(ctx clustercontext.ClusterContext) (*hcloud.Server, error) {
 	name := getName(ctx)
 	logger.LogResourceEvent(logger.Server, logger.Get, name, logger.Initialized)
 

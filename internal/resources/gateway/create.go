@@ -46,7 +46,7 @@ func createServer(
 	network *hcloud.Network,
 	image *hcloud.Image,
 ) *hcloud.Server {
-	server, err := getServer(ctx)
+	server, err := Get(ctx)
 	if err == nil && server != nil {
 		return server
 	}
@@ -88,7 +88,7 @@ func createServer(
 		logger.LogResourceEvent(logger.Server, logger.Create, name, logger.Failure, err)
 	}
 
-	server, err = getServer(ctx)
+	server, err = Get(ctx)
 	if err != nil {
 		logger.LogResourceEvent(logger.Server, logger.Create, name, logger.Failure, err)
 	}

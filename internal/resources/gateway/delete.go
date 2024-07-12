@@ -10,7 +10,7 @@ import (
 
 func Delete(ctx clustercontext.ClusterContext) {
 	net := network.Get(ctx)
-	server, err := getServer(ctx)
+	server, err := Get(ctx)
 	if err != nil || server == nil {
 		return
 	}

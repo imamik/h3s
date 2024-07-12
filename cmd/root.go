@@ -6,6 +6,7 @@ import (
 	"hcloud-k3s-cli/cmd/cluster"
 	"hcloud-k3s-cli/cmd/config"
 	"hcloud-k3s-cli/cmd/k3s"
+	"hcloud-k3s-cli/cmd/kubectl"
 	"hcloud-k3s-cli/cmd/microos"
 	"hcloud-k3s-cli/cmd/resources"
 	"os"
@@ -25,6 +26,7 @@ func init() {
 	rootCmd.AddCommand(cluster.Cluster)
 	rootCmd.AddCommand(microos.Image)
 	rootCmd.AddCommand(resources.Resources)
+	rootCmd.AddCommand(kubectl.Kubectl)
 }
 
 func Execute() {
