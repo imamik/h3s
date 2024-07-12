@@ -1,4 +1,4 @@
-package software
+package components
 
 import (
 	"github.com/hetznercloud/hcloud-go/v2/hcloud"
@@ -74,7 +74,7 @@ additionalArguments:
 	return values
 }
 
-func traefikYaml(
+func TraefikHelmChartWithValues(
 	ctx clustercontext.ClusterContext,
 	lb *hcloud.LoadBalancer,
 	namespace string,
@@ -103,7 +103,7 @@ spec:
 		})
 }
 
-func initNamespace(namespace string) string {
+func TraefikNamespace(namespace string) string {
 	return template.CompileTemplate(`
 apiVersion: v1
 kind: Namespace
@@ -121,7 +121,4 @@ func InstallTraefik(
 	proxy *hcloud.Server,
 	remote *hcloud.Server,
 ) {
-	namespace := "traefik"
-	apply(ctx, proxy, remote, initNamespace(namespace))
-	apply(ctx, proxy, remote, traefikYaml(ctx, lb, namespace))
 }

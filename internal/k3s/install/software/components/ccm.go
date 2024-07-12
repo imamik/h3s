@@ -1,4 +1,4 @@
-package software
+package components
 
 import (
 	"github.com/hetznercloud/hcloud-go/v2/hcloud"
@@ -6,38 +6,37 @@ import (
 	"hcloud-k3s-cli/internal/utils/template"
 )
 
-func secretYaml(ctx clustercontext.ClusterContext, network *hcloud.Network) string {
-	return template.CompileTemplate(`
-apiVersion: "v1"
-kind: "Secret"
-metadata:
-  namespace: 'kube-system'
-  name: 'hcloud'
-stringData:
-  network: "{{ .NetworkName }}"
-  token: "{{ .HCloudToken }}"
-`, map[string]interface{}{
-		"NetworkName": network.Name,
-		"HCloudToken": ctx.Credentials.HCloudToken,
-	})
-}
-
-func hcloudCCMHelmChartYaml() string {
+// Source: hcloud-cloud-controller-manager/templates/serviceaccount.yaml
+func CCMServiceAccount() string {
 	return `
-apiVersion: helm.cattle.io/v1
-kind: HelmChart
+apiVersion: v1
+kind: ServiceAccount
 metadata:
   name: hcloud-cloud-controller-manager
   namespace: kube-system
-spec:
-  chart: hcloud/hcloud-cloud-controller-manager
-  version: 1.20.0
-  repo: https://charts.hetzner.cloud
-  targetNamespace: kube-system
 `
 }
 
-func settingsYaml(ctx clustercontext.ClusterContext, network *hcloud.Network) string {
+// Source: hcloud-cloud-controller-manager/templates/clusterrolebinding.yaml
+func CCMRoleBinding() string {
+	return `
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: "system:hcloud-cloud-controller-manager"
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cluster-admin
+subjects:
+  - kind: ServiceAccount
+    name: hcloud-cloud-controller-manager
+    namespace: kube-system
+`
+}
+
+// Source: hcloud-cloud-controller-manager/templates/deployment.yaml
+func CCMSettings(ctx clustercontext.ClusterContext, network *hcloud.Network) string {
 	return template.CompileTemplate(`
 apiVersion: apps/v1
 kind: Deployment
@@ -46,6 +45,7 @@ metadata:
   namespace: kube-system
 spec:
   replicas: 1
+  revisionHistoryLimit: 2
   selector:
     matchLabels:
       app: hcloud-cloud-controller-manager
@@ -75,6 +75,7 @@ spec:
         - key: "node.kubernetes.io/not-ready"
           effect: "NoExecute"
       hostNetwork: true
+      priorityClassName: system-cluster-critical
       containers:
         - name: hcloud-cloud-controller-manager
           image: docker.io/hetznercloud/hcloud-cloud-controller-manager:v1.20.0
@@ -105,20 +106,16 @@ spec:
                 secretKeyRef:
                   key: network
                   name: hcloud
+          ports:
+            - name: metrics
+              containerPort: 8233
+          resources:
+            requests:
+              cpu: 100m
+              memory: 50Mi
 `,
 		map[string]interface{}{
 			"LoadbalancerLocation": ctx.Config.ControlPlane.Pool.Location,
 			"ClusterCidrIpv4":      network.IPRange.String(),
 		})
-}
-
-func InstallHetznerCCM(
-	ctx clustercontext.ClusterContext,
-	network *hcloud.Network,
-	proxy *hcloud.Server,
-	remote *hcloud.Server,
-) {
-	apply(ctx, proxy, remote, secretYaml(ctx, network))
-	apply(ctx, proxy, remote, hcloudCCMHelmChartYaml())
-	apply(ctx, proxy, remote, settingsYaml(ctx, network))
 }
