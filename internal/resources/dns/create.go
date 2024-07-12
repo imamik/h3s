@@ -2,17 +2,15 @@ package dns
 
 import (
 	"fmt"
-	"github.com/hetznercloud/hcloud-go/v2/hcloud"
 	"hcloud-k3s-cli/internal/clustercontext"
 	"hcloud-k3s-cli/internal/resources/dns/utils"
+	"hcloud-k3s-cli/internal/resources/loadbalancers"
 	"hcloud-k3s-cli/internal/utils/logger"
 	"sync"
 )
 
-func Create(
-	ctx clustercontext.ClusterContext,
-	lb *hcloud.LoadBalancer,
-) {
+func Create(ctx clustercontext.ClusterContext) {
+	lb := loadbalancers.Get(ctx)
 	zone, err := GetZone(ctx)
 	if err != nil {
 		fmt.Println("Error getting zone:", err)

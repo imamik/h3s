@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/hetznercloud/hcloud-go/v2/hcloud"
 	"hcloud-k3s-cli/internal/clustercontext"
+	"hcloud-k3s-cli/internal/resources/server"
 	"sync"
 )
 
@@ -11,9 +12,10 @@ var UsePrivateIP = true
 
 func Add(
 	ctx clustercontext.ClusterContext,
-	lb *hcloud.LoadBalancer,
-	nodes []*hcloud.Server,
 ) {
+	lb := Get(ctx)
+	nodes := server.GetAll(ctx)
+
 	var wg sync.WaitGroup
 	for _, n := range nodes {
 		if n.Labels["is_gateway"] == "true" {

@@ -11,12 +11,13 @@ func getServer(
 ) string {
 	address := ""
 	if lb == nil {
-		address = ip.FirstAvailable(node)
+		address = ip.Private(node)
 	} else if len(lb.PrivateNet) > 0 {
 		address = lb.PrivateNet[0].IP.String()
 	} else {
 		address = lb.PublicNet.IPv4.IP.String()
 	}
+	address = ip.Private(node)
 	return "https://" + address + ":6443"
 }
 

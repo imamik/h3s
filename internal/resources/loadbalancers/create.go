@@ -3,20 +3,22 @@ package loadbalancers
 import (
 	"github.com/hetznercloud/hcloud-go/v2/hcloud"
 	"hcloud-k3s-cli/internal/clustercontext"
+	"hcloud-k3s-cli/internal/resources/network"
 	"hcloud-k3s-cli/internal/utils/logger"
 )
 
-func Create(ctx clustercontext.ClusterContext, network *hcloud.Network) *hcloud.LoadBalancer {
+func Create(ctx clustercontext.ClusterContext) *hcloud.LoadBalancer {
 	balancer := Get(ctx)
 	if balancer == nil {
-		return create(ctx, network)
+		net := network.Get(ctx)
+		return create(ctx, net)
 	}
 	return balancer
 }
 
 func create(
 	ctx clustercontext.ClusterContext,
-	network *hcloud.Network,
+	net *hcloud.Network,
 ) *hcloud.LoadBalancer {
 	name := getName(ctx)
 
@@ -33,7 +35,7 @@ func create(
 	opts := hcloud.LoadBalancerCreateOpts{
 		Name:             name,
 		Location:         &location,
-		Network:          network,
+		Network:          net,
 		Algorithm:        &algorithm,
 		LoadBalancerType: &loadBalancerType,
 		Labels:           ctx.GetLabels(),

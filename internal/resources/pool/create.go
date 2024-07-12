@@ -5,17 +5,18 @@ import (
 	"hcloud-k3s-cli/internal/clustercontext"
 	"hcloud-k3s-cli/internal/config"
 	"hcloud-k3s-cli/internal/resources/microos/image"
+	"hcloud-k3s-cli/internal/resources/network"
 	"hcloud-k3s-cli/internal/resources/pool/node"
 	"hcloud-k3s-cli/internal/resources/pool/placementgroup"
+	"hcloud-k3s-cli/internal/resources/sshkey"
 	"hcloud-k3s-cli/internal/utils/logger"
 	"sync"
 )
 
-func CreatePools(
-	ctx clustercontext.ClusterContext,
-	sshKey *hcloud.SSHKey,
-	network *hcloud.Network,
-) []*hcloud.Server {
+func CreatePools(ctx clustercontext.ClusterContext) []*hcloud.Server {
+	sshKey := sshkey.Get(ctx)
+	net := network.Get(ctx)
+
 	// Create a channel to collect the nodes & setup a WaitGroup
 	nodeCh := make(chan []*hcloud.Server)
 	var wg sync.WaitGroup
@@ -27,7 +28,7 @@ func CreatePools(
 		nodeCh <- CreatePool(
 			ctx,
 			sshKey,
-			network,
+			net,
 			ctx.Config.ControlPlane.Pool,
 			true,
 			ctx.Config.ControlPlane.AsWorkerPool,
@@ -42,7 +43,7 @@ func CreatePools(
 			nodeCh <- CreatePool(
 				ctx,
 				sshKey,
-				network,
+				net,
 				pool,
 				false,
 				true,
