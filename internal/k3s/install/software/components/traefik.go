@@ -8,9 +8,9 @@ import (
 )
 
 const (
-	NamespaceTraefik = "traefik"
-	VersionTraefik   = "29.0.0"
-	ImageTagTraefik  = "v3.1"
+	TraefikNamespace = "traefik"
+	TraefikVersion   = "29.0.0"
+	TraefikImageTag  = "v3.1"
 )
 
 func valuesContent(
@@ -64,11 +64,11 @@ additionalArguments:
   - "--providers.kubernetesingress.ingressendpoint.publishedservice={{ .IngressControllerNamespace }}/traefik"
 `,
 		map[string]interface{}{
-			"TraefikImageTag":            ImageTagTraefik,
+			"TraefikImageTag":            TraefikImageTag,
 			"IngressReplicaCount":        1,
 			"LoadbalancerName":           lb.Name,
 			"LoadbalancerLocation":       ctx.Config.ControlPlane.Pool.Location,
-			"IngressControllerNamespace": NamespaceTraefik,
+			"IngressControllerNamespace": TraefikNamespace,
 		})
 	lines := strings.Split(values, "\n")
 	for i, line := range lines {
@@ -83,6 +83,11 @@ func TraefikHelmChartWithValues(
 	lb *hcloud.LoadBalancer,
 ) string {
 	return template.CompileTemplate(`
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: {{ .TargetNamespace }}
+---
 apiVersion: helm.cattle.io/v1
 kind: HelmChart
 metadata:
@@ -98,20 +103,8 @@ spec:
 {{ .ValuesContent }}
 `,
 		map[string]interface{}{
-			"TargetNamespace": NamespaceTraefik,
-			"TraefikVersion":  VersionTraefik,
+			"TargetNamespace": TraefikNamespace,
+			"TraefikVersion":  TraefikVersion,
 			"ValuesContent":   valuesContent(ctx, lb),
-		})
-}
-
-func TraefikNamespace() string {
-	return template.CompileTemplate(`
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: {{ .TargetNamespace }}
-`,
-		map[string]interface{}{
-			"TargetNamespace": NamespaceTraefik,
 		})
 }
