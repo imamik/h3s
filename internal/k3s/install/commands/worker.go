@@ -18,6 +18,7 @@ func Worker(
 ) {
 	nodeIp := node.PrivateNet[0].IP.String()
 	server := getServer(lb, controlPlaneNodes[0])
+	networkInterface, _ := GetNetworkInterfaceName(ctx, proxy, node)
 
 	configYaml := config.K3sServerConfig{
 		// Node
@@ -38,7 +39,7 @@ func Worker(
 		},
 
 		// Network
-		FlannelIface: "eth1",
+		FlannelIface: networkInterface,
 		NodeIP:       []string{nodeIp},
 
 		// Security
@@ -47,7 +48,7 @@ func Worker(
 
 	configYamlStr := yaml.String(configYaml)
 	commandArr := []string{
-		PreInstallCommand(configYamlStr),
+		PreInstallCommand(ctx, configYamlStr),
 		K3sInstall(ctx, false),
 		SeLinux(),
 		PostInstall(),

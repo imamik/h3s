@@ -9,19 +9,6 @@ func PreInstallCommand(ctx clustercontext.ClusterContext, configYaml string) str
 	return template.CompileTemplate(`
 set -ex
 
-# rename the private network interface to eth1
-/etc/cloud/rename_interface.sh
-
-# setup or remove the default gateway based on OnlyPrivateNetwork
-if {{ .OnlyPrivateNetwork }} {
-    ip route add default via 10.0.0.1 || true
-} else {
-    ip route del default || true
-}
-
-# Wait for network to be fully up
-timeout 60s bash -c 'until ping -c1 1.1.1.1 &>/dev/null; do sleep 1; done'
-
 # prepare the k3s config directory
 mkdir -p /etc/rancher/k3s
 
@@ -46,10 +33,10 @@ fi
 EOF
 
 # wait for the internet connection to be available
-timeout 180s /bin/sh -c 'while ! ping -c 1 {{ .IP }} >/dev/null 2>&1; do echo \"Ready for k3s installation, waiting for a successful connection to the internet...\"; sleep 5; done; echo Connected'
+timeout 180s /bin/sh -c 'while ! ping -c 1 {{ .Address }} >/dev/null 2>&1; do echo \"Ready for k3s installation, waiting for a successful connection to the internet...\"; sleep 5; done; echo Connected'
 `, map[string]interface{}{
 		"ConfigYaml":         configYaml,
-		"IP":                 "1.1.1.1",
-		"OnlyPrivateNetwork": ctx.Config.EnableIPv4 == false && ctx.Config.EnableIPv6 == false,
+		"Address":            "cloudflare.com",
+		"OnlyPrivateNetwork": ctx.Config.PublicIps == false,
 	})
 }

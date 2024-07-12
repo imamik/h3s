@@ -40,11 +40,15 @@ func ExecuteWithSsh(
 
 func ExecuteViaProxy(
 	ctx clustercontext.ClusterContext,
-	proxy *hcloud.Server,
+	gateway *hcloud.Server,
 	remote *hcloud.Server,
 	command string,
 ) (string, error) {
-	proxyIp := ip.FirstAvailable(proxy)
+	if gateway == nil {
+		return ExecuteWithSsh(ctx, remote, command)
+	}
+
+	proxyIp := ip.FirstAvailable(gateway)
 	remoteIp := ip.FirstAvailable(remote)
 	removeKnownHostsEntry(proxyIp)
 
@@ -54,20 +58,20 @@ func ExecuteViaProxy(
 		return "", fmt.Errorf("unable to create SSH config: %w", err)
 	}
 
-	// Connect to proxy
-	fmt.Printf("Connecting to proxy (%s)\n", proxyIp)
+	// Connect to gateway
+	fmt.Printf("Connecting to gateway (%s)\n", proxyIp)
 	proxyConn, err := dialWithRetries(proxyIp, sshConfig, 5*time.Second, 5)
 	if err != nil {
-		return "", fmt.Errorf("unable to connect to proxy: %w", err)
+		return "", fmt.Errorf("unable to connect to gateway: %w", err)
 	}
 	defer func(proxyConn *ssh.Client) {
 		err := proxyConn.Close()
 		if err != nil {
-			fmt.Printf("unable to close proxy connection: %v\n", err)
+			fmt.Printf("unable to close gateway connection: %v\n", err)
 		}
 	}(proxyConn)
 
-	// Create a tunnel to the remote server via the proxy
+	// Create a tunnel to the remote server via the gateway
 	fmt.Printf("Creating tunnel to remote (%s)\n", remoteIp)
 	tunnel, err := proxyConn.Dial("tcp", remoteIp+":22")
 	if err != nil {

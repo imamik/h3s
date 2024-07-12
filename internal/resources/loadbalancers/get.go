@@ -1,4 +1,4 @@
-package loadbalancer
+package loadbalancers
 
 import (
 	"github.com/hetznercloud/hcloud-go/v2/hcloud"
@@ -6,8 +6,8 @@ import (
 	"hcloud-k3s-cli/internal/utils/logger"
 )
 
-func Get(ctx clustercontext.ClusterContext, balancerType Type) *hcloud.LoadBalancer {
-	balancer := getName(ctx, balancerType)
+func Get(ctx clustercontext.ClusterContext) *hcloud.LoadBalancer {
+	balancer := getName(ctx)
 	logger.LogResourceEvent(logger.LoadBalancer, logger.Get, balancer, logger.Initialized)
 
 	lb, _, err := ctx.Client.LoadBalancer.GetByName(ctx.Context, balancer)

@@ -65,21 +65,9 @@ func Survey(k3sReleases []releases.Release) (config.Config, error) {
 	conf.ControlPlane.Pool.Nodes = controlPlaneNodes
 
 	huh.NewConfirm().
-		Title("Enable IPv4").
-		Description("Enable IPv4 for the nodes in this pool").
-		Value(&conf.EnableIPv4).
-		Run()
-
-	huh.NewConfirm().
-		Title("Enable IPv6").
-		Description("Enable IPv6 for the nodes in this pool").
-		Value(&conf.EnableIPv6).
-		Run()
-
-	huh.NewConfirm().
-		Title("Control Plane Load Balancer").
-		Description("Use a load balancer for the control plane controlPlaneNodes").
-		Value(&conf.ControlPlane.LoadBalancer).
+		Title("Public IPs").
+		Description("Should the nodes have public IPv4 & IPv6 (alt: all traffic is in private network & gateway is created)").
+		Value(&conf.PublicIps).
 		Run()
 
 	huh.NewConfirm().
@@ -87,16 +75,6 @@ func Survey(k3sReleases []releases.Release) (config.Config, error) {
 		Description("Use the control plane controlPlaneNodes as workers").
 		Value(&conf.ControlPlane.AsWorkerPool).
 		Run()
-
-	huh.NewConfirm().
-		Title("Combined Load Balancer").
-		Description("Use a single load balancer for all controlPlaneNodes").
-		Value(&conf.CombinedLoadBalancer).
-		Run()
-
-	if conf.CombinedLoadBalancer {
-		conf.ControlPlane.LoadBalancer = false
-	}
 
 	var workerPoolsString string
 	huh.NewInput().

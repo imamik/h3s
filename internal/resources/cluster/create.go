@@ -3,8 +3,8 @@ package cluster
 import (
 	"hcloud-k3s-cli/internal/clustercontext"
 	"hcloud-k3s-cli/internal/resources/dns"
+	"hcloud-k3s-cli/internal/resources/gateway"
 	"hcloud-k3s-cli/internal/resources/loadbalancers"
-	"hcloud-k3s-cli/internal/resources/loadbalancers/loadbalancer"
 	"hcloud-k3s-cli/internal/resources/microos"
 	"hcloud-k3s-cli/internal/resources/network"
 	"hcloud-k3s-cli/internal/resources/pool"
@@ -23,8 +23,13 @@ func Create(ctx clustercontext.ClusterContext) {
 
 	nodes := server.GetAll(ctx)
 	loadbalancers.Create(ctx, net, nodes)
-	lb := loadbalancer.Get(ctx, loadbalancer.Combined) // TODO: use the actual loadbalancer(s)
+
+	lb := loadbalancers.Get(ctx)
 	dns.Create(ctx, lb)
+
+	if ctx.Config.PublicIps == false {
+		gateway.Create(ctx)
+	}
 
 	logger.LogResourceEvent(logger.Cluster, logger.Create, ctx.Config.Name, logger.Success)
 }

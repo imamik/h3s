@@ -6,7 +6,7 @@ import (
 	"hcloud-k3s-cli/internal/k3s/install/commands"
 	"hcloud-k3s-cli/internal/k3s/install/software"
 	"hcloud-k3s-cli/internal/resources/gateway"
-	"hcloud-k3s-cli/internal/resources/loadbalancers/loadbalancer"
+	"hcloud-k3s-cli/internal/resources/loadbalancers"
 	"hcloud-k3s-cli/internal/resources/network"
 	"hcloud-k3s-cli/internal/resources/pool/node"
 	"hcloud-k3s-cli/internal/resources/server"
@@ -15,12 +15,7 @@ import (
 func getSetup(ctx clustercontext.ClusterContext) (*hcloud.Network, *hcloud.LoadBalancer, *hcloud.Server, []*hcloud.Server, []*hcloud.Server) {
 	net := network.Get(ctx)
 	nodes := server.GetAll(ctx)
-
-	balancerType := loadbalancer.ControlPlane
-	if ctx.Config.CombinedLoadBalancer {
-		balancerType = loadbalancer.Combined
-	}
-	lb := loadbalancer.Get(ctx, balancerType)
+	lb := loadbalancers.Get(ctx)
 
 	var controlPlaneNodes []*hcloud.Server
 	var workerNodes []*hcloud.Server
@@ -32,38 +27,33 @@ func getSetup(ctx clustercontext.ClusterContext) (*hcloud.Network, *hcloud.LoadB
 		}
 	}
 
-	proxyServer := gateway.Create(ctx)
-
-	return net, lb, proxyServer, controlPlaneNodes, workerNodes
-}
-
-func Install(ctx clustercontext.ClusterContext, cleanup bool) {
-	net, lb, proxyServer, controlPlaneNodes, workerNodes := getSetup(ctx)
-
-	if cleanup {
-		defer gateway.Delete(ctx)
+	var gatewayServer *hcloud.Server
+	if ctx.Config.PublicIps == false {
+		gatewayServer = gateway.Create(ctx)
 	}
 
+	return net, lb, gatewayServer, controlPlaneNodes, workerNodes
+}
+
+func Install(ctx clustercontext.ClusterContext) {
+	net, lb, gatewayServer, controlPlaneNodes, workerNodes := getSetup(ctx)
+
 	for i, remote := range controlPlaneNodes {
-		commands.ControlPlane(ctx, lb, controlPlaneNodes, proxyServer, remote)
+		commands.ControlPlane(ctx, lb, controlPlaneNodes, gatewayServer, remote)
 		if i == 0 {
-			downloadKubeConfig(ctx, lb, proxyServer, remote)
-			software.Install(ctx, net, lb, proxyServer, remote)
+			downloadKubeConfig(ctx, lb, gatewayServer, remote)
+			software.Install(ctx, net, lb, gatewayServer, remote)
 		}
 	}
 
 	for _, remote := range workerNodes {
-		commands.Worker(ctx, lb, controlPlaneNodes, proxyServer, remote)
+		commands.Worker(ctx, lb, controlPlaneNodes, gatewayServer, remote)
 	}
 
 }
 
-func InstallSoftware(ctx clustercontext.ClusterContext, cleanup bool) {
+func InstallSoftware(ctx clustercontext.ClusterContext) {
 	net, lb, proxyServer, controlPlaneNodes, _ := getSetup(ctx)
-
-	if cleanup {
-		defer gateway.Delete(ctx)
-	}
 
 	software.Install(ctx, net, lb, proxyServer, controlPlaneNodes[0])
 }

@@ -46,7 +46,7 @@ func generateRunCmdCommon(config CloudInitConfig) string {
 # Make sure the network is up
 - [systemctl, restart, NetworkManager]
 - [systemctl, status, NetworkManager]
-- [ip, route, add, default, via, '172.31.1.1', dev, 'eth0']
+- [ip, route, add, default, via, '10.0.0.1', ||, true]
 
 # Cleanup some logs
 - [truncate, '-s', '0', '/var/log/audit/audit.log']

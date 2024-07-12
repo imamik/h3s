@@ -17,25 +17,25 @@ func Create(ctx clustercontext.ClusterContext) *hcloud.Server {
 	sshKey := sshkey.Get(ctx)
 
 	img, _ := image.Get(ctx, hcloud.ArchitectureARM)
-	proxy := createServer(ctx, sshKey, net, img)
-	configureGateway(ctx, proxy)
-	setupGatewayRoute(ctx, net, proxy)
+	gateway := createServer(ctx, sshKey, net, img)
+	configureGateway(ctx, gateway)
+	setupGatewayRoute(ctx, net, gateway)
 
-	return proxy
+	return gateway
 }
 
-func configureGateway(ctx clustercontext.ClusterContext, proxy *hcloud.Server) {
-	ssh.ExecuteWithSsh(ctx, proxy, `
+func configureGateway(ctx clustercontext.ClusterContext, gateway *hcloud.Server) {
+	ssh.ExecuteWithSsh(ctx, gateway, `
 echo 1 > /proc/sys/net/ipv4/ip_forward
 iptables -t nat -A POSTROUTING -s '10.0.0.0/16' -o eth0 -j MASQUERADE
 	`)
 }
 
-func setupGatewayRoute(ctx clustercontext.ClusterContext, net *hcloud.Network, proxy *hcloud.Server) {
+func setupGatewayRoute(ctx clustercontext.ClusterContext, net *hcloud.Network, gateway *hcloud.Server) {
 	ctx.Client.Network.AddRoute(ctx.Context, net, hcloud.NetworkAddRouteOpts{
 		Route: hcloud.NetworkRoute{
 			Destination: ip.GetIpRange("0.0.0.0/0"),
-			Gateway:     proxy.PrivateNet[0].IP,
+			Gateway:     gateway.PrivateNet[0].IP,
 		},
 	})
 }

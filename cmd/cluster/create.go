@@ -8,7 +8,6 @@ import (
 )
 
 var k3sInstall bool
-var cleanup bool
 
 var Create = &cobra.Command{
 	Use:   "create",
@@ -17,12 +16,11 @@ var Create = &cobra.Command{
 		ctx := clustercontext.Context()
 		cluster.Create(ctx)
 		if k3sInstall {
-			install.Install(ctx, cleanup)
+			install.Install(ctx)
 		}
 	},
 }
 
 func init() {
-	Create.Flags().BoolVar(&cleanup, "cleanup", true, "Force installation")
 	Create.Flags().BoolVar(&k3sInstall, "install", true, "Install k3s on all servers in the cluster")
 }
