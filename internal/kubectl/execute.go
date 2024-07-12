@@ -20,6 +20,9 @@ func Execute(args []string) {
 	// iterate over all filteredArgs
 	for i, arg := range filteredArgs {
 		if arg == "-f" || arg == "--filename" {
+			if filteredArgs[i+1][:4] == "http" {
+				continue
+			}
 			// replace the filename with the content of the file
 			content, err := file.Load(filteredArgs[i+1])
 			if err != nil {

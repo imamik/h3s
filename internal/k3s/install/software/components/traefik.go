@@ -98,6 +98,7 @@ spec:
   version: {{ .TraefikVersion }}
   repo: https://traefik.github.io/charts
   targetNamespace: {{ .TargetNamespace }}
+  createNamespace: true
   bootstrap: true
   valuesContent: |-
 {{ .ValuesContent }}

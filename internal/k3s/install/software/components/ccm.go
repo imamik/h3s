@@ -6,7 +6,6 @@ import (
 	"hcloud-k3s-cli/internal/utils/template"
 )
 
-// Source: hcloud-cloud-controller-manager/templates/serviceaccount.yaml
 func CCMServiceAccount() string {
 	return `
 apiVersion: v1
@@ -17,7 +16,6 @@ metadata:
 `
 }
 
-// Source: hcloud-cloud-controller-manager/templates/clusterrolebinding.yaml
 func CCMRoleBinding() string {
 	return `
 apiVersion: rbac.authorization.k8s.io/v1
@@ -35,7 +33,6 @@ subjects:
 `
 }
 
-// Source: hcloud-cloud-controller-manager/templates/deployment.yaml
 func CCMSettings(ctx clustercontext.ClusterContext, network *hcloud.Network) string {
 	return template.CompileTemplate(`
 apiVersion: apps/v1

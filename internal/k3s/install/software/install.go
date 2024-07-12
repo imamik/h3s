@@ -6,7 +6,6 @@ import (
 	"hcloud-k3s-cli/internal/clustercontext"
 	"hcloud-k3s-cli/internal/k3s/install/software/components"
 	"hcloud-k3s-cli/internal/utils/ssh"
-	"strings"
 )
 
 func Install(
@@ -33,12 +32,24 @@ func Install(
 
 		// Install Cert-Manager
 		components.CertManagerHelmChart(),
+
+		// Install WhoAmI
+		components.WhoAmI(),
 	}
 
-	yaml := strings.Join(cmdArr, "\n---\n")
-	cmd := "kubectl apply -f - <<EOF\n" + yaml + "\nEOF"
-	_, err := ssh.ExecuteViaProxy(ctx, gateway, remote, cmd)
-	if err != nil {
-		fmt.Printf("Failed to apply: %s", err.Error())
+	for _, cmd := range cmdArr {
+
+		// if cmd starts with http
+		if cmd[:4] == "http" {
+			cmd = "kubectl apply -f " + cmd
+		} else {
+			cmd = "kubectl apply -f - <<EOF\n" + cmd + "\nEOF"
+		}
+
+		_, err := ssh.ExecuteViaProxy(ctx, gateway, remote, cmd)
+		if err != nil {
+			fmt.Printf("Failed to apply: %s", err.Error())
+		}
 	}
+
 }

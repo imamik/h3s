@@ -1,6 +1,8 @@
 package components
 
-import "hcloud-k3s-cli/internal/utils/template"
+import (
+	"hcloud-k3s-cli/internal/utils/template"
+)
 
 const (
 	CertManagerNamespace = "cert-manager"
@@ -9,21 +11,28 @@ const (
 
 func CertManagerHelmChart() string {
 	return template.CompileTemplate(`
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: {{ .TargetNamespace }}
----
 apiVersion: helm.cattle.io/v1
 kind: HelmChart
 metadata:
   name: cert-manager
   namespace: kube-system
 spec:
-  chart: jetstack/cert-manager
+  chart: cert-manager
   version: {{ .Version }}
   repo: https://charts.jetstack.io
   targetNamespace: {{ .TargetNamespace }}
+  createNamespace: true
+  valuesContent: |-
+    crds:
+      enabled: true
+    webhook:
+      enabled: true
+    cainjector:
+      enabled: true
+    startupapicheck:
+      enabled: true
+    ingressShim:
+      enabled: true
 `,
 		map[string]interface{}{
 			"Version":         CertManagerVersion,
