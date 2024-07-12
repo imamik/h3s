@@ -6,6 +6,7 @@ import (
 	"hcloud-k3s-cli/internal/clustercontext"
 	"hcloud-k3s-cli/internal/k3s/install/software/components"
 	"hcloud-k3s-cli/internal/utils/ssh"
+	"strings"
 )
 
 func Install(
@@ -32,14 +33,17 @@ func Install(
 
 		// Install Cert-Manager
 		components.CertManagerHelmChart(),
+		components.CertManagerHetznerHelmChart(ctx),
+		components.WildcardCertificate(ctx),
 
 		// Install WhoAmI
-		components.WhoAmI(),
+		components.WhoAmI(ctx),
 	}
 
 	for _, cmd := range cmdArr {
 
-		// if cmd starts with http
+		cmd = strings.TrimSpace(cmd)
+
 		if cmd[:4] == "http" {
 			cmd = "kubectl apply -f " + cmd
 		} else {

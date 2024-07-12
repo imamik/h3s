@@ -1,7 +1,13 @@
 package components
 
-func WhoAmI() string {
-	return `
+import (
+	"hcloud-k3s-cli/internal/clustercontext"
+	"hcloud-k3s-cli/internal/utils/template"
+	"strings"
+)
+
+func WhoAmI(ctx clustercontext.ClusterContext) string {
+	return template.CompileTemplate(`
 apiVersion: v1
 kind: Namespace
 metadata:
@@ -41,38 +47,20 @@ spec:
             - name: web
               containerPort: 80
 ---
-apiVersion: cert-manager.io/v1
-kind: Issuer
-metadata:
-  name: le-example-http
-  namespace: whoami
-spec:
-  acme:
-    email: milan@kappen.name
-    server: https://acme-staging-v02.api.letsencrypt.org/directory
-    privateKeySecretRef:
-      name: storyteller-plus-le-example-http
-    solvers:
-      - http01:
-          ingress:
-            class: traefik
----
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: whoami
   namespace: whoami
   annotations:
-    cert-manager.io/issuer: "le-example-http"
     kubernetes.io/ingress.class: "traefik"
-    cert-manager.io/acme-challenge-type: http01
 spec:
   tls:
     - hosts:
-        - whoami.storyteller.plus
-      secretName: tls-whoami-ingress-http
+        - whoami.{{ .Domain }}
+      secretName: {{ .DomainKebap }}-wildcard-tls
   rules:
-    - host: whoami.storyteller.plus
+    - host: whoami.{{ .Domain }}
       http:
         paths:
           - path: /
@@ -82,5 +70,9 @@ spec:
                 name: whoami
                 port:
                   name: web
-`
+`,
+		map[string]interface{}{
+			"Domain":      ctx.Config.Domain,
+			"DomainKebap": strings.ReplaceAll(ctx.Config.Domain, ".", "-"),
+		})
 }

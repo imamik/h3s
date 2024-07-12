@@ -70,6 +70,12 @@ func Survey(k3sReleases []releases.Release) (config.Config, error) {
 		Value(&conf.PublicIps).
 		Run()
 
+	huh.NewInput().
+		Title("Certmanager Email").
+		Description("Email to use for cert-manager (letsencrypt certificate generation process)").
+		Value(&conf.CertManager.Email).
+		Run()
+
 	huh.NewConfirm().
 		Title("Control Plane as Worker Pool").
 		Description("Use the control plane controlPlaneNodes as workers").

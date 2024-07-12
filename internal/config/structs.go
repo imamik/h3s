@@ -19,12 +19,18 @@ type SSHKeyPaths struct {
 	PublicKeyPath  string `yaml:"public_key_path"`
 }
 
+type CertManager struct {
+	Email   string `yaml:"email"`
+	Staging bool   `yaml:"staging"`
+}
+
 type Config struct {
 	Name         string             `yaml:"name"`
 	K3sVersion   string             `yaml:"k3s_version"`
 	SSHKeyPaths  SSHKeyPaths        `yaml:"ssh_key_paths"`
 	NetworkZone  hcloud.NetworkZone `yaml:"network_zone"`
 	Domain       string             `yaml:"domain"`
+	CertManager  CertManager        `yaml:"cert_manager"`
 	PublicIps    bool               `yaml:"public_ips"`
 	ControlPlane ControlPlane       `yaml:"control_plane"`
 	WorkerPools  []NodePool         `yaml:"worker_pools,omitempty"`
