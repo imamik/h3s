@@ -22,7 +22,20 @@ stringData:
 	})
 }
 
-const hetznerCloudControllerManagerYaml = "https://github.com/hetznercloud/hcloud-cloud-controller-manager/releases/latest/download/ccm-networks.yaml"
+func hcloudCCMHelmChartYaml() string {
+	return `
+apiVersion: helm.cattle.io/v1
+kind: HelmChart
+metadata:
+  name: hcloud-cloud-controller-manager
+  namespace: kube-system
+spec:
+  chart: hcloud/hcloud-cloud-controller-manager
+  version: 1.20.0
+  repo: https://charts.hetzner.cloud
+  targetNamespace: kube-system
+`
+}
 
 func settingsYaml(ctx clustercontext.ClusterContext, network *hcloud.Network) string {
 	return template.CompileTemplate(`
@@ -105,7 +118,7 @@ func InstallHetznerCCM(
 	proxy *hcloud.Server,
 	remote *hcloud.Server,
 ) {
-	ApplyDynamicFile(ctx, proxy, remote, secretYaml(ctx, network))
-	ApplyYaml(ctx, proxy, remote, hetznerCloudControllerManagerYaml)
-	ApplyDynamicFile(ctx, proxy, remote, settingsYaml(ctx, network))
+	apply(ctx, proxy, remote, secretYaml(ctx, network))
+	apply(ctx, proxy, remote, hcloudCCMHelmChartYaml())
+	apply(ctx, proxy, remote, settingsYaml(ctx, network))
 }

@@ -40,7 +40,7 @@ func Run(client *ssh.Client, command string) (string, error) {
 		return "", fmt.Errorf("unable to create stderr pipe: %w", err)
 	}
 
-	fmt.Printf("\n===============================================================================================\n" + command + "\n===============================================================================================\n")
+	fmt.Printf("===============================================================================================\n")
 
 	go func() {
 		scanner := bufio.NewScanner(stdoutPipe)

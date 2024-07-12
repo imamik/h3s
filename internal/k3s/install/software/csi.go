@@ -5,11 +5,25 @@ import (
 	"hcloud-k3s-cli/internal/clustercontext"
 )
 
+func hcloudCSIHelmChartYaml() string {
+	return `
+apiVersion: helm.cattle.io/v1
+kind: HelmChart
+metadata:
+  name: hcloud-csi-driver
+  namespace: kube-system
+spec:
+  chart: hcloud/hcloud-csi-driver
+  version: 2.8.0
+  repo: https://charts.hetzner.cloud
+  targetNamespace: kube-system
+`
+}
+
 func InstallHetznerCSI(
 	ctx clustercontext.ClusterContext,
-	network *hcloud.Network,
 	proxy *hcloud.Server,
 	remote *hcloud.Server,
 ) {
-	ApplyYaml(ctx, proxy, remote, "https://raw.githubusercontent.com/hetznercloud/csi-driver/v2.6.0/deploy/kubernetes/hcloud-csi.yml")
+	apply(ctx, proxy, remote, hcloudCSIHelmChartYaml())
 }

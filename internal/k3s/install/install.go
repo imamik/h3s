@@ -29,7 +29,7 @@ func getSetup(ctx clustercontext.ClusterContext) (*hcloud.Network, *hcloud.LoadB
 
 	var gatewayServer *hcloud.Server
 	if ctx.Config.PublicIps == false {
-		gatewayServer = gateway.Create(ctx)
+		gatewayServer, _ = gateway.Get(ctx)
 	}
 
 	return net, lb, gatewayServer, controlPlaneNodes, workerNodes

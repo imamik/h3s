@@ -52,14 +52,11 @@ func ExecuteViaProxy(
 	remoteIp := ip.FirstAvailable(remote)
 	removeKnownHostsEntry(proxyIp)
 
-	// SSH client configuration
 	sshConfig, err := ConfigSsh(ctx)
 	if err != nil {
 		return "", fmt.Errorf("unable to create SSH config: %w", err)
 	}
 
-	// Connect to gateway
-	fmt.Printf("Connecting to gateway (%s)\n", proxyIp)
 	proxyConn, err := dialWithRetries(proxyIp, sshConfig, 5*time.Second, 5)
 	if err != nil {
 		return "", fmt.Errorf("unable to connect to gateway: %w", err)
@@ -71,15 +68,11 @@ func ExecuteViaProxy(
 		}
 	}(proxyConn)
 
-	// Create a tunnel to the remote server via the gateway
-	fmt.Printf("Creating tunnel to remote (%s)\n", remoteIp)
 	tunnel, err := proxyConn.Dial("tcp", remoteIp+":22")
 	if err != nil {
 		return "", fmt.Errorf("unable to create tunnel to remote: %w", err)
 	}
 
-	// Establish SSH connection to remote server through the tunnel
-	fmt.Printf("Establishing connection to remote (%s)\n", remoteIp)
 	clientConn, chans, reqs, err := ssh.NewClientConn(tunnel, remoteIp+":22", sshConfig)
 	if err != nil {
 		return "", fmt.Errorf("unable to establish connection to remote: %w", err)

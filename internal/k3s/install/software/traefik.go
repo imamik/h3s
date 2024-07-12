@@ -122,6 +122,6 @@ func InstallTraefik(
 	remote *hcloud.Server,
 ) {
 	namespace := "traefik"
-	ApplyDynamicFile(ctx, proxy, remote, initNamespace(namespace))
-	ApplyDynamicFile(ctx, proxy, remote, traefikYaml(ctx, lb, namespace))
+	apply(ctx, proxy, remote, initNamespace(namespace))
+	apply(ctx, proxy, remote, traefikYaml(ctx, lb, namespace))
 }

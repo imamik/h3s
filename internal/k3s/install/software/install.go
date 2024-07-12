@@ -13,6 +13,6 @@ func Install(
 	remote *hcloud.Server,
 ) {
 	InstallHetznerCCM(ctx, net, proxyServer, remote)
-	InstallHetznerCSI(ctx, net, proxyServer, remote)
+	InstallHetznerCSI(ctx, proxyServer, remote)
 	InstallTraefik(ctx, lb, proxyServer, remote)
 }
