@@ -39,7 +39,11 @@ func Install(
 	apply(components.CSIHelmChart())
 
 	// Install Traefik
-	namespace := "traefik"
-	apply(components.TraefikNamespace(namespace))
-	apply(components.TraefikHelmChartWithValues(ctx, lb, namespace))
+	apply(components.TraefikNamespace())
+	apply(components.TraefikHelmChartWithValues(ctx, lb))
+
+	// Install Cert-Manager
+	apply(components.CertManagerNamespace())
+	apply(components.CertManagerHelmChart())
+
 }

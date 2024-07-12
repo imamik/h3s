@@ -7,11 +7,15 @@ import (
 	"strings"
 )
 
+const (
+	NamespaceTraefik = "traefik"
+	VersionTraefik   = "29.0.0"
+	ImageTagTraefik  = "v3.1"
+)
+
 func valuesContent(
 	ctx clustercontext.ClusterContext,
 	lb *hcloud.LoadBalancer,
-	namespace string,
-	imageTag string,
 ) string {
 	values := template.CompileTemplate(`
 image:
@@ -60,11 +64,11 @@ additionalArguments:
   - "--providers.kubernetesingress.ingressendpoint.publishedservice={{ .IngressControllerNamespace }}/traefik"
 `,
 		map[string]interface{}{
-			"TraefikImageTag":            imageTag,
+			"TraefikImageTag":            ImageTagTraefik,
 			"IngressReplicaCount":        1,
 			"LoadbalancerName":           lb.Name,
 			"LoadbalancerLocation":       ctx.Config.ControlPlane.Pool.Location,
-			"IngressControllerNamespace": namespace,
+			"IngressControllerNamespace": NamespaceTraefik,
 		})
 	lines := strings.Split(values, "\n")
 	for i, line := range lines {
@@ -77,10 +81,7 @@ additionalArguments:
 func TraefikHelmChartWithValues(
 	ctx clustercontext.ClusterContext,
 	lb *hcloud.LoadBalancer,
-	namespace string,
 ) string {
-	version := "29.0.0"
-	imageTag := "v3.1"
 	return template.CompileTemplate(`
 apiVersion: helm.cattle.io/v1
 kind: HelmChart
@@ -97,13 +98,13 @@ spec:
 {{ .ValuesContent }}
 `,
 		map[string]interface{}{
-			"TargetNamespace": namespace,
-			"TraefikVersion":  version,
-			"ValuesContent":   valuesContent(ctx, lb, namespace, imageTag),
+			"TargetNamespace": NamespaceTraefik,
+			"TraefikVersion":  VersionTraefik,
+			"ValuesContent":   valuesContent(ctx, lb),
 		})
 }
 
-func TraefikNamespace(namespace string) string {
+func TraefikNamespace() string {
 	return template.CompileTemplate(`
 apiVersion: v1
 kind: Namespace
@@ -111,14 +112,6 @@ metadata:
   name: {{ .TargetNamespace }}
 `,
 		map[string]interface{}{
-			"TargetNamespace": namespace,
+			"TargetNamespace": NamespaceTraefik,
 		})
-}
-
-func InstallTraefik(
-	ctx clustercontext.ClusterContext,
-	lb *hcloud.LoadBalancer,
-	proxy *hcloud.Server,
-	remote *hcloud.Server,
-) {
 }
