@@ -75,7 +75,6 @@ func CreatePool(
 ) []*hcloud.Server {
 	logger.LogResourceEvent(logger.Pool, logger.Create, ctx.GetName(pool.Name), logger.Initialized)
 
-	// img := hcloud.Image{Name: "ubuntu-24.04"}
 	img, err := image.Get(ctx, config.GetArchitecture(pool.Instance))
 	if err != nil {
 		logger.LogResourceEvent(logger.Pool, logger.Create, ctx.GetName(pool.Name), logger.Failure)

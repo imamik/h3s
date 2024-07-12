@@ -6,28 +6,17 @@ import (
 	"hcloud-k3s-cli/internal/utils/logger"
 )
 
-var UsePrivateIP = true
-
-func Create(ctx clustercontext.ClusterContext, network *hcloud.Network, nodes []*hcloud.Server) *hcloud.LoadBalancer {
+func Create(ctx clustercontext.ClusterContext, network *hcloud.Network) *hcloud.LoadBalancer {
 	balancer := Get(ctx)
 	if balancer == nil {
-		return create(ctx, network, nodes)
+		return create(ctx, network)
 	}
 	return balancer
-}
-
-func getNodeTarget(server *hcloud.Server) hcloud.LoadBalancerCreateOptsTarget {
-	return hcloud.LoadBalancerCreateOptsTarget{
-		Type:         hcloud.LoadBalancerTargetTypeServer,
-		Server:       hcloud.LoadBalancerCreateOptsTargetServer{Server: server},
-		UsePrivateIP: &UsePrivateIP,
-	}
 }
 
 func create(
 	ctx clustercontext.ClusterContext,
 	network *hcloud.Network,
-	nodes []*hcloud.Server,
 ) *hcloud.LoadBalancer {
 	name := getName(ctx)
 
@@ -40,14 +29,9 @@ func create(
 		Name: "lb11",
 	}
 	location := hcloud.Location{Name: string(ctx.Config.ControlPlane.Pool.Location)}
-	var targets []hcloud.LoadBalancerCreateOptsTarget
-	for _, n := range nodes {
-		targets = append(targets, getNodeTarget(n))
-	}
 
 	opts := hcloud.LoadBalancerCreateOpts{
 		Name:             name,
-		Targets:          targets,
 		Location:         &location,
 		Network:          network,
 		Algorithm:        &algorithm,
@@ -69,5 +53,5 @@ func create(
 
 	logger.LogResourceEvent(logger.LoadBalancer, logger.Create, name, logger.Success)
 
-	return res.LoadBalancer
+	return Get(ctx)
 }

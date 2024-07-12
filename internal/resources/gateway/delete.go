@@ -20,6 +20,9 @@ func Delete(ctx clustercontext.ClusterContext) {
 }
 
 func deleteGatewayRoute(ctx clustercontext.ClusterContext, net *hcloud.Network, proxy *hcloud.Server) {
+	if len(proxy.PrivateNet) == 0 {
+		return
+	}
 	ctx.Client.Network.DeleteRoute(ctx.Context, net, hcloud.NetworkDeleteRouteOpts{
 		Route: hcloud.NetworkRoute{
 			Destination: ip.GetIpRange("0.0.0.0/0"),
