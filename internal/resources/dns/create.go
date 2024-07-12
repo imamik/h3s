@@ -6,6 +6,7 @@ import (
 	"hcloud-k3s-cli/internal/clustercontext"
 	"hcloud-k3s-cli/internal/resources/dns/utils"
 	"hcloud-k3s-cli/internal/utils/logger"
+	"sync"
 )
 
 func Create(
@@ -20,17 +21,22 @@ func Create(
 
 	records := utils.GetExpectedRecords(lb, zone)
 
+	var wg sync.WaitGroup
 	for _, record := range records {
+		go func() {
+			wg.Add(1)
+			defer wg.Done()
+			recordId := record.Name + " | " + record.Type + " | " + record.Value
 
-		recordId := record.Name + " | " + record.Type + " | " + record.Value
+			logger.LogResourceEvent(logger.DNSRecord, logger.Create, recordId, logger.Initialized)
 
-		logger.LogResourceEvent(logger.DNSRecord, logger.Create, recordId, logger.Initialized)
-
-		_, err := ctx.DNSClient.CreateRecord(ctx.Context, record)
-		if err != nil {
-			logger.LogResourceEvent(logger.DNSRecord, logger.Create, recordId, logger.Failure, err)
-		} else {
-			logger.LogResourceEvent(logger.DNSRecord, logger.Create, recordId, logger.Success)
-		}
+			_, err := ctx.DNSClient.CreateRecord(ctx.Context, record)
+			if err != nil {
+				logger.LogResourceEvent(logger.DNSRecord, logger.Create, recordId, logger.Failure, err)
+			} else {
+				logger.LogResourceEvent(logger.DNSRecord, logger.Create, recordId, logger.Success)
+			}
+		}()
 	}
+	wg.Wait()
 }
