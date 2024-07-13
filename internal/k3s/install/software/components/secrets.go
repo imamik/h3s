@@ -3,11 +3,10 @@ package components
 import (
 	"github.com/hetznercloud/hcloud-go/v2/hcloud"
 	"hcloud-k3s-cli/internal/clustercontext"
-	"hcloud-k3s-cli/internal/utils/template"
 )
 
 func HCloudSecrets(ctx clustercontext.ClusterContext, network *hcloud.Network) string {
-	return template.CompileTemplate(`
+	return kubectlApply(`
 apiVersion: "v1"
 kind: "Secret"
 metadata:

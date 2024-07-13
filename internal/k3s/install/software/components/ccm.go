@@ -3,21 +3,20 @@ package components
 import (
 	"github.com/hetznercloud/hcloud-go/v2/hcloud"
 	"hcloud-k3s-cli/internal/clustercontext"
-	"hcloud-k3s-cli/internal/utils/template"
 )
 
 func CCMServiceAccount() string {
-	return `
+	return kubectlApply(`
 apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: hcloud-cloud-controller-manager
   namespace: kube-system
-`
+`, nil)
 }
 
 func CCMRoleBinding() string {
-	return `
+	return kubectlApply(`
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
@@ -30,11 +29,11 @@ subjects:
   - kind: ServiceAccount
     name: hcloud-cloud-controller-manager
     namespace: kube-system
-`
+`, nil)
 }
 
 func CCMSettings(ctx clustercontext.ClusterContext, network *hcloud.Network) string {
-	return template.CompileTemplate(`
+	return kubectlApply(`
 apiVersion: apps/v1
 kind: Deployment
 metadata:

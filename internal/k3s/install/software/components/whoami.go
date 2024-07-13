@@ -2,12 +2,10 @@ package components
 
 import (
 	"hcloud-k3s-cli/internal/clustercontext"
-	"hcloud-k3s-cli/internal/utils/template"
-	"strings"
 )
 
 func WhoAmI(ctx clustercontext.ClusterContext) string {
-	return template.CompileTemplate(`
+	return kubectlApply(`
 apiVersion: v1
 kind: Namespace
 metadata:
@@ -53,12 +51,9 @@ metadata:
   name: whoami
   namespace: whoami
   annotations:
-    kubernetes.io/ingress.class: "traefik"
+    traefik.ingress.kubernetes.io/router.tls: "true"
 spec:
-  tls:
-    - hosts:
-        - whoami.{{ .Domain }}
-      secretName: {{ .DomainKebap }}-wildcard-tls
+  ingressClassName: traefik
   rules:
     - host: whoami.{{ .Domain }}
       http:
@@ -72,7 +67,6 @@ spec:
                   name: web
 `,
 		map[string]interface{}{
-			"Domain":      ctx.Config.Domain,
-			"DomainKebap": strings.ReplaceAll(ctx.Config.Domain, ".", "-"),
+			"Domain": ctx.Config.Domain,
 		})
 }

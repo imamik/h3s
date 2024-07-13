@@ -82,7 +82,7 @@ func TraefikHelmChartWithValues(
 	ctx clustercontext.ClusterContext,
 	lb *hcloud.LoadBalancer,
 ) string {
-	return template.CompileTemplate(`
+	return kubectlApply(`
 apiVersion: v1
 kind: Namespace
 metadata:

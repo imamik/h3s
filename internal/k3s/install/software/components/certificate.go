@@ -3,7 +3,6 @@ package components
 import (
 	"encoding/base64"
 	"hcloud-k3s-cli/internal/clustercontext"
-	"hcloud-k3s-cli/internal/utils/template"
 	"strings"
 )
 
@@ -17,7 +16,7 @@ func WildcardCertificate(ctx clustercontext.ClusterContext) string {
 		server = "https://acme-v02.api.letsencrypt.org/directory"
 	}
 
-	return template.CompileTemplate(`
+	return kubectlApply(`
 apiVersion: v1
 kind: Secret
 metadata:
@@ -62,6 +61,15 @@ spec:
   dnsNames:
     - {{ .Domain }}
     - "*.{{ .Domain }}"
+---
+apiVersion: traefik.io/v1alpha1
+kind: TLSStore
+metadata:
+  name: default
+  namespace: cert-manager
+spec:
+  defaultCertificate:
+    secretName: {{ .DomainKebap }}-wildcard-tls
 `,
 		map[string]interface{}{
 			"Environment":     env,
