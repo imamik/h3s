@@ -9,6 +9,7 @@ import (
 	"hcloud-k3s-cli/cmd/kubectl"
 	"hcloud-k3s-cli/cmd/microos"
 	"hcloud-k3s-cli/cmd/resources"
+	"hcloud-k3s-cli/cmd/ssh"
 	"os"
 )
 
@@ -27,6 +28,7 @@ func init() {
 	rootCmd.AddCommand(microos.Image)
 	rootCmd.AddCommand(resources.Resources)
 	rootCmd.AddCommand(kubectl.Kubectl)
+	rootCmd.AddCommand(ssh.Ssh)
 }
 
 func Execute() {
