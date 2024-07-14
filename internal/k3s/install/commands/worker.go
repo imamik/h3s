@@ -11,13 +11,12 @@ import (
 
 func Worker(
 	ctx clustercontext.ClusterContext,
-	lb *hcloud.LoadBalancer,
-	controlPlaneNodes []*hcloud.Server,
+	firstControlPlane *hcloud.Server,
 	proxy *hcloud.Server,
 	node *hcloud.Server,
 ) {
 	nodeIp := node.PrivateNet[0].IP.String()
-	server := getServer(lb, controlPlaneNodes[0])
+	server := getServer(firstControlPlane)
 	networkInterface, _ := GetNetworkInterfaceName(ctx, proxy, node)
 
 	configYaml := config.K3sServerConfig{

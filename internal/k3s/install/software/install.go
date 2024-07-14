@@ -36,6 +36,10 @@ func Install(
 		components.CertManagerHetznerHelmChart(ctx),
 		components.WildcardCertificate(ctx),
 
+		// Configure K3s API Server Endpoint
+		components.K3sAPI(ctx),
+		// components.K3sAPIServerConfig(ctx),
+
 		// Install WhoAmI
 		components.WhoAmI(ctx),
 	}

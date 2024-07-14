@@ -29,7 +29,7 @@ service:
   annotations:
     "load-balancer.hetzner.cloud/name": "{{ .LoadbalancerName }}"
     "load-balancer.hetzner.cloud/use-private-ip": "true"
-    "load-balancer.hetzner.cloud/disable-private-ingress": "true"
+    "load-balancer.hetzner.cloud/disable-private-ingress": "false"
     "load-balancer.hetzner.cloud/disable-public-network": "false"
     "load-balancer.hetzner.cloud/ipv6-disabled": "false"
     "load-balancer.hetzner.cloud/location": "{{ .LoadbalancerLocation }}"

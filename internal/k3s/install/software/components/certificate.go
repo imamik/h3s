@@ -30,7 +30,6 @@ apiVersion: cert-manager.io/v1
 kind: ClusterIssuer
 metadata:
   name: {{ .DomainKebap }}-wildcard-issuer
-  namespace: cert-manager
 spec:
   acme:
     server: {{ .Server }}
