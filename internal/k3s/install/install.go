@@ -37,10 +37,9 @@ func getSetup(ctx clustercontext.ClusterContext) (*hcloud.Network, *hcloud.LoadB
 
 func Install(ctx clustercontext.ClusterContext) {
 	net, lb, gatewayServer, controlPlaneNodes, workerNodes := getSetup(ctx)
-	firstControlPlane := controlPlaneNodes[0]
 
 	for i, remote := range controlPlaneNodes {
-		commands.ControlPlane(ctx, lb, firstControlPlane, gatewayServer, remote)
+		commands.ControlPlane(ctx, lb, controlPlaneNodes, gatewayServer, remote)
 		if i == 0 {
 			downloadKubeConfig(ctx, lb, gatewayServer, remote)
 			software.Install(ctx, net, lb, gatewayServer, remote)
@@ -48,7 +47,7 @@ func Install(ctx clustercontext.ClusterContext) {
 	}
 
 	for _, remote := range workerNodes {
-		commands.Worker(ctx, firstControlPlane, gatewayServer, remote)
+		commands.Worker(ctx, controlPlaneNodes[0], gatewayServer, remote)
 	}
 
 }

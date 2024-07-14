@@ -13,8 +13,14 @@ func getServer(firstControlPlane *hcloud.Server) string {
 func getTlsSan(
 	ctx clustercontext.ClusterContext,
 	lb *hcloud.LoadBalancer,
+	controlPlaneNodes []*hcloud.Server,
 ) []string {
 	tlsSan := []string{
+		"127.0.0.1",
+		"localhost",
+		"kubernetes",
+		"kubernetes.default",
+		"kubernetes.default.svc",
 		"k3s." + ctx.Config.Domain,
 		lb.PublicNet.IPv4.IP.String(),
 		lb.PublicNet.IPv6.IP.String(),
@@ -22,6 +28,10 @@ func getTlsSan(
 
 	for _, privateNet := range lb.PrivateNet {
 		tlsSan = append(tlsSan, privateNet.IP.String())
+	}
+
+	for _, node := range controlPlaneNodes {
+		tlsSan = append(tlsSan, node.PrivateNet[0].IP.String())
 	}
 
 	return tlsSan

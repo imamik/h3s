@@ -12,11 +12,11 @@ import (
 func ControlPlane(
 	ctx clustercontext.ClusterContext,
 	lb *hcloud.LoadBalancer,
-	firstControlPlane *hcloud.Server,
+	controlPlaneNodes []*hcloud.Server,
 	proxy *hcloud.Server,
 	node *hcloud.Server,
 ) {
-	isFirst := node.ID == firstControlPlane.ID
+	isFirst := node.ID == controlPlaneNodes[0].ID
 	nodeIp := node.PrivateNet[0].IP.String()
 	networkInterface, _ := GetNetworkInterfaceName(ctx, proxy, node)
 
@@ -62,7 +62,7 @@ func ControlPlane(
 		ClusterDNS:       "10.43.0.10",
 
 		// Etcd
-		TLSSAN: getTlsSan(ctx, lb),
+		TLSSAN: getTlsSan(ctx, lb, controlPlaneNodes),
 
 		// Security
 		SELinux: true,
@@ -71,7 +71,7 @@ func ControlPlane(
 	if isFirst {
 		configYaml.ClusterInit = true
 	} else {
-		configYaml.Server = getServer(firstControlPlane)
+		configYaml.Server = getServer(controlPlaneNodes[0])
 		configYaml.WriteKubeconfigMode = "0644"
 	}
 

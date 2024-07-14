@@ -7,6 +7,27 @@ import (
 
 func K3sAPI(ctx clustercontext.ClusterContext) string {
 	return kubectlApply(`
+apiVersion: v1
+kind: Service
+metadata:
+  name: kubernetes-api-proxy
+  namespace: kube-system
+spec:
+  ports:
+    - port: 443
+      targetPort: 6443
+---
+apiVersion: v1
+kind: Endpoints
+metadata:
+  name: kubernetes-api-proxy
+  namespace: kube-system
+subsets:
+  - addresses:
+      - ip: 10.0.0.3
+    ports:
+      - port: 6443
+---
 apiVersion: traefik.io/v1alpha1
 kind: IngressRoute
 metadata:
@@ -16,11 +37,12 @@ spec:
   entryPoints:
     - websecure
   routes:
-    - match: Host(`+"k3s.{{ .Domain }}"+`)
+    - match: Host({{ .Host }})
       kind: Rule
       services:
-        - name: kubernetes-api
-          port: 6443
+        - name: kubernetes-api-proxy
+          port: 443
+  tls: {}
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
@@ -33,19 +55,20 @@ metadata:
 spec:
   ingressClassName: traefik
   rules:
-    - host: k3s.{{ .Domain }}
+    - host: {{ .K3sDomain }}
       http:
         paths:
           - path: /
             pathType: Prefix
             backend:
               service:
-                name: kubernetes-api
+                name: kubernetes-api-proxy
                 port: 
-                  number: 6443
+                  number: 443
 `,
 		map[string]interface{}{
-			"Domain": ctx.Config.Domain,
+			"K3sDomain": fmt.Sprintf("k3s.%s", ctx.Config.Domain),
+			"Host":      fmt.Sprintf("\\`k3s.%s\\`", ctx.Config.Domain),
 		})
 }
 
