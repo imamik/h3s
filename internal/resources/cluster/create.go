@@ -15,6 +15,7 @@ import (
 
 func Create(ctx clustercontext.ClusterContext) {
 	addEvent, logEvents := logger.NewEventLogger(logger.Cluster, logger.Create, ctx.Config.Name)
+	addEvent(logger.Initialized)
 	defer logEvents()
 
 	var wg sync.WaitGroup

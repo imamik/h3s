@@ -17,6 +17,9 @@ var Kubectl = &cobra.Command{
 		// iterate over all filteredArgs
 		for i, arg := range args {
 			if arg == "-f" || arg == "--filename" {
+				if len(args) <= i+1 {
+					continue
+				}
 				if args[i+1][:4] == "http" {
 					continue
 				}

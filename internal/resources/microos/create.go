@@ -11,8 +11,7 @@ import (
 )
 
 func Create(ctx clustercontext.ClusterContext) {
-	// Prepare server to create image from
-	sshKey := sshkey.Create(ctx)
+	sshKey := sshkey.Get(ctx)
 	architectures := config.GetArchitectures(ctx.Config)
 
 	var wg sync.WaitGroup
