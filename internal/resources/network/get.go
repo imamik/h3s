@@ -8,13 +8,16 @@ import (
 
 func Get(ctx clustercontext.ClusterContext) *hcloud.Network {
 	networkName := getName(ctx)
-	logger.LogResourceEvent(logger.Network, logger.Get, networkName, logger.Initialized)
+
+	addEvent, logEvents := logger.NewEventLogger(logger.Network, logger.Get, networkName)
+	defer logEvents()
 
 	network, _, err := ctx.Client.Network.GetByName(ctx.Context, networkName)
 	if err != nil || network == nil {
-		logger.LogResourceEvent(logger.Network, logger.Get, networkName, logger.Failure, err)
+		addEvent(logger.Failure, err)
+		return nil
 	}
 
-	logger.LogResourceEvent(logger.Network, logger.Get, networkName, logger.Success)
+	addEvent(logger.Success)
 	return network
 }

@@ -11,12 +11,14 @@ func Delete(ctx clustercontext.ClusterContext) {
 		return
 	}
 
-	logger.LogResourceEvent(logger.Network, logger.Delete, network.Name, logger.Initialized)
+	addEvent, logEvents := logger.NewEventLogger(logger.Network, logger.Delete, network.Name)
+	defer logEvents()
 
 	_, err := ctx.Client.Network.Delete(ctx.Context, network)
 	if err != nil {
-		logger.LogResourceEvent(logger.Network, logger.Delete, network.Name, logger.Failure, err)
+		addEvent(logger.Failure, err)
+		return
 	}
 
-	logger.LogResourceEvent(logger.Network, logger.Delete, network.Name, logger.Success)
+	addEvent(logger.Success)
 }

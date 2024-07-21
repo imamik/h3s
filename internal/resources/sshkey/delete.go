@@ -12,12 +12,14 @@ func Delete(ctx clustercontext.ClusterContext) {
 		return
 	}
 
-	logger.LogResourceEvent(logger.SSHKey, logger.Delete, sshKey.Name, logger.Initialized)
+	addEvent, logEvents := logger.NewEventLogger(logger.SSHKey, logger.Delete, sshKey.Name)
+	defer logEvents()
 
 	_, err := ctx.Client.SSHKey.Delete(ctx.Context, sshKey)
 	if err != nil {
-		logger.LogResourceEvent(logger.SSHKey, logger.Delete, sshKey.Name, logger.Failure, err)
+		addEvent(logger.Failure, err)
+		return
 	}
 
-	logger.LogResourceEvent(logger.SSHKey, logger.Delete, sshKey.Name, logger.Success)
+	addEvent(logger.Success)
 }

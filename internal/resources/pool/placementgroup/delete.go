@@ -10,17 +10,19 @@ func Delete(
 	ctx clustercontext.ClusterContext,
 	pool config.NodePool,
 ) {
+	addEvent, logEvents := logger.NewEventLogger(logger.PlacementGroup, logger.Delete, ctx.GetName(pool.Name))
+	defer logEvents()
+
 	placementGroup := Get(ctx, pool)
 	if placementGroup == nil {
 		return
 	}
 
-	logger.LogResourceEvent(logger.PlacementGroup, logger.Delete, placementGroup.Name, logger.Initialized)
-
 	_, err := ctx.Client.PlacementGroup.Delete(ctx.Context, placementGroup)
 	if err != nil {
-		logger.LogResourceEvent(logger.PlacementGroup, logger.Delete, placementGroup.Name, logger.Failure, err)
+		addEvent(logger.Failure, err)
+		return
 	}
 
-	logger.LogResourceEvent(logger.PlacementGroup, logger.Delete, placementGroup.Name, logger.Success)
+	addEvent(logger.Success)
 }

@@ -14,7 +14,8 @@ import (
 )
 
 func Create(ctx clustercontext.ClusterContext) {
-	logger.LogResourceEvent(logger.Cluster, logger.Create, ctx.Config.Name, logger.Initialized)
+	addEvent, logEvents := logger.NewEventLogger(logger.Cluster, logger.Create, ctx.Config.Name)
+	defer logEvents()
 
 	var wg sync.WaitGroup
 	wg.Add(3)
@@ -54,5 +55,5 @@ func Create(ctx clustercontext.ClusterContext) {
 
 	loadbalancers.Add(ctx)
 
-	logger.LogResourceEvent(logger.Cluster, logger.Create, ctx.Config.Name, logger.Success)
+	addEvent(logger.Success)
 }

@@ -16,18 +16,18 @@ func Delete(ctx clustercontext.ClusterContext) {
 	var wg sync.WaitGroup
 	for _, record := range records {
 		recordId := record.Name + " | " + record.Type + " | " + record.Value
+		addEvent, logEvents := logger.NewEventLogger(logger.DNSRecord, logger.Delete, recordId)
+		defer logEvents()
 
 		go func(recordId string, record api.Record) {
 			wg.Add(1)
 			defer wg.Done()
 
-			logger.LogResourceEvent(logger.DNSRecord, logger.Delete, recordId, logger.Initialized)
 			err := ctx.DNSClient.DeleteRecord(ctx.Context, record.ID)
-
 			if err != nil {
-				logger.LogResourceEvent(logger.DNSRecord, logger.Delete, recordId, logger.Failure, err)
+				addEvent(logger.Failure, err)
 			} else {
-				logger.LogResourceEvent(logger.DNSRecord, logger.Delete, recordId, logger.Success)
+				addEvent(logger.Success)
 			}
 		}(recordId, record)
 	}

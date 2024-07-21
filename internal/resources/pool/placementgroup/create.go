@@ -15,7 +15,8 @@ func create(
 	isWorker bool,
 ) *hcloud.PlacementGroup {
 	name := getName(ctx, pool)
-	logger.LogResourceEvent(logger.PlacementGroup, logger.Create, name, logger.Initialized)
+	addEvent, logEvents := logger.NewEventLogger(logger.PlacementGroup, logger.Create, name)
+	defer logEvents()
 
 	res, _, err := ctx.Client.PlacementGroup.Create(ctx.Context, hcloud.PlacementGroupCreateOpts{
 		Name: name,
@@ -28,16 +29,16 @@ func create(
 		}),
 	})
 	if err != nil {
-		logger.LogResourceEvent(logger.PlacementGroup, logger.Create, name, logger.Failure, err)
+		addEvent(logger.Failure, err)
 	}
 	if res.PlacementGroup == nil {
-		logger.LogResourceEvent(logger.PlacementGroup, logger.Create, name, logger.Failure, "Empty Response")
+		addEvent(logger.Failure, "Empty Response")
 	}
 	if err := ctx.Client.Action.WaitFor(ctx.Context, res.Action); err != nil {
-		logger.LogResourceEvent(logger.PlacementGroup, logger.Create, name, logger.Failure, err)
+		addEvent(logger.Failure, err)
 	}
 
-	logger.LogResourceEvent(logger.PlacementGroup, logger.Create, name, logger.Success)
+	addEvent(logger.Success)
 	return res.PlacementGroup
 }
 

@@ -32,12 +32,14 @@ func deleteGatewayRoute(ctx clustercontext.ClusterContext, net *hcloud.Network, 
 }
 
 func delete(ctx clustercontext.ClusterContext, server *hcloud.Server) {
-	logger.LogResourceEvent(logger.Server, logger.Delete, server.Name, logger.Initialized)
+	addEvent, logEvents := logger.NewEventLogger(logger.Server, logger.Delete, server.Name)
+	defer logEvents()
 
 	_, _, err := ctx.Client.Server.DeleteWithResult(ctx.Context, server)
 	if err != nil {
-		logger.LogResourceEvent(logger.Server, logger.Delete, server.Name, logger.Failure, err)
+		addEvent(logger.Failure, err)
+		return
 	}
 
-	logger.LogResourceEvent(logger.Server, logger.Delete, server.Name, logger.Success)
+	addEvent(logger.Success)
 }

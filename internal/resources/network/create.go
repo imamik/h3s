@@ -18,7 +18,8 @@ func Create(ctx clustercontext.ClusterContext) *hcloud.Network {
 func create(ctx clustercontext.ClusterContext) *hcloud.Network {
 	networkName := getName(ctx)
 
-	logger.LogResourceEvent(logger.Network, logger.Create, networkName, logger.Initialized)
+	addEvent, logEvents := logger.NewEventLogger(logger.Network, logger.Create, networkName)
+	defer logEvents()
 
 	network, _, err := ctx.Client.Network.Create(ctx.Context, hcloud.NetworkCreateOpts{
 		Name:    networkName,
@@ -26,11 +27,13 @@ func create(ctx clustercontext.ClusterContext) *hcloud.Network {
 		Labels:  ctx.GetLabels(),
 	})
 	if err != nil || network == nil {
-		logger.LogResourceEvent(logger.Network, logger.Create, networkName, logger.Failure, err)
+		addEvent(logger.Failure, err)
+		return nil
 	}
 
-	logger.LogResourceEvent(logger.Network, logger.Create, networkName, logger.Success)
-	logger.LogResourceEvent(logger.Subnet, logger.Create, networkName, logger.Initialized)
+	addEvent(logger.Success)
+	logEvents()
+	addEvent, logEvents = logger.NewEventLogger(logger.Subnet, logger.Create, networkName)
 
 	subnet := hcloud.NetworkSubnet{
 		Type:        hcloud.NetworkSubnetTypeServer,
@@ -42,10 +45,10 @@ func create(ctx clustercontext.ClusterContext) *hcloud.Network {
 		Subnet: subnet,
 	})
 	if err != nil || subNet == nil {
-		logger.LogResourceEvent(logger.Subnet, logger.Create, networkName, logger.Failure, err)
+		addEvent(logger.Failure, err)
+		return nil
 	}
 
-	logger.LogResourceEvent(logger.Subnet, logger.Create, networkName, logger.Success)
-
+	addEvent(logger.Success)
 	return network
 }

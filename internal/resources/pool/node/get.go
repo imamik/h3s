@@ -12,14 +12,16 @@ func Get(
 	pool config.NodePool,
 	i int,
 ) *hcloud.Server {
-	serverName := getName(ctx, pool, i)
-	logger.LogResourceEvent(logger.Server, logger.Get, serverName, logger.Initialized)
+	name := getName(ctx, pool, i)
+	addEvent, logEvents := logger.NewEventLogger(logger.Server, logger.Get, name)
+	defer logEvents()
 
-	server, _, err := ctx.Client.Server.GetByName(ctx.Context, serverName)
+	server, _, err := ctx.Client.Server.GetByName(ctx.Context, name)
 	if err != nil || server == nil {
-		logger.LogResourceEvent(logger.Server, logger.Get, serverName, logger.Failure, err)
+		addEvent(logger.Failure, err)
+		return nil
 	}
 
-	logger.LogResourceEvent(logger.Server, logger.Get, serverName, logger.Success)
+	addEvent(logger.Success)
 	return server
 }

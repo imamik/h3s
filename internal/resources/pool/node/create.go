@@ -39,7 +39,8 @@ func create(
 	isWorker bool,
 ) *hcloud.Server {
 	name := getName(ctx, pool, i)
-	logger.LogResourceEvent(logger.Server, logger.Create, name, logger.Initialized)
+	addEvent, logEvents := logger.NewEventLogger(logger.Server, logger.Create, name)
+	defer logEvents()
 
 	serverType := hcloud.ServerType{Name: string(pool.Instance)}
 	location := hcloud.Location{Name: string(pool.Location)}
@@ -77,18 +78,22 @@ func create(
 		}),
 	})
 	if err != nil {
-		logger.LogResourceEvent(logger.Server, logger.Create, name, logger.Failure, err)
+		addEvent(logger.Failure, err)
+		return nil
 	}
 	if res.Server == nil {
-		logger.LogResourceEvent(logger.Server, logger.Create, name, logger.Failure, "Empty Response")
+		addEvent(logger.Failure, "Empty Response")
+		return nil
 	}
 	if err := ctx.Client.Action.WaitFor(ctx.Context, res.Action); err != nil {
-		logger.LogResourceEvent(logger.Server, logger.Create, name, logger.Failure, err)
+		addEvent(logger.Failure, err)
+		return nil
 	}
 	if err := ctx.Client.Action.WaitFor(ctx.Context, res.NextActions...); err != nil {
-		logger.LogResourceEvent(logger.Server, logger.Create, name, logger.Failure, err)
+		addEvent(logger.Failure, err)
+		return nil
 	}
 
-	logger.LogResourceEvent(logger.Server, logger.Create, name, logger.Success)
+	addEvent(logger.Success)
 	return res.Server
 }

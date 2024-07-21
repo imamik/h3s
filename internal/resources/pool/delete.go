@@ -32,7 +32,9 @@ func Delete(ctx clustercontext.ClusterContext) {
 }
 
 func deletePool(ctx clustercontext.ClusterContext, pool config.NodePool) {
-	logger.LogResourceEvent(logger.Pool, logger.Delete, ctx.GetName(pool.Name), logger.Initialized)
+	addEvent, logEvents := logger.NewEventLogger(logger.Pool, logger.Delete, ctx.GetName(pool.Name))
+	defer logEvents()
+
 	var wg sync.WaitGroup
 	for i := 0; i < pool.Nodes; i++ {
 		wg.Add(1)
@@ -43,5 +45,5 @@ func deletePool(ctx clustercontext.ClusterContext, pool config.NodePool) {
 	}
 	wg.Wait()
 	placementgroup.Delete(ctx, pool)
-	logger.LogResourceEvent(logger.Pool, logger.Delete, ctx.GetName(pool.Name), logger.Success)
+	addEvent(logger.Success)
 }

@@ -12,13 +12,15 @@ func Get(
 	pool config.NodePool,
 ) *hcloud.PlacementGroup {
 	name := getName(ctx, pool)
-	logger.LogResourceEvent(logger.PlacementGroup, logger.Get, name, logger.Initialized)
+	addEvent, logEvents := logger.NewEventLogger(logger.PlacementGroup, logger.Get, name)
+	defer logEvents()
 
 	placementGroup, _, err := ctx.Client.PlacementGroup.GetByName(ctx.Context, name)
 	if err != nil || placementGroup == nil {
-		logger.LogResourceEvent(logger.PlacementGroup, logger.Get, name, logger.Failure, err)
+		addEvent(logger.Failure, err)
+		return nil
 	}
 
-	logger.LogResourceEvent(logger.PlacementGroup, logger.Get, name, logger.Success)
+	addEvent(logger.Success)
 	return placementGroup
 }

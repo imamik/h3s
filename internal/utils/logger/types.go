@@ -1,5 +1,16 @@
 package logger
 
+type ResourceEvent struct {
+	Resource LogResource
+	ID       string
+	Action   interface{}
+	Status   LogCrudStatus
+	Err      []any
+}
+
+type AddEventFunc func(status LogCrudStatus, err ...any)
+type LogFunc func()
+
 type LogResource string
 
 const (

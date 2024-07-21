@@ -8,13 +8,16 @@ import (
 
 func Get(ctx clustercontext.ClusterContext) *hcloud.LoadBalancer {
 	balancer := getName(ctx)
-	logger.LogResourceEvent(logger.LoadBalancer, logger.Get, balancer, logger.Initialized)
+
+	addEvent, logEvents := logger.NewEventLogger(logger.LoadBalancer, logger.Create, balancer)
+	defer logEvents()
 
 	lb, _, err := ctx.Client.LoadBalancer.GetByName(ctx.Context, balancer)
 	if err != nil || lb == nil {
-		logger.LogResourceEvent(logger.LoadBalancer, logger.Get, balancer, logger.Failure, err)
+		addEvent(logger.Failure, err)
+		return nil
 	}
 
-	logger.LogResourceEvent(logger.LoadBalancer, logger.Get, balancer, logger.Success)
+	addEvent(logger.Success)
 	return lb
 }

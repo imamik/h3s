@@ -14,7 +14,8 @@ func create(ctx clustercontext.ClusterContext) *hcloud.SSHKey {
 	}
 
 	sshKeyName := getName(ctx)
-	logger.LogResourceEvent(logger.SSHKey, logger.Create, sshKeyName, logger.Initialized)
+	addEvent, logEvents := logger.NewEventLogger(logger.SSHKey, logger.Create, sshKeyName)
+	defer logEvents()
 
 	sshKey, _, err := ctx.Client.SSHKey.Create(ctx.Context, hcloud.SSHKeyCreateOpts{
 		Name:      sshKeyName,
@@ -22,10 +23,11 @@ func create(ctx clustercontext.ClusterContext) *hcloud.SSHKey {
 		Labels:    ctx.GetLabels(),
 	})
 	if err != nil || sshKey == nil {
-		logger.LogResourceEvent(logger.SSHKey, logger.Create, sshKeyName, logger.Failure, err)
+		addEvent(logger.Failure, err)
+		return nil
 	}
 
-	logger.LogResourceEvent(logger.SSHKey, logger.Create, sshKeyName, logger.Success)
+	addEvent(logger.Success)
 	return sshKey
 }
 

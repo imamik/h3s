@@ -8,13 +8,16 @@ import (
 
 func Get(ctx clustercontext.ClusterContext) *hcloud.SSHKey {
 	sshKeyName := getName(ctx)
-	logger.LogResourceEvent(logger.SSHKey, logger.Get, sshKeyName, logger.Initialized)
+
+	addEvent, logEvents := logger.NewEventLogger(logger.SSHKey, logger.Get, sshKeyName)
+	defer logEvents()
 
 	sshKey, _, err := ctx.Client.SSHKey.GetByName(ctx.Context, sshKeyName)
 	if err != nil || sshKey == nil {
-		logger.LogResourceEvent(logger.SSHKey, logger.Get, sshKeyName, logger.Failure, err)
+		addEvent(logger.Failure, err)
+		return nil
 	}
 
-	logger.LogResourceEvent(logger.SSHKey, logger.Get, sshKeyName, logger.Success)
+	addEvent(logger.Success)
 	return sshKey
 }

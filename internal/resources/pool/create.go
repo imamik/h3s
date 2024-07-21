@@ -74,11 +74,12 @@ func CreatePool(
 	isControlPlane bool,
 	isWorker bool,
 ) []*hcloud.Server {
-	logger.LogResourceEvent(logger.Pool, logger.Create, ctx.GetName(pool.Name), logger.Initialized)
+	addEvent, logEvents := logger.NewEventLogger(logger.Pool, logger.Create, ctx.GetName(pool.Name))
+	defer logEvents()
 
 	img, err := image.Get(ctx, config.GetArchitecture(pool.Instance))
 	if err != nil {
-		logger.LogResourceEvent(logger.Pool, logger.Create, ctx.GetName(pool.Name), logger.Failure)
+		addEvent(logger.Failure, err)
 		return nil
 	}
 
@@ -116,6 +117,6 @@ func CreatePool(
 		nodes = append(nodes, n)
 	}
 
-	logger.LogResourceEvent(logger.Pool, logger.Create, ctx.GetName(pool.Name), logger.Success)
+	addEvent(logger.Success)
 	return nodes
 }

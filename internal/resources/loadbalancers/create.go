@@ -21,8 +21,8 @@ func create(
 	net *hcloud.Network,
 ) *hcloud.LoadBalancer {
 	name := getName(ctx)
-
-	logger.LogResourceEvent(logger.LoadBalancer, logger.Create, name, logger.Initialized)
+	addEvent, logEvents := logger.NewEventLogger(logger.LoadBalancer, logger.Create, name)
+	defer logEvents()
 
 	algorithm := hcloud.LoadBalancerAlgorithm{
 		Type: "round_robin",
@@ -44,16 +44,18 @@ func create(
 	res, _, err := ctx.Client.LoadBalancer.Create(ctx.Context, opts)
 
 	if err != nil {
-		logger.LogResourceEvent(logger.LoadBalancer, logger.Create, name, logger.Failure, err)
+		addEvent(logger.Failure, err)
+		return nil
 	}
 	if res.LoadBalancer == nil {
-		logger.LogResourceEvent(logger.LoadBalancer, logger.Create, name, logger.Failure, "Empty response")
+		addEvent(logger.Failure, "Empty response")
+		return nil
 	}
 	if err := ctx.Client.Action.WaitFor(ctx.Context, res.Action); err != nil {
-		logger.LogResourceEvent(logger.LoadBalancer, logger.Create, name, logger.Failure, err)
+		addEvent(logger.Failure, err)
+		return nil
 	}
 
-	logger.LogResourceEvent(logger.LoadBalancer, logger.Create, name, logger.Success)
-
+	addEvent(logger.Success)
 	return Get(ctx)
 }

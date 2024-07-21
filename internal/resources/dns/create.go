@@ -21,18 +21,19 @@ func Create(ctx clustercontext.ClusterContext) {
 
 	var wg sync.WaitGroup
 	for _, record := range records {
+		recordId := record.Name + " | " + record.Type + " | " + record.Value
+		addEvent, logEvents := logger.NewEventLogger(logger.DNSRecord, logger.Create, recordId)
+		defer logEvents()
+
 		go func() {
 			wg.Add(1)
 			defer wg.Done()
-			recordId := record.Name + " | " + record.Type + " | " + record.Value
-
-			logger.LogResourceEvent(logger.DNSRecord, logger.Create, recordId, logger.Initialized)
 
 			_, err := ctx.DNSClient.CreateRecord(ctx.Context, record)
 			if err != nil {
-				logger.LogResourceEvent(logger.DNSRecord, logger.Create, recordId, logger.Failure, err)
+				addEvent(logger.Failure, err)
 			} else {
-				logger.LogResourceEvent(logger.DNSRecord, logger.Create, recordId, logger.Success)
+				addEvent(logger.Success)
 			}
 		}()
 	}

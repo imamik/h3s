@@ -52,7 +52,9 @@ func createServer(
 	}
 
 	name := getName(ctx)
-	logger.LogResourceEvent(logger.Server, logger.Create, name, logger.Initialized)
+
+	addEvent, logEvents := logger.NewEventLogger(logger.Server, logger.Create, name)
+	defer logEvents()
 
 	serverType := &hcloud.ServerType{Name: string(config.CAX11)}
 	location := &hcloud.Location{Name: string(ctx.Config.ControlPlane.Pool.Location)}
@@ -76,24 +78,28 @@ func createServer(
 		}),
 	})
 	if err != nil {
-		logger.LogResourceEvent(logger.Server, logger.Create, name, logger.Failure, err)
+		addEvent(logger.Failure, err)
+		return nil
 	}
 	if res.Server == nil {
-		logger.LogResourceEvent(logger.Server, logger.Create, name, logger.Failure, "Empty Response")
+		addEvent(logger.Failure, "Empty Response")
+		return nil
 	}
 	if err := ctx.Client.Action.WaitFor(ctx.Context, res.Action); err != nil {
-		logger.LogResourceEvent(logger.Server, logger.Create, name, logger.Failure, err)
+		addEvent(logger.Failure, err)
+		return nil
 	}
 	if err := ctx.Client.Action.WaitFor(ctx.Context, res.NextActions...); err != nil {
-		logger.LogResourceEvent(logger.Server, logger.Create, name, logger.Failure, err)
+		addEvent(logger.Failure, err)
+		return nil
 	}
 
 	server, err = Get(ctx)
 	if err != nil {
-		logger.LogResourceEvent(logger.Server, logger.Create, name, logger.Failure, err)
+		addEvent(logger.Failure, err)
+		return nil
 	}
 
-	logger.LogResourceEvent(logger.Server, logger.Create, name, logger.Success)
-
+	addEvent(logger.Success)
 	return server
 }
