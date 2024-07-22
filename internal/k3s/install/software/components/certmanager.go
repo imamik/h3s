@@ -57,7 +57,7 @@ func WaitForCRDsToBeEstablished() string {
 		for i in {1..5}; do
 			if %s; then
 				echo "CRDs established successfully"
-	            sleep 10
+	            sleep 3
 				exit 0
 			fi
 			echo "Waiting for CRDs to be established (attempt $i)"
