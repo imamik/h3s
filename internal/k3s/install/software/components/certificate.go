@@ -16,6 +16,8 @@ func WildcardCertificate(ctx clustercontext.ClusterContext) string {
 		server = "https://acme-v02.api.letsencrypt.org/directory"
 	}
 
+	domainKebap := strings.ReplaceAll(ctx.Config.Domain, ".", "-")
+
 	return kubectlApply(`
 apiVersion: v1
 kind: Secret
@@ -29,13 +31,13 @@ data:
 apiVersion: cert-manager.io/v1
 kind: ClusterIssuer
 metadata:
-  name: {{ .DomainKebap }}-wildcard-issuer
+  name: {{ .WildcardIssuer }}
 spec:
   acme:
     server: {{ .Server }}
     email: {{ .Email }}
     privateKeySecretRef:
-      name: {{ .DomainKebap }}-{{ .Environment }}-issuer
+      name: {{ .PrivateKeySecretRef }}
     solvers:
       - dns01:
           webhook:
@@ -49,13 +51,13 @@ spec:
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
-  name: {{ .DomainKebap }}-wildcard
+  name: {{ .WildcardTLS }}
   namespace: cert-manager
 spec:
-  commonName: {{ .Domain }}
-  secretName: {{ .DomainKebap }}-wildcard-tls
+  commonName: {{ .WildcardTLS }}
+  secretName: {{ .WildcardTLS }}
   issuerRef:
-    name: {{ .DomainKebap }}-wildcard-issuer
+    name: {{ .WildcardIssuer }}
     kind: ClusterIssuer
   dnsNames:
     - {{ .Domain }}
@@ -68,14 +70,15 @@ metadata:
   namespace: cert-manager
 spec:
   defaultCertificate:
-    secretName: {{ .DomainKebap }}-wildcard-tls
+    secretName: {{ .WildcardTLS }}
 `,
 		map[string]interface{}{
-			"Environment":     env,
-			"Server":          server,
-			"Email":           ctx.Config.CertManager.Email,
-			"HetznerDNSToken": hetznerDNSTokenBase64,
-			"Domain":          ctx.Config.Domain,
-			"DomainKebap":     strings.ReplaceAll(ctx.Config.Domain, ".", "-"),
+			"Server":              server,
+			"Email":               ctx.Config.CertManager.Email,
+			"HetznerDNSToken":     hetznerDNSTokenBase64,
+			"Domain":              ctx.Config.Domain,
+			"WildcardTLS":         domainKebap + "-wildcard-tls",
+			"WildcardIssuer":      domainKebap + "-wildcard-issuer",
+			"PrivateKeySecretRef": domainKebap + "-" + env + "-issuer",
 		})
 }
