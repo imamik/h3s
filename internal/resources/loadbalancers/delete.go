@@ -11,7 +11,7 @@ func Delete(ctx clustercontext.ClusterContext) {
 		return
 	}
 
-	addEvent, logEvents := logger.NewEventLogger(logger.LoadBalancer, logger.Create, balancer.Name)
+	addEvent, logEvents := logger.NewEventLogger(logger.LoadBalancer, logger.Delete, balancer.Name)
 	defer logEvents()
 
 	_, err := ctx.Client.LoadBalancer.Delete(ctx.Context, balancer)

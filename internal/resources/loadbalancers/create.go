@@ -56,6 +56,13 @@ func create(
 		return nil
 	}
 
+	balancer := Get(ctx)
+	_, _, err = ctx.Client.RDNS.ChangeDNSPtr(ctx.Context, balancer, balancer.PublicNet.IPv4.IP, &ctx.Config.Domain)
+	if err != nil {
+		addEvent(logger.Failure, err)
+		return nil
+	}
+
 	addEvent(logger.Success)
-	return Get(ctx)
+	return balancer
 }
