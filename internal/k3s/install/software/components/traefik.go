@@ -62,16 +62,16 @@ ports:
         - 127.0.0.1/32
         - 10.0.0.0/8
 additionalArguments:
-  - "--providers.kubernetesingress.ingressendpoint.publishedservice={{ .IngressControllerNamespace }}/traefik"
+  - "--providers.kubernetesingress.ingressendpoint.publishedservice={{ .Namespace }}/traefik"
   - "--api.dashboard=true"
 `,
 		map[string]interface{}{
-			"TraefikImageTag":            TraefikImageTag,
-			"IngressReplicaCount":        1,
-			"LoadbalancerName":           lb.Name,
-			"LoadbalancerLocation":       ctx.Config.ControlPlane.Pool.Location,
-			"LoadbalancerHostname":       ctx.Config.Domain, // TODO: use the actual hostname
-			"IngressControllerNamespace": TraefikNamespace,
+			"TraefikImageTag":      TraefikImageTag,
+			"IngressReplicaCount":  1,
+			"LoadbalancerName":     lb.Name,
+			"LoadbalancerLocation": ctx.Config.ControlPlane.Pool.Location,
+			"LoadbalancerHostname": ctx.Config.Domain, // TODO: use the actual hostname
+			"Namespace":            TraefikNamespace,
 		})
 	lines := strings.Split(values, "\n")
 	for i, line := range lines {
@@ -81,7 +81,7 @@ additionalArguments:
 	return values
 }
 
-func TraefikHelmChartWithValues(
+func TraefikHelmChart(
 	ctx clustercontext.ClusterContext,
 	lb *hcloud.LoadBalancer,
 ) string {
@@ -89,7 +89,7 @@ func TraefikHelmChartWithValues(
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: {{ .TargetNamespace }}
+  name: {{ .Namespace }}
 ---
 apiVersion: helm.cattle.io/v1
 kind: HelmChart
@@ -100,17 +100,47 @@ spec:
   chart: traefik
   version: {{ .TraefikVersion }}
   repo: https://traefik.github.io/charts
-  targetNamespace: {{ .TargetNamespace }}
+  targetNamespace: {{ .Namespace }}
   createNamespace: true
   bootstrap: true
   valuesContent: |-
 {{ .ValuesContent }}
----
+`,
+		map[string]interface{}{
+			"Namespace":      TraefikNamespace,
+			"TraefikVersion": TraefikVersion,
+			"ValuesContent":  valuesContent(ctx, lb),
+		})
+}
+
+func WaitForTraefikCRDs() string {
+	return WaitForCRDsToBeEstablished("Traefik", []string{
+		"crd/accesscontrolpolicies.hub.traefik.io",
+		"crd/apiaccesses.hub.traefik.io",
+		"crd/apiportals.hub.traefik.io",
+		"crd/apiratelimits.hub.traefik.io",
+		"crd/apis.hub.traefik.io",
+		"crd/apiversions.hub.traefik.io",
+		"crd/ingressroutes.traefik.io",
+		"crd/ingressroutetcps.traefik.io",
+		"crd/ingressrouteudps.traefik.io",
+		"crd/middlewares.traefik.io",
+		"crd/middlewaretcps.traefik.io",
+		"crd/serverstransports.traefik.io",
+		"crd/serverstransporttcps.traefik.io",
+		"crd/tlsoptions.traefik.io",
+		"crd/tlsstores.traefik.io",
+		"crd/traefikservices.traefik.io",
+	})
+}
+
+func TraefikDashboard(ctx clustercontext.ClusterContext) string {
+	return kubectlApply(`
 apiVersion: traefik.io/v1alpha1
 kind: IngressRoute
 metadata:
   name: traefik-dashboard
-  namespace: {{ .TargetNamespace }}
+  namespace: {{ .Namespace }}
   annotations:
     traefik.ingress.kubernetes.io/router.tls: "true"
 spec:
@@ -124,9 +154,7 @@ spec:
       kind: TraefikService
 `,
 		map[string]interface{}{
-			"TargetNamespace": TraefikNamespace,
-			"TraefikVersion":  TraefikVersion,
-			"ValuesContent":   valuesContent(ctx, lb),
-			"Host":            fmt.Sprintf("\\`traefik.%s\\`", ctx.Config.Domain),
+			"Namespace": TraefikNamespace,
+			"Host":      fmt.Sprintf("\\`traefik.%s\\`", ctx.Config.Domain),
 		})
 }

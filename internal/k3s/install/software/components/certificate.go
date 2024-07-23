@@ -52,9 +52,8 @@ apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
   name: {{ .WildcardTLS }}
-  namespace: cert-manager
 spec:
-  commonName: {{ .WildcardTLS }}
+  commonName: {{ .Domain }}
   secretName: {{ .WildcardTLS }}
   issuerRef:
     name: {{ .WildcardIssuer }}
@@ -67,7 +66,6 @@ apiVersion: traefik.io/v1alpha1
 kind: TLSStore
 metadata:
   name: default
-  namespace: cert-manager
 spec:
   defaultCertificate:
     secretName: {{ .WildcardTLS }}

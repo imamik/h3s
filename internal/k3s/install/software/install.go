@@ -28,11 +28,13 @@ func Install(
 		// components.CSIHelmChart(),
 
 		// Install Traefik
-		components.TraefikHelmChartWithValues(ctx, lb),
+		components.TraefikHelmChart(ctx, lb),
+		components.WaitForTraefikCRDs(),
+		components.TraefikDashboard(ctx),
 
 		// Install Cert-Manager
 		components.CertManagerHelmChart(),
-		components.WaitForCRDsToBeEstablished(),
+		components.WaitForCertManagerCRDs(),
 		components.CertManagerHetznerHelmChart(ctx),
 
 		// Install Wildcard Certificate
