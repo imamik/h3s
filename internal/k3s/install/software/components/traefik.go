@@ -22,7 +22,7 @@ func valuesContent(
 image:
   tag: {{ .TraefikImageTag }}
 deployment:
-  replicas: {{ .IngressReplicaCount }}
+  replicas: {{ .ReplicaCount }}
 globalArguments: []
 service:
   enabled: true
@@ -67,10 +67,9 @@ additionalArguments:
 `,
 		map[string]interface{}{
 			"TraefikImageTag":      TraefikImageTag,
-			"IngressReplicaCount":  1,
+			"ReplicaCount":         1,
 			"LoadbalancerName":     lb.Name,
 			"LoadbalancerLocation": ctx.Config.ControlPlane.Pool.Location,
-			"LoadbalancerHostname": ctx.Config.Domain, // TODO: use the actual hostname
 			"Namespace":            TraefikNamespace,
 		})
 	lines := strings.Split(values, "\n")
@@ -136,6 +135,25 @@ func WaitForTraefikCRDs() string {
 
 func TraefikDashboard(ctx clustercontext.ClusterContext) string {
 	return kubectlApply(`
+apiVersion: v1
+kind: Secret
+metadata:
+  name: traefik-dashboard-auth-secret
+  namespace: {{ .Namespace }}
+type: kubernetes.io/basic-auth
+stringData:
+  username: admin
+  password: pass
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: traefik-dashboard-auth
+  namespace: {{ .Namespace }}
+spec:
+  basicAuth:
+    secret: traefik-dashboard-auth-secret
+---
 apiVersion: traefik.io/v1alpha1
 kind: IngressRoute
 metadata:
@@ -152,6 +170,8 @@ spec:
     services:
     - name: api@internal
       kind: TraefikService
+    middlewares:
+    - name: traefik-dashboard-auth
 `,
 		map[string]interface{}{
 			"Namespace": TraefikNamespace,

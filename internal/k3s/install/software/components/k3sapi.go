@@ -17,7 +17,7 @@ metadata:
 spec:
   ingressClassName: traefik
   rules:
-    - host: {{ .K3sDomain }}
+    - host: {{ .Domain }}
       http:
         paths:
           - path: /
@@ -29,8 +29,8 @@ spec:
                   number: 443
 `,
 		map[string]interface{}{
-			"K3sDomain": fmt.Sprintf("k3s.%s", ctx.Config.Domain),
-			"Host":      fmt.Sprintf("\\`k3s.%s\\`", ctx.Config.Domain),
+			"Domain": fmt.Sprintf("k3s.%s", ctx.Config.Domain),
+			"Host":   fmt.Sprintf("\\`k3s.%s\\`", ctx.Config.Domain),
 		})
 }
 
