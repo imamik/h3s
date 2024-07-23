@@ -21,6 +21,8 @@ func getTlsSan(
 		"kubernetes",
 		"kubernetes.default",
 		"kubernetes.default.svc",
+		ctx.Config.Domain,
+		ctx.Config.Domain + ".local",
 		"k3s." + ctx.Config.Domain,
 		lb.PublicNet.IPv4.IP.String(),
 		lb.PublicNet.IPv6.IP.String(),

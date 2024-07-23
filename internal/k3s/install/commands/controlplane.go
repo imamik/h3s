@@ -60,6 +60,8 @@ func ControlPlane(
 		ClusterCIDR:      "10.42.0.0/16",
 		ServiceCIDR:      "10.43.0.0/16",
 		ClusterDNS:       "10.43.0.10",
+		ClusterDomain:    ctx.Config.Domain + ".local",
+		HTTPSListenPort:  443,
 
 		// Etcd
 		TLSSAN: getTlsSan(ctx, lb, controlPlaneNodes),

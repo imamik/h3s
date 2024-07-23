@@ -1,6 +1,7 @@
 package components
 
 import (
+	"fmt"
 	"github.com/hetznercloud/hcloud-go/v2/hcloud"
 	"hcloud-k3s-cli/internal/clustercontext"
 	"hcloud-k3s-cli/internal/utils/template"
@@ -62,12 +63,14 @@ ports:
         - 10.0.0.0/8
 additionalArguments:
   - "--providers.kubernetesingress.ingressendpoint.publishedservice={{ .IngressControllerNamespace }}/traefik"
+  - "--api.dashboard=true"
 `,
 		map[string]interface{}{
 			"TraefikImageTag":            TraefikImageTag,
 			"IngressReplicaCount":        1,
 			"LoadbalancerName":           lb.Name,
 			"LoadbalancerLocation":       ctx.Config.ControlPlane.Pool.Location,
+			"LoadbalancerHostname":       ctx.Config.Domain, // TODO: use the actual hostname
 			"IngressControllerNamespace": TraefikNamespace,
 		})
 	lines := strings.Split(values, "\n")
@@ -102,10 +105,28 @@ spec:
   bootstrap: true
   valuesContent: |-
 {{ .ValuesContent }}
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: traefik-dashboard
+  namespace: {{ .TargetNamespace }}
+  annotations:
+    traefik.ingress.kubernetes.io/router.tls: "true"
+spec:
+  entryPoints:
+    - websecure
+  routes:
+  - match: Host({{ .Host }})
+    kind: Rule
+    services:
+    - name: api@internal
+      kind: TraefikService
 `,
 		map[string]interface{}{
 			"TargetNamespace": TraefikNamespace,
 			"TraefikVersion":  TraefikVersion,
 			"ValuesContent":   valuesContent(ctx, lb),
+			"Host":            fmt.Sprintf("\\`traefik.%s\\`", ctx.Config.Domain),
 		})
 }

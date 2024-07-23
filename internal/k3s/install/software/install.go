@@ -34,6 +34,8 @@ func Install(
 		components.CertManagerHelmChart(),
 		components.WaitForCRDsToBeEstablished(),
 		components.CertManagerHetznerHelmChart(ctx),
+
+		// Install Wildcard Certificate
 		components.WildcardCertificate(ctx),
 
 		// Configure K3s API Server Endpoint
