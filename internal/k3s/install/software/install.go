@@ -27,25 +27,26 @@ func Install(
 		// Install Hetzner CSI (Cloud Storage Interface)
 		// components.CSIHelmChart(),
 
-		// Install Traefik
-		components.TraefikHelmChart(ctx, lb),
-		components.WaitForTraefikCRDs(),
-		components.TraefikDashboard(ctx),
-
 		// Install Cert-Manager
 		components.CertManagerHelmChart(),
 		components.WaitForCertManagerCRDs(),
 		components.CertManagerHetznerHelmChart(ctx),
 
+		// Install Traefik
+		components.TraefikHelmChart(ctx, lb),
+		components.WaitForTraefikCRDs(),
+
 		// Install Wildcard Certificate
 		components.WildcardCertificate(ctx),
+
+		// Setup Dashboards
+		components.K8sDashboardHelmChart(),
+		components.K8sDashboardIngress(ctx),
+		components.TraefikDashboard(ctx),
 
 		// Configure K3s API Server Endpoint
 		components.K3sAPI(ctx),
 		// components.K3sAPIServerConfig(ctx),
-
-		// Install WhoAmI
-		components.WhoAmI(ctx),
 	}
 
 	for _, cmd := range cmdArr {

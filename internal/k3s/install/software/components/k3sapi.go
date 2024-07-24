@@ -14,6 +14,7 @@ metadata:
   namespace: default
   annotations:
     traefik.ingress.kubernetes.io/router.tls: "true"
+    traefik.ingress.kubernetes.io/service.serverscheme: "https"
 spec:
   ingressClassName: traefik
   rules:

@@ -23,7 +23,8 @@ image:
   tag: {{ .TraefikImageTag }}
 deployment:
   replicas: {{ .ReplicaCount }}
-globalArguments: []
+globalArguments:
+  - "--serversTransport.insecureSkipVerify=true"
 service:
   enabled: true
   type: LoadBalancer
