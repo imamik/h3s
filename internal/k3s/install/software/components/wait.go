@@ -5,7 +5,7 @@ import (
 	"strings"
 )
 
-func WaitForCRDsToBeEstablished(component string, resources []string) string {
+func WaitForCRDs(component string, resources []string) string {
 	waitCmd := "kubectl wait --for=condition=established --timeout=30s " + strings.Join(resources, " ") + " >/dev/null 2>&1"
 	return fmt.Sprintf(`
 echo "Waiting for CRDs of %s to be established"
@@ -25,7 +25,7 @@ exit 1
 `, component, waitCmd)
 }
 
-func WaitForNamespaceToBeEstablished(namespace string) string {
+func WaitForNamespace(namespace string) string {
 	return fmt.Sprintf(`
 echo "Waiting for namespace %s to be established"
 for i in {1..5}; do

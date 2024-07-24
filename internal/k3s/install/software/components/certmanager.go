@@ -42,7 +42,7 @@ spec:
 }
 
 func WaitForCertManagerCRDs() string {
-	return WaitForCRDsToBeEstablished("Cert-Manager", []string{
+	return WaitForCRDs("Cert-Manager", []string{
 		"crd/certificaterequests.cert-manager.io",
 		"crd/certificates.cert-manager.io",
 		"crd/challenges.acme.cert-manager.io",

@@ -41,8 +41,8 @@ func Install(ctx clustercontext.ClusterContext) {
 	for i, remote := range controlPlaneNodes {
 		commands.ControlPlane(ctx, lb, controlPlaneNodes, gatewayServer, remote)
 		if i == 0 {
-			downloadKubeConfig(ctx, lb, gatewayServer, remote)
 			software.Install(ctx, net, lb, gatewayServer, remote)
+			downloadKubeConfig(ctx, lb, gatewayServer, remote)
 		}
 	}
 

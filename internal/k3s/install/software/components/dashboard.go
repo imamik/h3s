@@ -31,7 +31,7 @@ spec:
 }
 
 func WaitForK8sDashboardNamespace() string {
-	return WaitForNamespaceToBeEstablished(K8sDashboardNamespace)
+	return WaitForNamespace(K8sDashboardNamespace)
 }
 
 func K8sDashboardAccess(ctx clustercontext.ClusterContext) string {

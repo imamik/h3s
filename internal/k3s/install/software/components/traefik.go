@@ -114,7 +114,7 @@ spec:
 }
 
 func WaitForTraefikCRDs() string {
-	return WaitForCRDsToBeEstablished("Traefik", []string{
+	return WaitForCRDs("Traefik", []string{
 		"crd/accesscontrolpolicies.hub.traefik.io",
 		"crd/apiaccesses.hub.traefik.io",
 		"crd/apiportals.hub.traefik.io",
