@@ -39,9 +39,12 @@ func Install(
 		// Install Wildcard Certificate
 		components.WildcardCertificate(ctx),
 
-		// Setup Dashboards
+		// Setup K8s Dashboard
 		components.K8sDashboardHelmChart(),
+		components.WaitForK8sDashboardNamespace(),
 		components.K8sDashboardIngress(ctx),
+
+		// Setup Traefik Dashboard
 		components.TraefikDashboard(ctx),
 
 		// Configure K3s API Server Endpoint
