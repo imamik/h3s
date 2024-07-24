@@ -54,7 +54,5 @@ func Create(ctx clustercontext.ClusterContext) {
 	}
 	wg.Wait()
 
-	loadbalancers.Add(ctx)
-
 	addEvent(logger.Success)
 }
