@@ -9,10 +9,10 @@ import (
 	"hcloud-k3s-cli/internal/utils/ssh"
 )
 
-func SSH(ctx clustercontext.ClusterContext, cmd string) error {
+func SSH(ctx clustercontext.ClusterContext, cmd string) (string, error) {
 	gate, err := gateway.Get(ctx)
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	nodes := server.GetAll(ctx)
@@ -25,10 +25,10 @@ func SSH(ctx clustercontext.ClusterContext, cmd string) error {
 		}
 	}
 
-	_, err = ssh.ExecuteViaProxy(ctx, gate, controlPlane, cmd)
+	res, err := ssh.ExecuteViaProxy(ctx, gate, controlPlane, cmd)
 	if err != nil {
-		return err
+		return "", err
 	}
 
-	return nil
+	return res, nil
 }

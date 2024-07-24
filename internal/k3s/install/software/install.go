@@ -42,7 +42,7 @@ func Install(
 		// Setup K8s Dashboard
 		components.K8sDashboardHelmChart(),
 		components.WaitForK8sDashboardNamespace(),
-		components.K8sDashboardIngress(ctx),
+		components.K8sDashboardAccess(ctx),
 
 		// Setup Traefik Dashboard
 		components.TraefikDashboard(ctx),
