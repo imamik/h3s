@@ -20,7 +20,7 @@ func downloadKubeConfig(
 	if err != nil {
 		logger.LogResourceEvent(logger.Server, "Download kubeconfig", remote.Name, logger.Failure, err)
 	} else {
-		kubeConfig = strings.Replace(kubeConfig, "127.0.0.1", lb.PublicNet.IPv4.IP.String(), 1)
+		kubeConfig = strings.Replace(kubeConfig, "127.0.0.1:6443", ctx.Config.Domain, 1)
 		err := file.Save([]byte(kubeConfig), "k3s.yaml")
 		if err != nil {
 			logger.LogResourceEvent(logger.Server, "Download kubeconfig", remote.Name, logger.Failure, err)
