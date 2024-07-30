@@ -2,7 +2,6 @@ package components
 
 import (
 	"hcloud-k3s-cli/internal/clustercontext"
-	"strings"
 )
 
 const (
@@ -79,6 +78,6 @@ spec:
 		map[string]interface{}{
 			"Namespace":   K8sDashboardNamespace,
 			"Domain":      ctx.Config.Domain,
-			"WildcardTLS": strings.ReplaceAll(ctx.Config.Domain, ".", "-") + "-wildcard-tls",
+			"WildcardTLS": wildcardTlS(ctx),
 		})
 }

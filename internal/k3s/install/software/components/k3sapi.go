@@ -28,10 +28,14 @@ spec:
                 name: kubernetes
                 port: 
                   number: 443
+  tls:
+    - hosts:
+        - {{ .Domain }}
+      secretName: {{ .WildcardTLS }}
 `,
 		map[string]interface{}{
-			"Domain": fmt.Sprintf("k3s.%s", ctx.Config.Domain),
-			"Host":   fmt.Sprintf("\\`k3s.%s\\`", ctx.Config.Domain),
+			"Domain":      fmt.Sprintf("k3s.%s", ctx.Config.Domain),
+			"WildcardTLS": wildcardTlS(ctx),
 		})
 }
 

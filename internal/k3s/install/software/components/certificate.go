@@ -6,6 +6,18 @@ import (
 	"strings"
 )
 
+func domainKebap(ctx clustercontext.ClusterContext) string {
+	return strings.ReplaceAll(ctx.Config.Domain, ".", "-")
+}
+
+func wildcardTlS(ctx clustercontext.ClusterContext) string {
+	return domainKebap(ctx) + "-wildcard-tls"
+}
+
+func wildcardIssuer(ctx clustercontext.ClusterContext) string {
+	return domainKebap(ctx) + "-wildcard-issuer"
+}
+
 func WildcardCertificate(ctx clustercontext.ClusterContext) string {
 	env := "staging"
 	server := "https://acme-staging-v02.api.letsencrypt.org/directory"
@@ -15,8 +27,6 @@ func WildcardCertificate(ctx clustercontext.ClusterContext) string {
 		env = "production"
 		server = "https://acme-v02.api.letsencrypt.org/directory"
 	}
-
-	domainKebap := strings.ReplaceAll(ctx.Config.Domain, ".", "-")
 
 	return kubectlApply(`
 apiVersion: v1
@@ -75,8 +85,8 @@ spec:
 			"Email":               ctx.Config.CertManager.Email,
 			"HetznerDNSToken":     hetznerDNSTokenBase64,
 			"Domain":              ctx.Config.Domain,
-			"WildcardTLS":         domainKebap + "-wildcard-tls",
-			"WildcardIssuer":      domainKebap + "-wildcard-issuer",
-			"PrivateKeySecretRef": domainKebap + "-" + env + "-issuer",
+			"WildcardTLS":         wildcardTlS(ctx),
+			"WildcardIssuer":      wildcardIssuer(ctx),
+			"PrivateKeySecretRef": domainKebap(ctx) + "-" + env + "-issuer",
 		})
 }
