@@ -10,12 +10,17 @@ import (
 	"hcloud-k3s-cli/internal/resources/network"
 	"hcloud-k3s-cli/internal/resources/pool/node"
 	"hcloud-k3s-cli/internal/resources/server"
+	"sort"
 )
 
 func getSetup(ctx clustercontext.ClusterContext) (*hcloud.Network, *hcloud.LoadBalancer, *hcloud.Server, []*hcloud.Server, []*hcloud.Server) {
 	net := network.Get(ctx)
 	nodes := server.GetAll(ctx)
 	lb := loadbalancers.Get(ctx)
+
+	sort.Slice(nodes, func(i, j int) bool {
+		return nodes[i].Name < nodes[j].Name
+	})
 
 	var controlPlaneNodes []*hcloud.Server
 	var workerNodes []*hcloud.Server
@@ -37,18 +42,18 @@ func getSetup(ctx clustercontext.ClusterContext) (*hcloud.Network, *hcloud.LoadB
 
 func Install(ctx clustercontext.ClusterContext) {
 	net, lb, gatewayServer, controlPlaneNodes, workerNodes := getSetup(ctx)
+	firstControlPlane := controlPlaneNodes[0]
 
-	for i, remote := range controlPlaneNodes {
+	for _, remote := range controlPlaneNodes {
 		commands.ControlPlane(ctx, lb, controlPlaneNodes, gatewayServer, remote)
-		if i == 0 {
-			software.Install(ctx, net, lb, gatewayServer, remote)
-			downloadKubeConfig(ctx, lb, gatewayServer, remote)
-		}
 	}
 
 	for _, remote := range workerNodes {
 		commands.Worker(ctx, controlPlaneNodes[0], gatewayServer, remote)
 	}
+
+	software.Install(ctx, net, lb, gatewayServer, firstControlPlane)
+	downloadKubeConfig(ctx, lb, gatewayServer, firstControlPlane)
 
 }
 
