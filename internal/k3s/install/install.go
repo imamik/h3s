@@ -5,6 +5,7 @@ import (
 	"hcloud-k3s-cli/internal/clustercontext"
 	"hcloud-k3s-cli/internal/k3s/install/commands"
 	"hcloud-k3s-cli/internal/k3s/install/software"
+	"hcloud-k3s-cli/internal/k3s/kubeconfig"
 	"hcloud-k3s-cli/internal/resources/gateway"
 	"hcloud-k3s-cli/internal/resources/loadbalancers"
 	"hcloud-k3s-cli/internal/resources/network"
@@ -53,7 +54,7 @@ func Install(ctx clustercontext.ClusterContext) {
 	}
 
 	software.Install(ctx, net, lb, gatewayServer, firstControlPlane)
-	downloadKubeConfig(ctx, lb, gatewayServer, firstControlPlane)
+	kubeconfig.DownloadKubeConfig(ctx, gatewayServer, firstControlPlane)
 
 }
 

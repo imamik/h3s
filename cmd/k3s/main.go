@@ -12,5 +12,5 @@ var K3s = &cobra.Command{
 func init() {
 	K3s.AddCommand(Releases)
 	K3s.AddCommand(Install)
-	K3s.AddCommand(Dashboard)
+	K3s.AddCommand(Bearer)
 }

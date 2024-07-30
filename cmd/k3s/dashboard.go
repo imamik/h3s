@@ -4,21 +4,16 @@ import (
 	"fmt"
 	"github.com/spf13/cobra"
 	"hcloud-k3s-cli/internal/clustercontext"
-	"hcloud-k3s-cli/internal/ssh"
+	"hcloud-k3s-cli/internal/k3s/bearer"
 	"os/exec"
 )
-
-var Dashboard = &cobra.Command{
-	Use:   "dashboard",
-	Short: "Commands to manage the k3s dashboard",
-}
 
 var Bearer = &cobra.Command{
 	Use:   "bearer",
 	Short: "Get the bearer token for the k3s dashboard",
 	Run: func(cmd *cobra.Command, args []string) {
 		ctx := clustercontext.Context()
-		bearer, err := ssh.SSH(ctx, "kubectl -n kubernetes-dashboard create token admin-user --duration=24h") // 1 month
+		bearer, err := bearer.GetBearerToken(ctx, "kubernetes-dashboard", "admin-user", 24)
 		if err != nil {
 			fmt.Printf("Failed to get bearer token: %v\n", err)
 			return
@@ -32,8 +27,4 @@ var Bearer = &cobra.Command{
 			fmt.Println("Bearer token copied to clipboard.")
 		}
 	},
-}
-
-func init() {
-	Dashboard.AddCommand(Bearer)
 }

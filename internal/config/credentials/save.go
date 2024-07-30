@@ -5,7 +5,7 @@ import (
 	"hcloud-k3s-cli/internal/utils/yaml"
 )
 
-func save(projectName string, projectCredentials ProjectCredentials) {
+func Save(projectName string, projectCredentials ProjectCredentials) {
 	credentials, err := initialize()
 	if err != nil {
 		fmt.Println(err)
