@@ -7,8 +7,15 @@ import (
 	"hcloud-k3s-cli/internal/clustercontext"
 	"hcloud-k3s-cli/internal/utils/ip"
 	"log"
+	"os/exec"
 	"time"
 )
+
+func ExecuteLocal(command string) (string, error) {
+	cmd := exec.Command("sh", "-c", command)
+	output, err := cmd.CombinedOutput()
+	return string(output), err
+}
 
 func ExecuteWithSsh(
 	ctx clustercontext.ClusterContext,
