@@ -1,0 +1,3 @@
+- Build mechanism to get token from k8s and chache/validate it
+- Store the token in the .hcloud credentials file
+- Build a simple command that dynamically builds the k3s.yaml and uses it to invoke kubectl
