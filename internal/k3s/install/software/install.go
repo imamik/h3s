@@ -49,7 +49,6 @@ func Install(
 
 		// Configure K3s API Server Endpoint
 		components.K3sAPI(ctx),
-		// components.K3sAPIServerConfig(ctx),
 	}
 
 	for _, cmd := range cmdArr {
@@ -58,5 +57,7 @@ func Install(
 			fmt.Printf("Failed to apply: %s", err.Error())
 		}
 	}
+
+	ssh.ExecuteLocal(components.K3sAPIServerConfig(ctx))
 
 }
