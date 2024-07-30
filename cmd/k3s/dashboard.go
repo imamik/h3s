@@ -18,7 +18,7 @@ var Bearer = &cobra.Command{
 	Short: "Get the bearer token for the k3s dashboard",
 	Run: func(cmd *cobra.Command, args []string) {
 		ctx := clustercontext.Context()
-		bearer, err := ssh.SSH(ctx, "kubectl -n kubernetes-dashboard create token admin-user")
+		bearer, err := ssh.SSH(ctx, "kubectl -n kubernetes-dashboard create token admin-user --duration=24h") // 1 month
 		if err != nil {
 			fmt.Printf("Failed to get bearer token: %v\n", err)
 			return
