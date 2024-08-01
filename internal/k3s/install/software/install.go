@@ -25,7 +25,7 @@ func Install(
 		components.CCMSettings(ctx, net),
 
 		// Install Hetzner CSI (Cloud Storage Interface)
-		// components.CSIHelmChart(),
+		components.CSIHelmChart(),
 
 		// Install Cert-Manager
 		components.CertManagerHelmChart(),

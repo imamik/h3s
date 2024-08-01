@@ -8,7 +8,7 @@ metadata:
   name: hcloud-csi
   namespace: kube-system
 spec:
-  chart: hcloud/hcloud-csi
+  chart: hcloud-csi
   version: 2.8.0
   repo: https://charts.hetzner.cloud
   targetNamespace: kube-system
