@@ -9,8 +9,6 @@ var Credentials = &cobra.Command{
 	Use:   "credentials",
 	Short: "Configure project credentials",
 	Run: func(cmd *cobra.Command, args []string) {
-
-		credentials.Config()
-
+		credentials.Configure()
 	},
 }

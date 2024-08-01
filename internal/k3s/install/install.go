@@ -14,7 +14,7 @@ import (
 	"sort"
 )
 
-func getSetup(ctx clustercontext.ClusterContext) (*hcloud.Network, *hcloud.LoadBalancer, *hcloud.Server, []*hcloud.Server, []*hcloud.Server) {
+func GetSetup(ctx clustercontext.ClusterContext) (*hcloud.Network, *hcloud.LoadBalancer, *hcloud.Server, []*hcloud.Server, []*hcloud.Server) {
 	net := network.Get(ctx)
 	nodes := server.GetAll(ctx)
 	lb := loadbalancers.Get(ctx)
@@ -42,7 +42,7 @@ func getSetup(ctx clustercontext.ClusterContext) (*hcloud.Network, *hcloud.LoadB
 }
 
 func Install(ctx clustercontext.ClusterContext) {
-	net, lb, gatewayServer, controlPlaneNodes, workerNodes := getSetup(ctx)
+	net, lb, gatewayServer, controlPlaneNodes, workerNodes := GetSetup(ctx)
 	firstControlPlane := controlPlaneNodes[0]
 
 	for _, remote := range controlPlaneNodes {
@@ -54,12 +54,12 @@ func Install(ctx clustercontext.ClusterContext) {
 	}
 
 	software.Install(ctx, net, lb, gatewayServer, firstControlPlane)
-	kubeconfig.DownloadKubeConfig(ctx, gatewayServer, firstControlPlane)
+	kubeconfig.Download(ctx, gatewayServer, firstControlPlane)
 
 }
 
 func InstallSoftware(ctx clustercontext.ClusterContext) {
-	net, lb, proxyServer, controlPlaneNodes, _ := getSetup(ctx)
+	net, lb, proxyServer, controlPlaneNodes, _ := GetSetup(ctx)
 
 	software.Install(ctx, net, lb, proxyServer, controlPlaneNodes[0])
 }

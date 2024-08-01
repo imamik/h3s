@@ -9,13 +9,19 @@ import (
 
 func Context() ClusterContext {
 	conf := config.Load()
-	projectCredentials, _ := credentials.Get(conf)
-	client := GetClient(projectCredentials)
+	projectCredentials, err := credentials.Get(conf)
+	if err != nil {
+		panic(err)
+	}
+	if projectCredentials == nil {
+		panic("No credentials found")
+	}
+	client := GetClient(*projectCredentials)
 	dnsClient, _ := api.New("https://dns.hetzner.com", projectCredentials.HetznerDNSToken, nil)
 
 	return ClusterContext{
 		Config:      conf,
-		Credentials: projectCredentials,
+		Credentials: *projectCredentials,
 		Client:      client,
 		DNSClient:   dnsClient,
 		Context:     context.Background(),

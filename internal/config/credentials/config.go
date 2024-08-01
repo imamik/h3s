@@ -1,7 +1,7 @@
 package credentials
 
-func Config() {
+func Configure() {
 	projectName := surveyName()
 	projectCredentials := surveyCredentials()
-	Save(projectName, projectCredentials)
+	SaveCredentials(projectName, projectCredentials)
 }

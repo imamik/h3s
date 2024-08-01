@@ -1,20 +1,22 @@
 package credentials
 
 import (
+	"hcloud-k3s-cli/internal/config/path"
 	"hcloud-k3s-cli/internal/utils/file"
 	"hcloud-k3s-cli/internal/utils/yaml"
 )
 
-func initialize() (Credentials, error) {
-	err := file.Create(path)
+func initialize(projectName string) (*ProjectCredentials, error) {
+	p := path.GetPath(projectName, path.CredentialFileName)
+	err := file.Create(p)
 	if err != nil {
 		return nil, err
 	}
 
-	var credentials Credentials
-	err = yaml.Load(path, &credentials)
+	var credentials *ProjectCredentials
+	err = yaml.Load(p, &credentials)
 	if err != nil || credentials == nil {
-		return make(Credentials), err
+		return nil, err
 	}
 
 	return credentials, nil

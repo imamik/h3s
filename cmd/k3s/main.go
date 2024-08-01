@@ -13,4 +13,5 @@ func init() {
 	K3s.AddCommand(Releases)
 	K3s.AddCommand(Install)
 	K3s.AddCommand(Bearer)
+	K3s.AddCommand(KubeConfig)
 }

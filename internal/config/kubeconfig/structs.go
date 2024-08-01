@@ -1,4 +1,4 @@
-package types
+package kubeconfig
 
 // KubeConfig represents the overall Kubernetes configuration
 type KubeConfig struct {
