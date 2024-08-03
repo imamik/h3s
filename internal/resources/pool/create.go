@@ -2,14 +2,14 @@ package pool
 
 import (
 	"github.com/hetznercloud/hcloud-go/v2/hcloud"
-	"hcloud-k3s-cli/internal/clustercontext"
-	"hcloud-k3s-cli/internal/config"
-	"hcloud-k3s-cli/internal/resources/microos/image"
-	"hcloud-k3s-cli/internal/resources/network"
-	"hcloud-k3s-cli/internal/resources/pool/node"
-	"hcloud-k3s-cli/internal/resources/pool/placementgroup"
-	"hcloud-k3s-cli/internal/resources/sshkey"
-	"hcloud-k3s-cli/internal/utils/logger"
+	"h3s/internal/clustercontext"
+	"h3s/internal/config"
+	"h3s/internal/resources/microos/image"
+	"h3s/internal/resources/network"
+	"h3s/internal/resources/pool/node"
+	"h3s/internal/resources/pool/placementgroup"
+	"h3s/internal/resources/sshkey"
+	"h3s/internal/utils/logger"
 	"sync"
 )
 

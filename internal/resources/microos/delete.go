@@ -2,10 +2,10 @@ package microos
 
 import (
 	"github.com/hetznercloud/hcloud-go/v2/hcloud"
-	"hcloud-k3s-cli/internal/clustercontext"
-	"hcloud-k3s-cli/internal/config"
-	"hcloud-k3s-cli/internal/resources/microos/image"
-	"hcloud-k3s-cli/internal/resources/microos/server"
+	"h3s/internal/clustercontext"
+	"h3s/internal/config"
+	"h3s/internal/resources/microos/image"
+	"h3s/internal/resources/microos/server"
 )
 
 func Delete(ctx clustercontext.ClusterContext) {

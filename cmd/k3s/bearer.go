@@ -3,8 +3,8 @@ package k3s
 import (
 	"fmt"
 	"github.com/spf13/cobra"
-	"hcloud-k3s-cli/internal/clustercontext"
-	"hcloud-k3s-cli/internal/k3s/bearer"
+	"h3s/internal/clustercontext"
+	"h3s/internal/k3s/bearer"
 	"os/exec"
 )
 

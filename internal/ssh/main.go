@@ -2,11 +2,11 @@ package ssh
 
 import (
 	"github.com/hetznercloud/hcloud-go/v2/hcloud"
-	"hcloud-k3s-cli/internal/clustercontext"
-	"hcloud-k3s-cli/internal/resources/gateway"
-	"hcloud-k3s-cli/internal/resources/pool/node"
-	"hcloud-k3s-cli/internal/resources/server"
-	"hcloud-k3s-cli/internal/utils/ssh"
+	"h3s/internal/clustercontext"
+	"h3s/internal/resources/gateway"
+	"h3s/internal/resources/pool/node"
+	"h3s/internal/resources/server"
+	"h3s/internal/utils/ssh"
 )
 
 func SSH(ctx clustercontext.ClusterContext, cmd string) (string, error) {

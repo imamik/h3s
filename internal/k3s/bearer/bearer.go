@@ -2,8 +2,8 @@ package bearer
 
 import (
 	"fmt"
-	"hcloud-k3s-cli/internal/clustercontext"
-	"hcloud-k3s-cli/internal/ssh"
+	"h3s/internal/clustercontext"
+	"h3s/internal/ssh"
 )
 
 func GetBearerToken(ctx clustercontext.ClusterContext, namespace string, user string, hours int) (string, error) {

@@ -4,7 +4,7 @@ import (
 	"crypto/rand"
 	"encoding/hex"
 	"github.com/charmbracelet/huh"
-	"hcloud-k3s-cli/internal/config"
+	"h3s/internal/config"
 )
 
 func surveyName() string {

@@ -3,7 +3,7 @@ package ssh
 import (
 	"fmt"
 	"golang.org/x/crypto/ssh"
-	"hcloud-k3s-cli/internal/utils/logger"
+	"h3s/internal/utils/logger"
 	"log"
 	"time"
 )

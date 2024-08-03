@@ -2,10 +2,10 @@ package commands
 
 import (
 	"github.com/hetznercloud/hcloud-go/v2/hcloud"
-	"hcloud-k3s-cli/internal/clustercontext"
-	"hcloud-k3s-cli/internal/k3s/install/config"
-	"hcloud-k3s-cli/internal/utils/ssh"
-	"hcloud-k3s-cli/internal/utils/yaml"
+	"h3s/internal/clustercontext"
+	"h3s/internal/k3s/install/config"
+	"h3s/internal/utils/ssh"
+	"h3s/internal/utils/yaml"
 	"strings"
 )
 

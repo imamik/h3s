@@ -2,7 +2,7 @@ package utils
 
 import (
 	"github.com/hetznercloud/hcloud-go/v2/hcloud"
-	"hcloud-k3s-cli/internal/resources/dns/api"
+	"h3s/internal/resources/dns/api"
 )
 
 var ttl int64 = 60

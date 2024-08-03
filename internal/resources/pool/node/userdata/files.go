@@ -1,6 +1,6 @@
 package userdata
 
-import "hcloud-k3s-cli/internal/utils/template"
+import "h3s/internal/utils/template"
 
 func generateWriteFilesCommon(config CloudInitConfig) string {
 	return template.CompileTemplate(`

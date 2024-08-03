@@ -2,9 +2,9 @@ package build
 
 import (
 	"fmt"
-	"hcloud-k3s-cli/internal/config/build/survey"
-	"hcloud-k3s-cli/internal/k3s/releases"
-	"hcloud-k3s-cli/internal/utils/yaml"
+	"h3s/internal/config/build/survey"
+	"h3s/internal/k3s/releases"
+	"h3s/internal/utils/yaml"
 )
 
 func Build(k3sReleases []releases.Release) {

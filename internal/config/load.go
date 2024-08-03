@@ -1,7 +1,7 @@
 package config
 
 import (
-	"hcloud-k3s-cli/internal/utils/yaml"
+	"h3s/internal/utils/yaml"
 	"log"
 )
 

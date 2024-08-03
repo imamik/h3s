@@ -2,9 +2,9 @@ package clustercontext
 
 import (
 	"context"
-	"hcloud-k3s-cli/internal/config"
-	"hcloud-k3s-cli/internal/config/credentials"
-	"hcloud-k3s-cli/internal/resources/dns/api"
+	"h3s/internal/config"
+	"h3s/internal/config/credentials"
+	"h3s/internal/resources/dns/api"
 )
 
 func Context() ClusterContext {

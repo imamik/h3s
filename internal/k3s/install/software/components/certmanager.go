@@ -1,7 +1,7 @@
 package components
 
 import (
-	"hcloud-k3s-cli/internal/clustercontext"
+	"h3s/internal/clustercontext"
 )
 
 const (

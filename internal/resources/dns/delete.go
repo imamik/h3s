@@ -1,9 +1,9 @@
 package dns
 
 import (
-	"hcloud-k3s-cli/internal/clustercontext"
-	"hcloud-k3s-cli/internal/resources/dns/api"
-	"hcloud-k3s-cli/internal/utils/logger"
+	"h3s/internal/clustercontext"
+	"h3s/internal/resources/dns/api"
+	"h3s/internal/utils/logger"
 	"sync"
 )
 

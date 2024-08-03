@@ -2,9 +2,9 @@ package network
 
 import (
 	"github.com/hetznercloud/hcloud-go/v2/hcloud"
-	"hcloud-k3s-cli/internal/clustercontext"
-	"hcloud-k3s-cli/internal/utils/ip"
-	"hcloud-k3s-cli/internal/utils/logger"
+	"h3s/internal/clustercontext"
+	"h3s/internal/utils/ip"
+	"h3s/internal/utils/logger"
 )
 
 func Create(ctx clustercontext.ClusterContext) *hcloud.Network {

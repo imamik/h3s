@@ -1,4 +1,4 @@
-module hcloud-k3s-cli
+module h3s
 
 go 1.22.4
 

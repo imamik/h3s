@@ -2,9 +2,9 @@ package microos
 
 import (
 	"github.com/spf13/cobra"
-	"hcloud-k3s-cli/internal/clustercontext"
-	"hcloud-k3s-cli/internal/resources/microos"
-	"hcloud-k3s-cli/internal/resources/sshkey"
+	"h3s/internal/clustercontext"
+	"h3s/internal/resources/microos"
+	"h3s/internal/resources/sshkey"
 )
 
 var Create = &cobra.Command{

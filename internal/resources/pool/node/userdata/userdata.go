@@ -1,7 +1,7 @@
 package userdata
 
 import (
-	"hcloud-k3s-cli/internal/utils/template"
+	"h3s/internal/utils/template"
 )
 
 type CloudInitConfig struct {

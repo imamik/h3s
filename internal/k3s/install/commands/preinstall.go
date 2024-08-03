@@ -1,8 +1,8 @@
 package commands
 
 import (
-	"hcloud-k3s-cli/internal/clustercontext"
-	"hcloud-k3s-cli/internal/utils/template"
+	"h3s/internal/clustercontext"
+	"h3s/internal/utils/template"
 )
 
 func PreInstallCommand(ctx clustercontext.ClusterContext, configYaml string) string {

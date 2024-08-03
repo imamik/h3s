@@ -1,7 +1,7 @@
 package clustercontext
 
 import (
-	"hcloud-k3s-cli/internal/config"
+	"h3s/internal/config"
 	"strings"
 )
 

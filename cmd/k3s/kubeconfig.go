@@ -2,9 +2,9 @@ package k3s
 
 import (
 	"github.com/spf13/cobra"
-	"hcloud-k3s-cli/internal/clustercontext"
-	"hcloud-k3s-cli/internal/k3s/install"
-	"hcloud-k3s-cli/internal/k3s/kubeconfig"
+	"h3s/internal/clustercontext"
+	"h3s/internal/k3s/install"
+	"h3s/internal/k3s/kubeconfig"
 )
 
 var KubeConfig = &cobra.Command{

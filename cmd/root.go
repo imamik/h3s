@@ -3,13 +3,13 @@ package cmd
 import (
 	"fmt"
 	"github.com/spf13/cobra"
-	"hcloud-k3s-cli/cmd/cluster"
-	"hcloud-k3s-cli/cmd/config"
-	"hcloud-k3s-cli/cmd/k3s"
-	"hcloud-k3s-cli/cmd/kubectl"
-	"hcloud-k3s-cli/cmd/microos"
-	"hcloud-k3s-cli/cmd/resources"
-	"hcloud-k3s-cli/cmd/ssh"
+	"h3s/cmd/cluster"
+	"h3s/cmd/config"
+	"h3s/cmd/k3s"
+	"h3s/cmd/kubectl"
+	"h3s/cmd/microos"
+	"h3s/cmd/resources"
+	"h3s/cmd/ssh"
 	"os"
 )
 

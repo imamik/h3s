@@ -3,8 +3,8 @@ package survey
 import (
 	"github.com/charmbracelet/huh"
 	"github.com/hetznercloud/hcloud-go/v2/hcloud"
-	"hcloud-k3s-cli/internal/config"
-	"hcloud-k3s-cli/internal/k3s/releases"
+	"h3s/internal/config"
+	"h3s/internal/k3s/releases"
 	"strconv"
 )
 

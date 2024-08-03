@@ -2,14 +2,14 @@ package gateway
 
 import (
 	"github.com/hetznercloud/hcloud-go/v2/hcloud"
-	"hcloud-k3s-cli/internal/clustercontext"
-	"hcloud-k3s-cli/internal/config"
-	"hcloud-k3s-cli/internal/resources/microos/image"
-	"hcloud-k3s-cli/internal/resources/network"
-	"hcloud-k3s-cli/internal/resources/sshkey"
-	"hcloud-k3s-cli/internal/utils/ip"
-	"hcloud-k3s-cli/internal/utils/logger"
-	"hcloud-k3s-cli/internal/utils/ssh"
+	"h3s/internal/clustercontext"
+	"h3s/internal/config"
+	"h3s/internal/resources/microos/image"
+	"h3s/internal/resources/network"
+	"h3s/internal/resources/sshkey"
+	"h3s/internal/utils/ip"
+	"h3s/internal/utils/logger"
+	"h3s/internal/utils/ssh"
 )
 
 func Create(ctx clustercontext.ClusterContext) *hcloud.Server {

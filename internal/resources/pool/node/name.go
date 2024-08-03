@@ -1,8 +1,8 @@
 package node
 
 import (
-	"hcloud-k3s-cli/internal/clustercontext"
-	"hcloud-k3s-cli/internal/config"
+	"h3s/internal/clustercontext"
+	"h3s/internal/config"
 	"strconv"
 )
 

@@ -2,15 +2,15 @@ package install
 
 import (
 	"github.com/hetznercloud/hcloud-go/v2/hcloud"
-	"hcloud-k3s-cli/internal/clustercontext"
-	"hcloud-k3s-cli/internal/k3s/install/commands"
-	"hcloud-k3s-cli/internal/k3s/install/software"
-	"hcloud-k3s-cli/internal/k3s/kubeconfig"
-	"hcloud-k3s-cli/internal/resources/gateway"
-	"hcloud-k3s-cli/internal/resources/loadbalancers"
-	"hcloud-k3s-cli/internal/resources/network"
-	"hcloud-k3s-cli/internal/resources/pool/node"
-	"hcloud-k3s-cli/internal/resources/server"
+	"h3s/internal/clustercontext"
+	"h3s/internal/k3s/install/commands"
+	"h3s/internal/k3s/install/software"
+	"h3s/internal/k3s/kubeconfig"
+	"h3s/internal/resources/gateway"
+	"h3s/internal/resources/loadbalancers"
+	"h3s/internal/resources/network"
+	"h3s/internal/resources/pool/node"
+	"h3s/internal/resources/server"
 	"sort"
 )
 

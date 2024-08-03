@@ -2,7 +2,7 @@ package credentials
 
 import (
 	"fmt"
-	"hcloud-k3s-cli/internal/config"
+	"h3s/internal/config"
 )
 
 func Get(conf config.Config) (*ProjectCredentials, error) {

@@ -2,8 +2,8 @@ package microos
 
 import (
 	"github.com/spf13/cobra"
-	"hcloud-k3s-cli/internal/clustercontext"
-	"hcloud-k3s-cli/internal/resources/microos"
+	"h3s/internal/clustercontext"
+	"h3s/internal/resources/microos"
 )
 
 var Delete = &cobra.Command{

@@ -2,9 +2,9 @@ package loadbalancers
 
 import (
 	"github.com/hetznercloud/hcloud-go/v2/hcloud"
-	"hcloud-k3s-cli/internal/clustercontext"
-	"hcloud-k3s-cli/internal/resources/network"
-	"hcloud-k3s-cli/internal/utils/logger"
+	"h3s/internal/clustercontext"
+	"h3s/internal/resources/network"
+	"h3s/internal/utils/logger"
 )
 
 func Create(ctx clustercontext.ClusterContext) *hcloud.LoadBalancer {

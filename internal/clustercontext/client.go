@@ -3,7 +3,7 @@ package clustercontext
 import (
 	"fmt"
 	"github.com/hetznercloud/hcloud-go/v2/hcloud"
-	"hcloud-k3s-cli/internal/config/credentials"
+	"h3s/internal/config/credentials"
 	"os"
 )
 

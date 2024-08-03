@@ -3,11 +3,11 @@ package image
 import (
 	"fmt"
 	"github.com/hetznercloud/hcloud-go/v2/hcloud"
-	"hcloud-k3s-cli/internal/clustercontext"
-	"hcloud-k3s-cli/internal/resources/microos/image/commands"
-	"hcloud-k3s-cli/internal/utils/logger"
-	"hcloud-k3s-cli/internal/utils/ping"
-	"hcloud-k3s-cli/internal/utils/ssh"
+	"h3s/internal/clustercontext"
+	"h3s/internal/resources/microos/image/commands"
+	"h3s/internal/utils/logger"
+	"h3s/internal/utils/ping"
+	"h3s/internal/utils/ssh"
 	"time"
 )
 

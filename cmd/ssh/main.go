@@ -2,8 +2,8 @@ package ssh
 
 import (
 	"github.com/spf13/cobra"
-	"hcloud-k3s-cli/internal/clustercontext"
-	"hcloud-k3s-cli/internal/ssh"
+	"h3s/internal/clustercontext"
+	"h3s/internal/ssh"
 	"strings"
 )
 

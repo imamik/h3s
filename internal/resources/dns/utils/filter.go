@@ -1,7 +1,7 @@
 package utils
 
 import (
-	"hcloud-k3s-cli/internal/resources/dns/api"
+	"h3s/internal/resources/dns/api"
 )
 
 func isRecordExpected(record api.Record, expectedRecords []api.CreateRecordOpts) bool {

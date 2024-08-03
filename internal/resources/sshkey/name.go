@@ -1,7 +1,7 @@
 package sshkey
 
 import (
-	"hcloud-k3s-cli/internal/clustercontext"
+	"h3s/internal/clustercontext"
 )
 
 func getName(ctx clustercontext.ClusterContext) string {

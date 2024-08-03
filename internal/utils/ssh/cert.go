@@ -1,9 +1,9 @@
 package ssh
 
 import (
-	"hcloud-k3s-cli/internal/clustercontext"
-	"hcloud-k3s-cli/internal/utils/file"
-	"hcloud-k3s-cli/internal/utils/logger"
+	"h3s/internal/clustercontext"
+	"h3s/internal/utils/file"
+	"h3s/internal/utils/logger"
 )
 
 func readCertFromFile(path string) (string, error) {

@@ -3,7 +3,7 @@ package yaml
 import (
 	"fmt"
 	"gopkg.in/yaml.v3"
-	"hcloud-k3s-cli/internal/utils/file"
+	"h3s/internal/utils/file"
 )
 
 func Save(config any, filePath string) error {

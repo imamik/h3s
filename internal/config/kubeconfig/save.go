@@ -2,8 +2,8 @@ package kubeconfig
 
 import (
 	"fmt"
-	"hcloud-k3s-cli/internal/config/path"
-	"hcloud-k3s-cli/internal/utils/yaml"
+	"h3s/internal/config/path"
+	"h3s/internal/utils/yaml"
 )
 
 func SaveKubeConfig(projectName string, kubeConfig KubeConfig) {

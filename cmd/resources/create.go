@@ -2,8 +2,8 @@ package resources
 
 import (
 	"github.com/spf13/cobra"
-	"hcloud-k3s-cli/internal/clustercontext"
-	"hcloud-k3s-cli/internal/resources/cluster"
+	"h3s/internal/clustercontext"
+	"h3s/internal/resources/cluster"
 )
 
 var Create = &cobra.Command{

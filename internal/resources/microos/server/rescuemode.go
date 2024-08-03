@@ -2,8 +2,8 @@ package server
 
 import (
 	"github.com/hetznercloud/hcloud-go/v2/hcloud"
-	"hcloud-k3s-cli/internal/clustercontext"
-	"hcloud-k3s-cli/internal/utils/logger"
+	"h3s/internal/clustercontext"
+	"h3s/internal/utils/logger"
 )
 
 const RescueModeLog = "Set Rescue Mode"

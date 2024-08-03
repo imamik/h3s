@@ -2,10 +2,10 @@ package dns
 
 import (
 	"fmt"
-	"hcloud-k3s-cli/internal/clustercontext"
-	"hcloud-k3s-cli/internal/resources/dns/utils"
-	"hcloud-k3s-cli/internal/resources/loadbalancers"
-	"hcloud-k3s-cli/internal/utils/logger"
+	"h3s/internal/clustercontext"
+	"h3s/internal/resources/dns/utils"
+	"h3s/internal/resources/loadbalancers"
+	"h3s/internal/utils/logger"
 	"sync"
 )
 

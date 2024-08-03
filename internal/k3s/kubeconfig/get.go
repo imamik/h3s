@@ -3,10 +3,10 @@ package kubeconfig
 import (
 	"github.com/hetznercloud/hcloud-go/v2/hcloud"
 	"gopkg.in/yaml.v3"
-	"hcloud-k3s-cli/internal/clustercontext"
-	"hcloud-k3s-cli/internal/config/kubeconfig"
-	"hcloud-k3s-cli/internal/k3s/bearer"
-	"hcloud-k3s-cli/internal/utils/ssh"
+	"h3s/internal/clustercontext"
+	"h3s/internal/config/kubeconfig"
+	"h3s/internal/k3s/bearer"
+	"h3s/internal/utils/ssh"
 	"strings"
 )
 

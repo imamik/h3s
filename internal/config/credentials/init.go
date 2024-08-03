@@ -1,9 +1,9 @@
 package credentials
 
 import (
-	"hcloud-k3s-cli/internal/config/path"
-	"hcloud-k3s-cli/internal/utils/file"
-	"hcloud-k3s-cli/internal/utils/yaml"
+	"h3s/internal/config/path"
+	"h3s/internal/utils/file"
+	"h3s/internal/utils/yaml"
 )
 
 func initialize(projectName string) (*ProjectCredentials, error) {

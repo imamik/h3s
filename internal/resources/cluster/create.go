@@ -1,15 +1,15 @@
 package cluster
 
 import (
-	"hcloud-k3s-cli/internal/clustercontext"
-	"hcloud-k3s-cli/internal/resources/dns"
-	"hcloud-k3s-cli/internal/resources/gateway"
-	"hcloud-k3s-cli/internal/resources/loadbalancers"
-	"hcloud-k3s-cli/internal/resources/microos"
-	"hcloud-k3s-cli/internal/resources/network"
-	"hcloud-k3s-cli/internal/resources/pool"
-	"hcloud-k3s-cli/internal/resources/sshkey"
-	"hcloud-k3s-cli/internal/utils/logger"
+	"h3s/internal/clustercontext"
+	"h3s/internal/resources/dns"
+	"h3s/internal/resources/gateway"
+	"h3s/internal/resources/loadbalancers"
+	"h3s/internal/resources/microos"
+	"h3s/internal/resources/network"
+	"h3s/internal/resources/pool"
+	"h3s/internal/resources/sshkey"
+	"h3s/internal/utils/logger"
 	"sync"
 )
 

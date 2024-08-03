@@ -2,7 +2,7 @@ package survey
 
 import (
 	"github.com/charmbracelet/huh"
-	"hcloud-k3s-cli/internal/config"
+	"h3s/internal/config"
 	"log"
 )
 

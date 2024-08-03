@@ -3,7 +3,7 @@ package survey
 import (
 	"github.com/charmbracelet/huh"
 	"github.com/hetznercloud/hcloud-go/v2/hcloud"
-	"hcloud-k3s-cli/internal/k3s/releases"
+	"h3s/internal/k3s/releases"
 )
 
 func releasesToOptions(k3sReleases []releases.Release) []huh.Option[string] {

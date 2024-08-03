@@ -3,11 +3,11 @@ package kubectl
 import (
 	"fmt"
 	"github.com/spf13/cobra"
-	"hcloud-k3s-cli/internal/clustercontext"
-	"hcloud-k3s-cli/internal/config/kubeconfig"
-	"hcloud-k3s-cli/internal/ssh"
-	"hcloud-k3s-cli/internal/utils/file"
-	ssh2 "hcloud-k3s-cli/internal/utils/ssh"
+	"h3s/internal/clustercontext"
+	"h3s/internal/config/kubeconfig"
+	"h3s/internal/ssh"
+	"h3s/internal/utils/file"
+	ssh2 "h3s/internal/utils/ssh"
 	"strings"
 )
 

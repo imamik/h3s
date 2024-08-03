@@ -2,7 +2,7 @@ package components
 
 import (
 	"encoding/base64"
-	"hcloud-k3s-cli/internal/clustercontext"
+	"h3s/internal/clustercontext"
 	"strings"
 )
 

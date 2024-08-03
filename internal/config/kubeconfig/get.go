@@ -1,8 +1,8 @@
 package kubeconfig
 
 import (
-	"hcloud-k3s-cli/internal/config/path"
-	"hcloud-k3s-cli/internal/utils/file"
+	"h3s/internal/config/path"
+	"h3s/internal/utils/file"
 )
 
 func GetPathIfExists(projectName string) (string, bool) {

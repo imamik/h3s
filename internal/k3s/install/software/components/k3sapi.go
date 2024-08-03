@@ -2,7 +2,7 @@ package components
 
 import (
 	"fmt"
-	"hcloud-k3s-cli/internal/clustercontext"
+	"h3s/internal/clustercontext"
 )
 
 func K3sAPI(ctx clustercontext.ClusterContext) string {

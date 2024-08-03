@@ -2,7 +2,7 @@ package components
 
 import (
 	"github.com/hetznercloud/hcloud-go/v2/hcloud"
-	"hcloud-k3s-cli/internal/clustercontext"
+	"h3s/internal/clustercontext"
 )
 
 func CCMServiceAccount() string {
