@@ -7,7 +7,7 @@ import (
 
 func Load() Config {
 	var conf Config
-	err := yaml.Load("hcloud-k3s.yaml", &conf)
+	err := yaml.Load("h3s.yaml", &conf)
 	if err != nil {
 		log.Fatalf("error loading config: %s", err)
 		return conf

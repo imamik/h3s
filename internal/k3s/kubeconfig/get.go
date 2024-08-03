@@ -42,7 +42,8 @@ func get(ctx clustercontext.ClusterContext, proxy *hcloud.Server, remote *hcloud
 
 	for i := range config.Clusters {
 		config.Clusters[i].Cluster = kubeconfig.ClusterDetails{
-			Server: "https://k3s." + ctx.Config.Domain,
+			InsecureSkipTLSVerify: ctx.Config.CertManager.Production,
+			Server:                "https://k3s." + ctx.Config.Domain,
 		}
 	}
 

@@ -20,8 +20,8 @@ type SSHKeyPaths struct {
 }
 
 type CertManager struct {
-	Email   string `yaml:"email"`
-	Staging bool   `yaml:"staging"`
+	Email      string `yaml:"email"`
+	Production bool   `yaml:"production"`
 }
 
 type Config struct {

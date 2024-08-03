@@ -23,7 +23,7 @@ func WildcardCertificate(ctx clustercontext.ClusterContext) string {
 	server := "https://acme-staging-v02.api.letsencrypt.org/directory"
 	hetznerDNSTokenBase64 := base64.StdEncoding.EncodeToString([]byte(ctx.Credentials.HetznerDNSToken))
 
-	if !ctx.Config.CertManager.Staging {
+	if ctx.Config.CertManager.Production {
 		env = "production"
 		server = "https://acme-v02.api.letsencrypt.org/directory"
 	}

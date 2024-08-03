@@ -16,7 +16,7 @@ func Build(k3sReleases []releases.Release) {
 		return
 	}
 
-	err = yaml.Save(conf, "hcloud-k3s.yaml")
+	err = yaml.Save(conf, "h3s.yaml")
 	if err != nil {
 		fmt.Println(err)
 		return

@@ -10,5 +10,5 @@ const (
 )
 
 func GetPath(projectName string, fileName FileName) string {
-	return fmt.Sprintf("$HOME/.config/hcloud-k3s/%s/%s", projectName, fileName)
+	return fmt.Sprintf("$HOME/.config/h3s/%s/%s", projectName, fileName)
 }
