@@ -1,3 +1,4 @@
+// Package cmd contains the command-line interface definitions for the h3s tool
 package cmd
 
 import (
@@ -5,35 +6,42 @@ import (
 	"github.com/spf13/cobra"
 	"h3s/cmd/cluster"
 	"h3s/cmd/config"
+	"h3s/cmd/credentials"
 	"h3s/cmd/k3s"
 	"h3s/cmd/kubectl"
-	"h3s/cmd/microos"
-	"h3s/cmd/resources"
 	"h3s/cmd/ssh"
-	"os"
 )
 
+// rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
-	Use:   "hcloud-k8s",
-	Short: "A CLI to setup a k3s Kubernetes resources on Hetzner Cloud",
-	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("Welcome to my CLI")
-	},
+	Use:   "h3s",
+	Short: "A CLI to setup k3s Kubernetes resources on Hetzner Cloud",
+	Long: `h3s (Hetzner Highly-Available-k3s Clusters) is a command-line interface for setting up and managing
+k3s Kubernetes resources on Hetzner Cloud. It provides various subcommands
+for managing clusters, configurations, and resources.`,
+	Run: printWelcome,
 }
 
+// printWelcome prints a welcome message & help information when the root command is called
+func printWelcome(cmd *cobra.Command, args []string) {
+	fmt.Println("Welcome to h3s CLI")
+	fmt.Println("Use --help for more information about available commands")
+}
+
+// init function sets up the command structure by adding subcommands to the root command
 func init() {
 	rootCmd.AddCommand(k3s.K3s)
 	rootCmd.AddCommand(config.Config)
+	rootCmd.AddCommand(credentials.Credentials)
 	rootCmd.AddCommand(cluster.Cluster)
-	rootCmd.AddCommand(microos.Image)
-	rootCmd.AddCommand(resources.Resources)
 	rootCmd.AddCommand(kubectl.Kubectl)
 	rootCmd.AddCommand(ssh.Ssh)
 }
 
-func Execute() {
+// Execute adds all child commands to the root command and sets flags appropriately.
+func Execute() error {
 	if err := rootCmd.Execute(); err != nil {
-		fmt.Println(err)
-		os.Exit(1)
+		return err
 	}
+	return nil
 }

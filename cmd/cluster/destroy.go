@@ -6,11 +6,17 @@ import (
 	"h3s/internal/resources/cluster"
 )
 
+// Destroy is a cobra.Command that handles the destruction of an existing cluster
 var Destroy = &cobra.Command{
 	Use:   "destroy",
-	Short: "Destroy a new resources",
-	Run: func(cmd *cobra.Command, args []string) {
-		ctx := clustercontext.Context()
-		cluster.Destroy(ctx)
-	},
+	Short: "Destroy an existing cluster",
+	Long:  `Destroy an existing cluster including alle resources`,
+	Run:   runDestroy,
+}
+
+func runDestroy(cmd *cobra.Command, args []string) {
+	// Get the cluster context
+	ctx := clustercontext.Context()
+	// Destroy the cluster resources
+	cluster.Destroy(ctx)
 }

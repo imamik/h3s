@@ -7,20 +7,19 @@ import (
 	"h3s/internal/resources/cluster"
 )
 
-var k3sInstall bool
-
+// Create is a cobra.Command that handles the creation of a new cluster
 var Create = &cobra.Command{
 	Use:   "create",
-	Short: "Create a new resources",
-	Run: func(cmd *cobra.Command, args []string) {
-		ctx := clustercontext.Context()
-		cluster.Create(ctx)
-		if k3sInstall {
-			install.Install(ctx)
-		}
-	},
+	Short: "Create a new cluster",
+	Long:  `Create a new cluster including the necessary resources, install k3s and configure the cluster`,
+	Run:   runCreate,
 }
 
-func init() {
-	Create.Flags().BoolVar(&k3sInstall, "install", true, "Install k3s on all servers in the cluster")
+func runCreate(cmd *cobra.Command, args []string) {
+	// Get the cluster context
+	ctx := clustercontext.Context()
+	// Create the cluster resources
+	cluster.Create(ctx)
+	// Install k3s on the cluster
+	install.Install(ctx)
 }

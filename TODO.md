@@ -1,2 +1,4 @@
+- if 1 node cluster, ask if loadbalancer is needed
+- make sure to setup firewalls
 - Build mechanism to get token from k8s and chache/validate it
 - Build a simple command that dynamically builds the k3s.yaml and uses it to invoke kubectl

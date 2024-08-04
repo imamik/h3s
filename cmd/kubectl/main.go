@@ -13,46 +13,56 @@ import (
 
 var Kubectl = &cobra.Command{
 	Use:                "kubectl",
-	Short:              "Proxy kubectl commands via ssh to the Kubernetes API server",
+	Short:              "Run kubectl commands",
+	Long:               `Run kubectl commands either directly (if setup and possible) or via SSH to the first control plane server`,
 	DisableFlagParsing: true,
-	Run: func(cmd *cobra.Command, args []string) {
+	Run:                runKubectl,
+}
 
-		ctx := clustercontext.Context()
+func runKubectl(cmd *cobra.Command, args []string) {
+	ctx := clustercontext.Context()
 
-		kubeConfigPath, kubeConfigExists := kubeconfig.GetPathIfExists(ctx.Config.Name)
-		if kubeConfigExists {
-			kubeConfigStr := fmt.Sprintf(`--kubeconfig="%s"`, kubeConfigPath)
-			args = append([]string{"kubectl", kubeConfigStr}, args...)
-			cmd := strings.Join(args, " ")
-			println(cmd)
-			out, err := ssh2.ExecuteLocal(cmd)
+	kubeConfigPath, kubeConfigExists := kubeconfig.GetPathIfExists(ctx.Config.Name)
+	if kubeConfigExists {
+		runWithKubeConfig(kubeConfigPath, args)
+	} else {
+		runWithSSH(ctx, args)
+	}
+
+}
+
+func runWithKubeConfig(kubeConfigPath string, args []string) {
+	kubeConfigStr := fmt.Sprintf(`--kubeconfig="%s"`, kubeConfigPath)
+	args = append([]string{"kubectl", kubeConfigStr}, args...)
+	cmd := strings.Join(args, " ")
+	println(cmd)
+	out, err := ssh2.ExecuteLocal(cmd)
+	if err != nil {
+		fmt.Println(err)
+	}
+	fmt.Println(out)
+	return
+}
+
+func runWithSSH(ctx clustercontext.ClusterContext, args []string) {
+	for i, arg := range args {
+		if arg == "-f" || arg == "--filename" {
+			if len(args) <= i+1 {
+				continue
+			}
+			if args[i+1][:4] == "http" {
+				continue
+			}
+			// replace the filename with the content of the file
+			content, err := file.Load(args[i+1])
 			if err != nil {
-				fmt.Println(err)
+				panic(err)
 			}
-			fmt.Println(out)
-			return
+			args[i+1] = "- <<EOF\n" + string(content) + "\nEOF"
 		}
+	}
 
-		// iterate over all filteredArgs
-		for i, arg := range args {
-			if arg == "-f" || arg == "--filename" {
-				if len(args) <= i+1 {
-					continue
-				}
-				if args[i+1][:4] == "http" {
-					continue
-				}
-				// replace the filename with the content of the file
-				content, err := file.Load(args[i+1])
-				if err != nil {
-					panic(err)
-				}
-				args[i+1] = "- <<EOF\n" + string(content) + "\nEOF"
-			}
-		}
+	args = append([]string{"kubectl"}, args...)
 
-		args = append([]string{"kubectl"}, args...)
-
-		ssh.SSH(ctx, strings.Join(args, " "))
-	},
+	ssh.SSH(ctx, strings.Join(args, " "))
 }
