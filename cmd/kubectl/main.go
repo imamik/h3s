@@ -19,7 +19,7 @@ var Kubectl = &cobra.Command{
 	Run:                runKubectl,
 }
 
-func runKubectl(cmd *cobra.Command, args []string) {
+func runKubectl(_ *cobra.Command, args []string) {
 	ctx := clustercontext.Context()
 
 	kubeConfigPath, kubeConfigExists := kubeconfig.GetPathIfExists(ctx.Config.Name)

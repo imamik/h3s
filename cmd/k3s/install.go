@@ -12,6 +12,8 @@ var Install = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		ctx := clustercontext.Context()
 		install.Install(ctx)
+		install.InstallSoftware(ctx)
+		install.DownloadKubeconfig(ctx)
 	},
 }
 

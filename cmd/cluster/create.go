@@ -11,11 +11,11 @@ import (
 var Create = &cobra.Command{
 	Use:   "create",
 	Short: "Create a new cluster",
-	Long:  `Create a new cluster including the necessary resources, install k3s and configure the cluster`,
+	Long:  `Create a new cluster - setup the necessary resources, install k3s and configure the cluster`,
 	Run:   runCreate,
 }
 
-func runCreate(cmd *cobra.Command, args []string) {
+func runCreate(_ *cobra.Command, _ []string) {
 	// Get the cluster context
 	ctx := clustercontext.Context()
 	// Create the cluster resources

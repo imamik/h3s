@@ -16,7 +16,7 @@ var Ssh = &cobra.Command{
 	Run:                runSsh,
 }
 
-func runSsh(cmd *cobra.Command, args []string) {
+func runSsh(_ *cobra.Command, args []string) {
 	ctx := clustercontext.Context()
 	res, err := ssh.SSH(ctx, strings.Join(args, " "))
 	if err != nil {

@@ -16,10 +16,8 @@ import (
 var rootCmd = &cobra.Command{
 	Use:   "h3s",
 	Short: "A CLI to setup k3s Kubernetes resources on Hetzner Cloud",
-	Long: `h3s (Hetzner Highly-Available-k3s Clusters) is a command-line interface for setting up and managing
-k3s Kubernetes resources on Hetzner Cloud. It provides various subcommands
-for managing clusters, configurations, and resources.`,
-	Run: printWelcome,
+	Long:  "h3s (Hetzner Highly-Available-k3s Clusters) is a command-line interface for setting up and managing k3s Kubernetes resources on Hetzner Cloud. It provides various subcommands for managing clusters, configurations, and resources.",
+	Run:   printWelcome,
 }
 
 // printWelcome prints a welcome message & help information when the root command is called
@@ -30,10 +28,10 @@ func printWelcome(cmd *cobra.Command, args []string) {
 
 // init function sets up the command structure by adding subcommands to the root command
 func init() {
-	rootCmd.AddCommand(k3s.K3s)
 	rootCmd.AddCommand(config.Config)
 	rootCmd.AddCommand(credentials.Credentials)
 	rootCmd.AddCommand(cluster.Cluster)
+	rootCmd.AddCommand(k3s.K3s)
 	rootCmd.AddCommand(kubectl.Kubectl)
 	rootCmd.AddCommand(ssh.Ssh)
 }

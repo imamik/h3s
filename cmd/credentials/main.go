@@ -12,6 +12,6 @@ var Credentials = &cobra.Command{
 	Run:   runCredentials,
 }
 
-func runCredentials(cmd *cobra.Command, args []string) {
+func runCredentials(_ *cobra.Command, _ []string) {
 	credentials.Configure()
 }

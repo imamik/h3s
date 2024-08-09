@@ -14,7 +14,7 @@ var Destroy = &cobra.Command{
 	Run:   runDestroy,
 }
 
-func runDestroy(cmd *cobra.Command, args []string) {
+func runDestroy(_ *cobra.Command, _ []string) {
 	// Get the cluster context
 	ctx := clustercontext.Context()
 	// Destroy the cluster resources
