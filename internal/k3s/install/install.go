@@ -41,7 +41,7 @@ func GetSetup(ctx clustercontext.ClusterContext) (*hcloud.Network, *hcloud.LoadB
 	return net, lb, gatewayServer, controlPlaneNodes, workerNodes
 }
 
-func Install(ctx clustercontext.ClusterContext) {
+func K3s(ctx clustercontext.ClusterContext) {
 	_, lb, gatewayServer, controlPlaneNodes, workerNodes := GetSetup(ctx)
 
 	for _, remote := range controlPlaneNodes {
@@ -54,7 +54,7 @@ func Install(ctx clustercontext.ClusterContext) {
 
 }
 
-func InstallSoftware(ctx clustercontext.ClusterContext) {
+func Software(ctx clustercontext.ClusterContext) {
 	net, lb, proxyServer, controlPlaneNodes, _ := GetSetup(ctx)
 
 	software.Install(ctx, net, lb, proxyServer, controlPlaneNodes[0])

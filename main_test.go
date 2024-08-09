@@ -27,12 +27,17 @@ func runMainWithArgs(args []string, expectedOutput []string, t *testing.T) {
 	os.Args = args
 
 	// Run the main function
+	done := make(chan struct{})
 	go func() {
+		defer close(done)
 		cobra.MousetrapHelpText = "" // Disable mousetraps to prevent extra output on Windows
 		main()
 		wOut.Close()
 		wErr.Close()
 	}()
+
+	// Wait for the main function to complete
+	<-done
 
 	// Read the captured output
 	var bufOut, bufErr bytes.Buffer
@@ -55,6 +60,7 @@ func runMainWithArgs(args []string, expectedOutput []string, t *testing.T) {
 	}
 }
 
+// TestMainOutput tests the output when no arguments are provided - it should display the welcome message and "--help" hint
 func TestMainOutput(t *testing.T) {
 	runMainWithArgs(
 		[]string{"h3s"},
@@ -65,6 +71,7 @@ func TestMainOutput(t *testing.T) {
 		t)
 }
 
+// TestMainHelpOutput tests the output when the help flag is provided - it should list all available commands
 func TestMainHelpOutput(t *testing.T) {
 	runMainWithArgs(
 		[]string{"h3s", "--help"},
@@ -79,6 +86,7 @@ func TestMainHelpOutput(t *testing.T) {
 		t)
 }
 
+// TestMainInvalidArgOutput tests the output when an invalid argument is provided.
 func TestMainInvalidArgOutput(t *testing.T) {
 	runMainWithArgs(
 		[]string{"h3s", "invalid"},

@@ -7,8 +7,8 @@ import (
 
 // main is the entry function of the application - and will initialize the command line interface
 func main() {
-	err := cmd.Execute()
+	err := cmd.RootCmd.Execute()
 	if err != nil {
-		_, _ = fmt.Printf("Error: %v", err)
+		fmt.Println(err)
 	}
 }
