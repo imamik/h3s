@@ -7,7 +7,7 @@ import (
 
 // main is the entry function of the application - and will initialize the command line interface
 func main() {
-	err := cmd.RootCmd.Execute()
+	err := cmd.Cmd.Execute()
 	if err != nil {
 		fmt.Println(err)
 	}

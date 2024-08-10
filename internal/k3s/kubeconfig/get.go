@@ -5,14 +5,14 @@ import (
 	"gopkg.in/yaml.v3"
 	"h3s/internal/clustercontext"
 	"h3s/internal/config/kubeconfig"
-	"h3s/internal/k3s/bearer"
+	"h3s/internal/k3s/token"
 	"h3s/internal/utils/ssh"
 	"strings"
 )
 
 func getUser(ctx clustercontext.ClusterContext) (*kubeconfig.User, error) {
 	userName := "admin-user"
-	userToken, err := bearer.GetBearerToken(ctx, "kubernetes-dashboard", userName, 365*24)
+	userToken, err := token.Create(ctx, "kubernetes-dashboard", userName, 365*24)
 	if err != nil {
 		return nil, err
 	}

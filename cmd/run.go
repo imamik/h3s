@@ -6,8 +6,10 @@ import (
 )
 
 // runRoot prints information - version, if flag is set or welcome message with help info when called without any arguments
-func runRoot(_ *cobra.Command, _ []string) error {
-	fmt.Println("Welcome to h3s CLI")
-	fmt.Println("Use --help for more information about available commands")
+func runRoot(cmd *cobra.Command, _ []string) error {
+	_, err := fmt.Fprintln(cmd.OutOrStdout(), "Welcome to h3s CLI\nUse --help for more information about available commands")
+	if err != nil {
+		return err
+	}
 	return nil
 }

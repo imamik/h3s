@@ -1,0 +1,36 @@
+package get
+
+import (
+	"github.com/spf13/cobra"
+	"h3s/cmd/get/k3s"
+)
+
+// Cmd is the main command for getting information from the cluster
+var Cmd = &cobra.Command{
+	Use:   "get",
+	Short: "Get information about the cluster",
+	Long:  `Get various information about the cluster - kubeconfig, token, and other information`,
+}
+
+// getKubeConfigCmd gets the kubeconfig for the h3s cluster
+var getKubeConfigCmd = &cobra.Command{
+	Use:   "kubeconfig",
+	Short: "Get the kubeconfig for the k3s cluster",
+	RunE:  runGetKubeConfig,
+}
+
+// getTokenCmd gets the bearer token for the k3s dashboard
+var getTokenCmd = &cobra.Command{
+	Use:   "token",
+	Short: "Get the bearer token for the k3s cluster",
+	RunE:  runGetToken,
+}
+
+// init adds subcommands to the Cluster command
+func init() {
+	Cmd.AddCommand(
+		getTokenCmd,
+		getKubeConfigCmd,
+		k3s.Cmd,
+	)
+}

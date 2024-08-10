@@ -25,7 +25,7 @@ func normalize(s string, l int) string {
 }
 
 func LogError(err ...any) {
-	log.Println(err)
+	log.Println(err...)
 }
 
 func NewEventLogger(resource LogResource, action interface{}, id string) (AddEventFunc, LogFunc) {

@@ -1,8 +1,8 @@
-package build
+package create
 
 import (
 	"fmt"
-	"h3s/internal/config/build/survey"
+	"h3s/internal/config/create/survey"
 	"h3s/internal/k3s/releases"
 	"h3s/internal/utils/yaml"
 )

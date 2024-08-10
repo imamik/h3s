@@ -55,7 +55,7 @@ func getInstance() config.CloudInstance {
 		Run()
 
 	if err != nil {
-		log.Println("Error selecting instance type: %v", err)
+		log.Printf("Error selecting instance type: %v\n", err)
 		return instance
 	}
 
@@ -67,7 +67,7 @@ func getInstance() config.CloudInstance {
 		Run()
 
 	if err != nil {
-		log.Println("Error selecting instance: %v", err)
+		log.Printf("Error selecting instance: %v\n", err)
 		return instance
 	}
 

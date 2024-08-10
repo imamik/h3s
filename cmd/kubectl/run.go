@@ -11,7 +11,7 @@ import (
 	"strings"
 )
 
-// runKubectl is the function that is executed when the kubectl command is called - it runs kubectl commands either directly (if setup and possible) or via SSH to the first control plane server
+// runKubectl proxies kubectl commands either directly with the kubeconfig if available or via SSH to the first control plane server
 func runKubectl(_ *cobra.Command, args []string) error {
 	ctx := clustercontext.Context()
 
@@ -39,7 +39,7 @@ func runKubectl(_ *cobra.Command, args []string) error {
 	return nil
 }
 
-// buildKubectlCommand builds a kubectl command with a specific kubeconfig file
+// buildKubeConfigCommand builds a kubectl command with a specific kubeconfig file
 func buildKubeConfigCommand(kubeConfigPath string, args []string) string {
 	// add the kubeconfig flag to the command
 	kubeConfigStr := fmt.Sprintf(`--kubeconfig="%s"`, kubeConfigPath)
@@ -68,6 +68,7 @@ func compileFileContent(args []string) []string {
 	return args
 }
 
+// buildSSHCommand builds a kubectl command to be executed via SSH
 func buildSSHCommand(args []string) string {
 	args = compileFileContent(args)
 	args = append([]string{"kubectl"}, args...)

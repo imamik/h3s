@@ -4,7 +4,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// Cmd is the command to run kubectl commands - either directly (if setup and possible) or via SSH to the first control plane server
+// Cmd proxies kubectl commands either directly with the kubeconfig if available or via SSH to the first control plane server
 var Cmd = &cobra.Command{
 	Use:                "kubectl",
 	Short:              "Run kubectl commands",
