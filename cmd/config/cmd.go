@@ -16,7 +16,7 @@ var createCmd = &cobra.Command{
 	Use:   "create",
 	Short: "Create a new h3s cluster configuration",
 	Long:  `Create a new h3s cluster configuration. This command will prompt you various questions to configure the project and create a new configuration file.`,
-	Run:   runCreate,
+	RunE:  runCreate,
 }
 
 // init adds subcommands to the Cluster command

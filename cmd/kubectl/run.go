@@ -12,7 +12,7 @@ import (
 )
 
 // runKubectl is the function that is executed when the kubectl command is called - it runs kubectl commands either directly (if setup and possible) or via SSH to the first control plane server
-func runKubectl(_ *cobra.Command, args []string) {
+func runKubectl(_ *cobra.Command, args []string) error {
 	ctx := clustercontext.Context()
 
 	// check if a kubeconfig file exists
@@ -32,10 +32,11 @@ func runKubectl(_ *cobra.Command, args []string) {
 	}
 
 	if err != nil {
-		panic(err)
+		return err
 	}
 
 	fmt.Println(res)
+	return nil
 }
 
 // buildKubectlCommand builds a kubectl command with a specific kubeconfig file

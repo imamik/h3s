@@ -10,5 +10,5 @@ var Cmd = &cobra.Command{
 	Short:              "Run kubectl commands",
 	Long:               `Run kubectl commands either directly (if setup and possible) or via SSH to the first control plane server`,
 	DisableFlagParsing: true,
-	Run:                runKubectl,
+	RunE:               runKubectl,
 }

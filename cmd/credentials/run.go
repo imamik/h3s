@@ -6,6 +6,7 @@ import (
 )
 
 // runCreate is the function that is executed when the create command is called - it creates a new h3s cluster configuration
-func runCreate(_ *cobra.Command, _ []string) {
+func runCreate(_ *cobra.Command, _ []string) error {
 	credentials.Configure()
+	return nil
 }

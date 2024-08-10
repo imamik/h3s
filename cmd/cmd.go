@@ -22,16 +22,16 @@ var RootCmd = &cobra.Command{
 	Short:   "A CLI to setup k3s Kubernetes resources on Hetzner Cloud",
 	Long:    "h3s (Hetzner Highly-Available-k3s Clusters) is a command-line interface for setting up and managing k3s Kubernetes resources on Hetzner Cloud. It provides various subcommands for managing clusters, configurations, and resources.",
 	Version: Version.String(),
-	Run:     runRoot,
+	RunE:    runRoot,
 }
 
 // init function sets up the command structure with all high level subcommands & sets up the flags
 func init() {
 	// Add subcommands
 	RootCmd.AddCommand(
+		cluster.Cmd,
 		config.Cmd,
 		credentials.Cmd,
-		cluster.Cmd,
 		k3s.Cmd,
 		kubectl.Cmd,
 		ssh.Cmd,

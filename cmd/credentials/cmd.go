@@ -14,7 +14,7 @@ var Cmd = &cobra.Command{
 var createCmd = &cobra.Command{
 	Use:   "create",
 	Short: "Create project credentials",
-	Run:   runCreate,
+	RunE:  runCreate,
 }
 
 // init adds subcommands to the Cluster command

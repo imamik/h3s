@@ -21,35 +21,35 @@ var Cmd = &cobra.Command{
 var releasesCmd = &cobra.Command{
 	Use:   "releases",
 	Short: "Find available k3s releases",
-	Run:   runReleases,
+	RunE:  runReleases,
 }
 
 // kubeConfigCmd defines the command to get the kubeconfig for the k3s cluster
 var kubeConfigCmd = &cobra.Command{
 	Use:   "kubeconfig",
 	Short: "Get the kubeconfig for the k3s cluster",
-	Run:   runKubeConfig,
+	RunE:  runKubeConfig,
 }
 
 // installCmd defines the command to install k3s on all servers in the cluster
 var installCmd = &cobra.Command{
 	Use:   "install",
 	Short: "Install k3s on all servers in the cluster",
-	Run:   runInstall,
+	RunE:  runInstall,
 }
 
 // installSoftwareCmd defines the command to install software on all servers in the cluster
 var installSoftwareCmd = &cobra.Command{
 	Use:   "software",
 	Short: "Install software on all servers in the cluster",
-	Run:   runInstallSoftware,
+	RunE:  runInstallSoftware,
 }
 
 // tokenCmd defines the command to get the bearer token for the k3s dashboard
 var tokenCmd = &cobra.Command{
 	Use:   "bearer",
 	Short: "Get the bearer token for the k3s dashboard",
-	Run:   runToken,
+	RunE:  runToken,
 }
 
 // init adds

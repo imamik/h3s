@@ -9,5 +9,5 @@ var Cmd = &cobra.Command{
 	Use:                "ssh",
 	Short:              "Proxy ssh commands to first control plane server",
 	DisableFlagParsing: true,
-	Run:                runSsh,
+	RunE:               runSsh,
 }

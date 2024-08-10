@@ -7,7 +7,7 @@ import (
 	"h3s/internal/resources/cluster"
 )
 
-func runCreate(_ *cobra.Command, _ []string) {
+func runCreate(_ *cobra.Command, _ []string) error {
 	// Get the cluster context
 	ctx := clustercontext.Context()
 	// Create the cluster resources
@@ -18,12 +18,14 @@ func runCreate(_ *cobra.Command, _ []string) {
 	install.Software(ctx)
 	// Download the kubeconfig file
 	install.DownloadKubeconfig(ctx)
+	return nil
 }
 
 // runDestroy is the function that is executed when the destroy command is called - it destroys the cluster resources
-func runDestroy(_ *cobra.Command, _ []string) {
+func runDestroy(_ *cobra.Command, _ []string) error {
 	// Get the cluster context
 	ctx := clustercontext.Context()
 	// Destroy the cluster resources
 	cluster.Destroy(ctx)
+	return nil
 }

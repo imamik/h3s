@@ -17,7 +17,7 @@ var createCmd = &cobra.Command{
 	Use:   "create",
 	Short: "Create a new cluster",
 	Long:  `Create a new cluster - setup the necessary resources, install k3s and configure the cluster`,
-	Run:   runCreate,
+	RunE:  runCreate,
 }
 
 // Destroy is a cobra.Command that handles the destruction of an existing cluster
@@ -25,7 +25,7 @@ var destroyCmd = &cobra.Command{
 	Use:   "destroy",
 	Short: "Destroy an existing cluster",
 	Long:  `Destroy an existing cluster including alle resources`,
-	Run:   runDestroy,
+	RunE:  runDestroy,
 }
 
 // init adds subcommands to the Cluster command
