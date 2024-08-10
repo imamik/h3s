@@ -15,7 +15,7 @@ var Cmd = &cobra.Command{
 var destroyClusterCmd = &cobra.Command{
 	Use:   "cluster",
 	Short: "Destroy an existing cluster",
-	Long:  `Destroy an existing cluster including alle resources`,
+	Long:  `Destroy an existing cluster including all resources`,
 	RunE:  runDestroyCluster,
 }
 

@@ -3,7 +3,7 @@ package token
 import (
 	"fmt"
 	"h3s/internal/clustercontext"
-	"h3s/internal/ssh"
+	"h3s/internal/utils/ssh"
 )
 
 func Create(ctx clustercontext.ClusterContext, namespace string, user string, hours int) (string, error) {

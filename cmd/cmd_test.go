@@ -30,6 +30,7 @@ func TestSubcommandsSetup(t *testing.T) {
 func TestInvalidSubcommand(t *testing.T) {
 	buf := new(bytes.Buffer)
 	Cmd.SetOut(buf)
+	Cmd.SetErr(buf)
 	Cmd.SetArgs([]string{"invalid"}) // Invalid subcommand
 
 	err := Cmd.Execute()

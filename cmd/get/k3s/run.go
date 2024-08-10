@@ -6,12 +6,11 @@ import (
 )
 
 // runGetK3sReleases gets available k3s releases
-func runGetK3sReleases(_ *cobra.Command, _ []string) error {
-	r, err := releases.GetFilteredReleases(prerelease, stable, limit)
-	if err != nil {
-		println("Error fetching releases:", err)
+func runGetK3sReleases(cmd *cobra.Command, _ []string) error {
+	if r, err := releases.GetFilteredReleases(prerelease, stable, limit); err != nil {
 		return err
+	} else {
+		releases.PrintReleases(r)
 	}
-	releases.PrintReleases(r)
 	return nil
 }

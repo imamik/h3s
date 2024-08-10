@@ -10,7 +10,9 @@ import (
 func runDestroyCluster(_ *cobra.Command, _ []string) error {
 	// Get the cluster context
 	ctx := clustercontext.Context()
+
 	// Destroy the cluster resources
 	cluster.Destroy(ctx)
+
 	return nil
 }

@@ -19,21 +19,25 @@ func runGetKubeConfig(_ *cobra.Command, _ []string) error {
 }
 
 // runGetToken gets a fresh bearer token for the h3s cluster
-func runGetToken(_ *cobra.Command, _ []string) error {
+func runGetToken(cmd *cobra.Command, _ []string) error {
 	ctx := clustercontext.Context()
+
+	// Create a new bearer token for the k3s dashboard
 	b, err := token.Create(ctx, "kubernetes-dashboard", "admin-user", 24)
 	if err != nil {
-		fmt.Printf("Failed to get bearer token: %v\n", err)
+		cmd.PrintErrf("Failed to get bearer token: %v\n", err)
 		return err
 	}
 
-	// Correctly handling the bearer token with special characters
+	// Build the command to copy the bearer token to the clipboard
 	copyCmd := exec.Command("sh", "-c", fmt.Sprintf("printf '%%s' \"%s\" | pbcopy", b))
+
+	// Run the command
 	if err := copyCmd.Run(); err != nil {
-		fmt.Printf("Failed to copy bearer token to clipboard: %v\n", err)
+		cmd.PrintErrf("Failed to copy bearer token to clipboard: %v\n", err)
 		return err
 	}
 
-	fmt.Println("Bearer token copied to clipboard.")
+	cmd.Println("Bearer token copied to clipboard.")
 	return nil
 }

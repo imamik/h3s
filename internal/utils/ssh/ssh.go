@@ -6,7 +6,6 @@ import (
 	"h3s/internal/resources/gateway"
 	"h3s/internal/resources/pool/node"
 	"h3s/internal/resources/server"
-	"h3s/internal/utils/ssh"
 )
 
 func SSH(ctx clustercontext.ClusterContext, cmd string) (string, error) {
@@ -25,7 +24,7 @@ func SSH(ctx clustercontext.ClusterContext, cmd string) (string, error) {
 		}
 	}
 
-	res, err := ssh.ExecuteViaProxy(ctx, gate, controlPlane, cmd)
+	res, err := ExecuteViaProxy(ctx, gate, controlPlane, cmd)
 	if err != nil {
 		return "", err
 	}
