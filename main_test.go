@@ -76,9 +76,9 @@ func TestMainHelpOutput(t *testing.T) {
 	runMainWithArgs(
 		[]string{"h3s", "--help"},
 		[]string{
+			"cluster",
 			"config",
 			"credentials",
-			"cluster",
 			"k3s",
 			"kubectl",
 			"ssh",
