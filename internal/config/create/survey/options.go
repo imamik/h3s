@@ -4,10 +4,10 @@ import (
 	"github.com/charmbracelet/huh"
 	"github.com/hetznercloud/hcloud-go/v2/hcloud"
 	"h3s/internal/config"
-	"h3s/internal/k3s/releases"
+	"h3s/internal/k3s"
 )
 
-func releasesToOptions(k3sReleases []releases.Release) []huh.Option[string] {
+func releasesToOptions(k3sReleases []k3s.Release) []huh.Option[string] {
 	var options []huh.Option[string]
 	for _, release := range k3sReleases {
 		var releaseString = release.Name

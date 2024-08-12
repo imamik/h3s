@@ -9,8 +9,8 @@ import (
 	"h3s/internal/hetzner/pool/node"
 	"h3s/internal/hetzner/server"
 	"h3s/internal/k3s/install/commands"
-	"h3s/internal/k3s/install/software"
-	"h3s/internal/k3s/kubeconfig"
+	"h3s/internal/k8s/kubeconfig"
+	"h3s/internal/k8s/software"
 	"sort"
 )
 

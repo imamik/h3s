@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/hetznercloud/hcloud-go/v2/hcloud"
 	"h3s/internal/cluster"
-	"h3s/internal/k3s/install/software/components"
+	"h3s/internal/k8s/software/components"
 	"h3s/internal/utils/ssh"
 )
 

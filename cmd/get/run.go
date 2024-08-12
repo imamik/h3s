@@ -5,8 +5,8 @@ import (
 	"github.com/spf13/cobra"
 	"h3s/internal/cluster"
 	"h3s/internal/k3s/install"
-	"h3s/internal/k3s/kubeconfig"
-	"h3s/internal/k3s/token"
+	"h3s/internal/k8s/kubeconfig"
+	"h3s/internal/k8s/token"
 	"os/exec"
 )
 
@@ -17,7 +17,12 @@ func runGetKubeConfig(_ *cobra.Command, _ []string) error {
 		return err
 	}
 	_, _, gatewayServer, controlPlaneNodes, _ := install.GetSetup(ctx)
-	kubeconfig.Download(ctx, gatewayServer, controlPlaneNodes[0])
+
+	// Download the kubeconfig from the first control plane server
+	err = kubeconfig.Download(ctx, gatewayServer, controlPlaneNodes[0])
+	if err != nil {
+		return err
+	}
 	return nil
 }
 

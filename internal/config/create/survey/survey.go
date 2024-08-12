@@ -4,11 +4,11 @@ import (
 	"github.com/charmbracelet/huh"
 	"github.com/hetznercloud/hcloud-go/v2/hcloud"
 	"h3s/internal/config"
-	"h3s/internal/k3s/releases"
+	"h3s/internal/k3s"
 	"strconv"
 )
 
-func Survey(k3sReleases []releases.Release) (config.Config, error) {
+func Survey(k3sReleases []k3s.Release) (config.Config, error) {
 	var conf config.Config
 
 	huh.NewInput().
