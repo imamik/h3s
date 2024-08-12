@@ -4,9 +4,8 @@ import (
 	"fmt"
 	"github.com/spf13/cobra"
 	"h3s/internal/cluster"
-	"h3s/internal/k3s/install"
+	"h3s/internal/k8s"
 	"h3s/internal/k8s/kubeconfig"
-	"h3s/internal/k8s/token"
 	"os/exec"
 )
 
@@ -16,14 +15,7 @@ func runGetKubeConfig(_ *cobra.Command, _ []string) error {
 	if err != nil {
 		return err
 	}
-	_, _, gatewayServer, controlPlaneNodes, _ := install.GetSetup(ctx)
-
-	// Download the kubeconfig from the first control plane server
-	err = kubeconfig.Download(ctx, gatewayServer, controlPlaneNodes[0])
-	if err != nil {
-		return err
-	}
-	return nil
+	return kubeconfig.Download(ctx)
 }
 
 // runGetToken gets a fresh bearer token for the h3s cluster
@@ -34,7 +26,7 @@ func runGetToken(cmd *cobra.Command, _ []string) error {
 	}
 
 	// Create a new bearer token for the k3s dashboard
-	b, err := token.Create(ctx, "kubernetes-dashboard", "admin-user", 24)
+	b, err := k8s.Token(ctx, "kubernetes-dashboard", "admin-user", 24)
 	if err != nil {
 		cmd.PrintErrf("Failed to get bearer token: %v\n", err)
 		return err

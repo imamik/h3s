@@ -1,20 +1,40 @@
-package software
+package k8s
 
 import (
 	"fmt"
 	"github.com/hetznercloud/hcloud-go/v2/hcloud"
 	"h3s/internal/cluster"
-	"h3s/internal/k8s/software/components"
+	"h3s/internal/hetzner/gateway"
+	"h3s/internal/hetzner/loadbalancers"
+	"h3s/internal/hetzner/network"
+	"h3s/internal/hetzner/server"
+	"h3s/internal/k8s/components"
 	"h3s/internal/utils/ssh"
 )
 
-func Install(
+func Install(ctx *cluster.Cluster) error {
+	net := network.Get(ctx)
+	lb := loadbalancers.Get(ctx)
+	gatewayNode, _ := gateway.GetIfNeeded(ctx)
+	nodes, err := server.GetAll(ctx)
+	if err != nil {
+		return err
+	}
+	firstControlPlane := nodes.ControlPlane[0]
+	_, err = installComponents(ctx, net, lb, gatewayNode, firstControlPlane)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func installComponents(
 	ctx *cluster.Cluster,
 	net *hcloud.Network,
 	lb *hcloud.LoadBalancer,
 	gateway *hcloud.Server,
 	remote *hcloud.Server,
-) {
+) (string, error) {
 	cmdArr := []string{
 		// Setup Secrets
 		components.HCloudSecrets(ctx, net),
@@ -58,6 +78,6 @@ func Install(
 		}
 	}
 
-	ssh.ExecuteLocal(components.K3sAPIServerConfig(ctx))
+	return ssh.ExecuteLocal(components.K3sAPIServerConfig(ctx))
 
 }

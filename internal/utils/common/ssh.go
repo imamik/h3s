@@ -1,10 +1,8 @@
 package common
 
 import (
-	"github.com/hetznercloud/hcloud-go/v2/hcloud"
 	"h3s/internal/cluster"
 	"h3s/internal/hetzner/gateway"
-	"h3s/internal/hetzner/pool/node"
 	"h3s/internal/hetzner/server"
 	"h3s/internal/utils/ssh"
 )
@@ -15,17 +13,15 @@ func SSH(ctx *cluster.Cluster, cmd string) (string, error) {
 		return "", err
 	}
 
-	nodes := server.GetAll(ctx)
-	var controlPlane *hcloud.Server
-
-	for _, n := range nodes {
-		if node.IsControlPlaneNode(n) {
-			controlPlane = n
-			break
-		}
+	// Get the first control plane node
+	nodes, err := server.GetAll(ctx)
+	if err != nil {
+		return "", err
 	}
+	firstControlPlane := nodes.ControlPlane[0]
 
-	res, err := ssh.ExecuteViaProxy(ctx, gate, controlPlane, cmd)
+	// Execute the command on the first control plane node
+	res, err := ssh.ExecuteViaProxy(ctx, gate, firstControlPlane, cmd)
 	if err != nil {
 		return "", err
 	}

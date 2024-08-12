@@ -7,7 +7,8 @@ import (
 	"h3s/internal/config/credentials"
 	"h3s/internal/hetzner"
 	"h3s/internal/k3s"
-	"h3s/internal/k3s/install"
+	"h3s/internal/k8s"
+	"h3s/internal/k8s/kubeconfig"
 )
 
 // runCreateConfig creates a new h3s cluster configuration
@@ -44,13 +45,16 @@ func runCreateCluster(_ *cobra.Command, _ []string) error {
 	hetzner.Create(ctx)
 
 	// Install k3s on the cluster
-	install.K3s(ctx)
+	k3s.Install(ctx)
 
 	// Install additional software on the cluster (traefik, cert-manager, csi etc.)
-	install.Software(ctx)
+	k8s.Install(ctx)
 
 	// Download the kubeconfig file
-	install.DownloadKubeconfig(ctx)
+	err = kubeconfig.Download(ctx)
+	if err != nil {
+		return err
+	}
 
 	return nil
 }

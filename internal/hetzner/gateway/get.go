@@ -20,3 +20,10 @@ func Get(ctx *cluster.Cluster) (*hcloud.Server, error) {
 	addEvent(logger.Success)
 	return server, nil
 }
+
+func GetIfNeeded(ctx *cluster.Cluster) (*hcloud.Server, error) {
+	if ctx.Config.PublicIps {
+		return nil, nil
+	}
+	return Get(ctx)
+}
