@@ -1,7 +1,7 @@
 package components
 
 import (
-	"h3s/internal/clustercontext"
+	"h3s/internal/cluster"
 )
 
 const (
@@ -52,7 +52,7 @@ func WaitForCertManagerCRDs() string {
 	})
 }
 
-func CertManagerHetznerHelmChart(ctx clustercontext.ClusterContext) string {
+func CertManagerHetznerHelmChart(ctx *cluster.Cluster) string {
 	return kubectlApply(`
 apiVersion: helm.cattle.io/v1
 kind: HelmChart

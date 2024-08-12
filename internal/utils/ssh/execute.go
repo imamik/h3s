@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/hetznercloud/hcloud-go/v2/hcloud"
 	"golang.org/x/crypto/ssh"
-	"h3s/internal/clustercontext"
+	"h3s/internal/cluster"
 	"h3s/internal/utils/ip"
 	"log"
 	"os/exec"
@@ -18,7 +18,7 @@ func ExecuteLocal(command string) (string, error) {
 }
 
 func ExecuteWithSsh(
-	ctx clustercontext.ClusterContext,
+	ctx *cluster.Cluster,
 	remote *hcloud.Server,
 	command string,
 ) (string, error) {
@@ -46,7 +46,7 @@ func ExecuteWithSsh(
 }
 
 func ExecuteViaProxy(
-	ctx clustercontext.ClusterContext,
+	ctx *cluster.Cluster,
 	gateway *hcloud.Server,
 	remote *hcloud.Server,
 	command string,

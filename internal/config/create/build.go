@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"h3s/internal/config/create/survey"
 	"h3s/internal/k3s/releases"
-	"h3s/internal/utils/yaml"
+	"h3s/internal/utils/file"
 )
 
 func Build(k3sReleases []releases.Release) {
@@ -16,7 +16,7 @@ func Build(k3sReleases []releases.Release) {
 		return
 	}
 
-	err = yaml.Save(conf, "h3s.yaml")
+	_, err = file.New("h3s.yaml").SetYaml(conf).Save()
 	if err != nil {
 		fmt.Println(err)
 		return

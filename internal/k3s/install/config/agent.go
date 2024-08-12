@@ -15,7 +15,7 @@ type K3sAgentConfig struct {
 	TokenFile string `yaml:"token-file,omitempty"` // Token file to use for authentication
 	Server    string `yaml:"server,omitempty"`     // Server to connect to
 
-	// Data Directory
+	// data Directory
 	DataDir string `yaml:"data-dir,omitempty"` // Folder to hold state (default: "/var/lib/rancher/k3s")
 
 	// Node Configuration

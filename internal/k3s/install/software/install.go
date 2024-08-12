@@ -3,13 +3,13 @@ package software
 import (
 	"fmt"
 	"github.com/hetznercloud/hcloud-go/v2/hcloud"
-	"h3s/internal/clustercontext"
+	"h3s/internal/cluster"
 	"h3s/internal/k3s/install/software/components"
 	"h3s/internal/utils/ssh"
 )
 
 func Install(
-	ctx clustercontext.ClusterContext,
+	ctx *cluster.Cluster,
 	net *hcloud.Network,
 	lb *hcloud.LoadBalancer,
 	gateway *hcloud.Server,

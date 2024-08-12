@@ -2,20 +2,20 @@ package commands
 
 import (
 	"github.com/hetznercloud/hcloud-go/v2/hcloud"
-	"h3s/internal/clustercontext"
+	"gopkg.in/yaml.v3"
+	"h3s/internal/cluster"
 	"h3s/internal/k3s/install/config"
 	"h3s/internal/utils/ssh"
-	"h3s/internal/utils/yaml"
 	"strings"
 )
 
 func ControlPlane(
-	ctx clustercontext.ClusterContext,
+	ctx *cluster.Cluster,
 	lb *hcloud.LoadBalancer,
 	controlPlaneNodes []*hcloud.Server,
 	proxy *hcloud.Server,
 	node *hcloud.Server,
-) {
+) error {
 	isFirst := node.ID == controlPlaneNodes[0].ID
 	nodeIp := node.PrivateNet[0].IP.String()
 	networkInterface, _ := GetNetworkInterfaceName(ctx, proxy, node)
@@ -81,13 +81,23 @@ func ControlPlane(
 		configYaml.NodeTaint = []string{"node-role.kubernetes.io/control-plane:NoSchedule"}
 	}
 
-	configYamlStr := yaml.String(configYaml)
+	configYamlStr, err := yaml.Marshal(configYaml)
+
+	if err != nil {
+		return err
+	}
+
 	commandArr := []string{
-		PreInstallCommand(ctx, configYamlStr),
+		PreInstallCommand(ctx, string(configYamlStr)),
 		K3sInstall(ctx, true),
 		SeLinux(),
 		PostInstall(),
 		K3sStartServer(isFirst),
 	}
-	ssh.ExecuteViaProxy(ctx, proxy, node, strings.Join(commandArr, "\n"))
+
+	_, err = ssh.ExecuteViaProxy(ctx, proxy, node, strings.Join(commandArr, "\n"))
+	if err != nil {
+		return err
+	}
+	return nil
 }

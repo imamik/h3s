@@ -12,7 +12,7 @@ const k3sReleasesURL = "https://api.github.com/repos/k3s-io/k3s/releases"
 func getAllReleases() ([]Release, error) {
 	resp, err := http.Get(k3sReleasesURL)
 	if err != nil {
-		fmt.Println("Error fetching releases:", err)
+		fmt.Println("errors fetching releases:", err)
 		return nil, err
 	}
 	defer resp.Body.Close()

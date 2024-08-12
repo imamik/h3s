@@ -2,17 +2,23 @@ package destroy
 
 import (
 	"github.com/spf13/cobra"
-	"h3s/internal/clustercontext"
-	"h3s/internal/resources/cluster"
+	"h3s/internal/cluster"
+	"h3s/internal/hetzner"
 )
 
 // runDestroyCluster destroys a h3s cluster (leaving the configuration files)
 func runDestroyCluster(_ *cobra.Command, _ []string) error {
-	// Get the cluster context
-	ctx := clustercontext.Context()
+	// Load the cluster context
+	ctx, err := cluster.Context()
+	if err != nil {
+		return err
+	}
 
 	// Destroy the cluster resources
-	cluster.Destroy(ctx)
+	err = hetzner.Destroy(ctx)
+	if err != nil {
+		return err
+	}
 
 	return nil
 }

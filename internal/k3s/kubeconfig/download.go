@@ -2,13 +2,13 @@ package kubeconfig
 
 import (
 	"github.com/hetznercloud/hcloud-go/v2/hcloud"
-	"h3s/internal/clustercontext"
+	"h3s/internal/cluster"
 	"h3s/internal/config/kubeconfig"
 	"h3s/internal/utils/logger"
 )
 
 func Download(
-	ctx clustercontext.ClusterContext,
+	ctx *cluster.Cluster,
 	proxy *hcloud.Server,
 	remote *hcloud.Server,
 ) {

@@ -10,7 +10,7 @@ func GetArchitecture(instance CloudInstance) hcloud.Architecture {
 	}
 }
 
-func GetArchitectures(config Config) Architectures {
+func GetArchitectures(config *Config) Architectures {
 	architectures := Architectures{
 		ARM: GetArchitecture(config.ControlPlane.Pool.Instance) == hcloud.ArchitectureARM,
 	}

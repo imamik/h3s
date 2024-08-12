@@ -1,16 +1,12 @@
 package kubeconfig
 
 import (
-	"fmt"
 	"h3s/internal/config/path"
-	"h3s/internal/utils/yaml"
+	"h3s/internal/utils/file"
 )
 
-func SaveKubeConfig(projectName string, kubeConfig KubeConfig) {
-	p := path.GetPath(projectName, path.KubeConfigFileName)
-	err := yaml.Save(kubeConfig, p)
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
+func SaveKubeConfig(projectName string, kubeConfig KubeConfig) error {
+	p := string(path.KubeConfigFileName)
+	_, err := file.New(p).SetYaml(kubeConfig).Save()
+	return err
 }

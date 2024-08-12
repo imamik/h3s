@@ -2,7 +2,7 @@ package commands
 
 import (
 	"github.com/hetznercloud/hcloud-go/v2/hcloud"
-	"h3s/internal/clustercontext"
+	"h3s/internal/cluster"
 	"h3s/internal/utils/ip"
 )
 
@@ -11,7 +11,7 @@ func getServer(firstControlPlane *hcloud.Server) string {
 }
 
 func getTlsSan(
-	ctx clustercontext.ClusterContext,
+	ctx *cluster.Cluster,
 	lb *hcloud.LoadBalancer,
 	controlPlaneNodes []*hcloud.Server,
 ) []string {

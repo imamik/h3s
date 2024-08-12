@@ -2,7 +2,7 @@ package components
 
 import (
 	"github.com/hetznercloud/hcloud-go/v2/hcloud"
-	"h3s/internal/clustercontext"
+	"h3s/internal/cluster"
 )
 
 func CCMServiceAccount() string {
@@ -32,7 +32,7 @@ subjects:
 `, nil)
 }
 
-func CCMSettings(ctx clustercontext.ClusterContext, network *hcloud.Network) string {
+func CCMSettings(ctx *cluster.Cluster, network *hcloud.Network) string {
 	return kubectlApply(`
 apiVersion: apps/v1
 kind: Deployment

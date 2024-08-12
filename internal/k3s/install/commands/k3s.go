@@ -1,7 +1,7 @@
 package commands
 
 import (
-	"h3s/internal/clustercontext"
+	"h3s/internal/cluster"
 	"h3s/internal/utils/template"
 	"strings"
 )
@@ -21,7 +21,7 @@ func getMinorVersion(version string) string {
 	}
 }
 
-func K3sInstall(ctx clustercontext.ClusterContext, isControlPlane bool) string {
+func K3sInstall(ctx *cluster.Cluster, isControlPlane bool) string {
 	tpl := "curl -sfL https://get.k3s.io | INSTALL_K3S_SKIP_START=true INSTALL_K3S_SKIP_SELINUX_RPM=true INSTALL_K3S_CHANNEL={{ .InitialK3sChannel }} INSTALL_K3S_EXEC='{{ .ServerOrAgent }} {{ .K3sExecServerArgs }}' sh -"
 
 	k3sExecArgs := ""

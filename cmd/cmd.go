@@ -9,7 +9,7 @@ import (
 	"h3s/cmd/install"
 	"h3s/cmd/kubectl"
 	"h3s/cmd/ssh"
-	"h3s/internal/version"
+	"h3s/internal/utils/version"
 )
 
 var (

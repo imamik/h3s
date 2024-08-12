@@ -36,7 +36,7 @@ type LogCrudMethod string
 
 const (
 	Create LogCrudMethod = "Create"
-	Get    LogCrudMethod = "Get"
+	Get    LogCrudMethod = "Load"
 	Update LogCrudMethod = "Update"
 	Delete LogCrudMethod = "Delete"
 )

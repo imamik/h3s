@@ -2,19 +2,19 @@ package install
 
 import (
 	"github.com/hetznercloud/hcloud-go/v2/hcloud"
-	"h3s/internal/clustercontext"
+	"h3s/internal/cluster"
+	"h3s/internal/hetzner/gateway"
+	"h3s/internal/hetzner/loadbalancers"
+	"h3s/internal/hetzner/network"
+	"h3s/internal/hetzner/pool/node"
+	"h3s/internal/hetzner/server"
 	"h3s/internal/k3s/install/commands"
 	"h3s/internal/k3s/install/software"
 	"h3s/internal/k3s/kubeconfig"
-	"h3s/internal/resources/gateway"
-	"h3s/internal/resources/loadbalancers"
-	"h3s/internal/resources/network"
-	"h3s/internal/resources/pool/node"
-	"h3s/internal/resources/server"
 	"sort"
 )
 
-func GetSetup(ctx clustercontext.ClusterContext) (*hcloud.Network, *hcloud.LoadBalancer, *hcloud.Server, []*hcloud.Server, []*hcloud.Server) {
+func GetSetup(ctx *cluster.Cluster) (*hcloud.Network, *hcloud.LoadBalancer, *hcloud.Server, []*hcloud.Server, []*hcloud.Server) {
 	net := network.Get(ctx)
 	nodes := server.GetAll(ctx)
 	lb := loadbalancers.Get(ctx)
@@ -41,7 +41,7 @@ func GetSetup(ctx clustercontext.ClusterContext) (*hcloud.Network, *hcloud.LoadB
 	return net, lb, gatewayServer, controlPlaneNodes, workerNodes
 }
 
-func K3s(ctx clustercontext.ClusterContext) {
+func K3s(ctx *cluster.Cluster) {
 	_, lb, gatewayServer, controlPlaneNodes, workerNodes := GetSetup(ctx)
 
 	for _, remote := range controlPlaneNodes {
@@ -54,13 +54,13 @@ func K3s(ctx clustercontext.ClusterContext) {
 
 }
 
-func Software(ctx clustercontext.ClusterContext) {
+func Software(ctx *cluster.Cluster) {
 	net, lb, proxyServer, controlPlaneNodes, _ := GetSetup(ctx)
 
 	software.Install(ctx, net, lb, proxyServer, controlPlaneNodes[0])
 }
 
-func DownloadKubeconfig(ctx clustercontext.ClusterContext) {
+func DownloadKubeconfig(ctx *cluster.Cluster) {
 	_, _, gatewayServer, controlPlaneNodes, _ := GetSetup(ctx)
 	firstControlPlane := controlPlaneNodes[0]
 

@@ -1,7 +1,7 @@
 package components
 
 import (
-	"h3s/internal/clustercontext"
+	"h3s/internal/cluster"
 )
 
 const (
@@ -33,7 +33,7 @@ func WaitForK8sDashboardNamespace() string {
 	return WaitForNamespace(K8sDashboardNamespace)
 }
 
-func K8sDashboardAccess(ctx clustercontext.ClusterContext) string {
+func K8sDashboardAccess(ctx *cluster.Cluster) string {
 	return kubectlApply(`
 apiVersion: v1
 kind: ServiceAccount

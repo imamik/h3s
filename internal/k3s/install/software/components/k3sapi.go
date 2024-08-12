@@ -2,10 +2,10 @@ package components
 
 import (
 	"fmt"
-	"h3s/internal/clustercontext"
+	"h3s/internal/cluster"
 )
 
-func K3sAPI(ctx clustercontext.ClusterContext) string {
+func K3sAPI(ctx *cluster.Cluster) string {
 	return kubectlApply(`
 apiVersion: networking.k8s.io/v1
 kind: Ingress
@@ -39,6 +39,6 @@ spec:
 		})
 }
 
-func K3sAPIServerConfig(ctx clustercontext.ClusterContext) string {
+func K3sAPIServerConfig(ctx *cluster.Cluster) string {
 	return fmt.Sprintf("kubectl config set-cluster default --server=https://k3s.%s", ctx.Config.Domain)
 }

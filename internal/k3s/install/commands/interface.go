@@ -2,13 +2,13 @@ package commands
 
 import (
 	"github.com/hetznercloud/hcloud-go/v2/hcloud"
-	"h3s/internal/clustercontext"
+	"h3s/internal/cluster"
 	"h3s/internal/utils/ssh"
 	"strings"
 )
 
 func GetNetworkInterfaceName(
-	ctx clustercontext.ClusterContext,
+	ctx *cluster.Cluster,
 	proxy *hcloud.Server,
 	remote *hcloud.Server,
 ) (string, error) {

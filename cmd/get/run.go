@@ -3,7 +3,7 @@ package get
 import (
 	"fmt"
 	"github.com/spf13/cobra"
-	"h3s/internal/clustercontext"
+	"h3s/internal/cluster"
 	"h3s/internal/k3s/install"
 	"h3s/internal/k3s/kubeconfig"
 	"h3s/internal/k3s/token"
@@ -12,7 +12,10 @@ import (
 
 // runGetKubeConfig gets the kubeconfig for the h3s cluster
 func runGetKubeConfig(_ *cobra.Command, _ []string) error {
-	ctx := clustercontext.Context()
+	ctx, err := cluster.Context()
+	if err != nil {
+		return err
+	}
 	_, _, gatewayServer, controlPlaneNodes, _ := install.GetSetup(ctx)
 	kubeconfig.Download(ctx, gatewayServer, controlPlaneNodes[0])
 	return nil
@@ -20,7 +23,10 @@ func runGetKubeConfig(_ *cobra.Command, _ []string) error {
 
 // runGetToken gets a fresh bearer token for the h3s cluster
 func runGetToken(cmd *cobra.Command, _ []string) error {
-	ctx := clustercontext.Context()
+	ctx, err := cluster.Context()
+	if err != nil {
+		return err
+	}
 
 	// Create a new bearer token for the k3s dashboard
 	b, err := token.Create(ctx, "kubernetes-dashboard", "admin-user", 24)

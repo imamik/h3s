@@ -1,16 +1,12 @@
 package credentials
 
 import (
-	"fmt"
 	"h3s/internal/config/path"
-	"h3s/internal/utils/yaml"
+	"h3s/internal/utils/file"
 )
 
-func SaveCredentials(projectName string, projectCredentials ProjectCredentials) {
-	p := path.GetPath(projectName, path.CredentialFileName)
-	err := yaml.Save(projectCredentials, p)
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
+func SaveCredentials(projectCredentials ProjectCredentials) error {
+	p := string(path.SecretsFileName)
+	_, err := file.New(p).SetYaml(projectCredentials).Save()
+	return err
 }

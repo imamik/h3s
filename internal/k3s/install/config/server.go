@@ -17,7 +17,7 @@ type K3sServerConfig struct {
 	AdvertisePort    int      `yaml:"advertise-port,omitempty"`    // Port that apiserver uses to advertise to members of the cluster (default: listen-port) (default: 0)
 	TLSSAN           []string `yaml:"tls-san,omitempty"`           // Add additional hostnames or IPv4/IPv6 addresses as Subject Alternative Names on the server TLS cert
 
-	// Data Directory
+	// data Directory
 	DataDir string `yaml:"data-dir,omitempty"` // Folder to hold state (default: /var/lib/rancher/k3s or ${HOME}/.rancher/k3s if not root)
 
 	// Networking Configuration
@@ -32,7 +32,7 @@ type K3sServerConfig struct {
 	EgressSelectorMode   string `yaml:"egress-selector-mode,omitempty"`    // One of 'agent', 'cluster', 'pod', 'disabled' (default: "agent")
 	ServiceLBNamespace   string `yaml:"servicelb-namespace,omitempty"`     // Namespace of the pods for the servicelb component (default: "kube-system")
 
-	// Client Configuration
+	// CloudClient Configuration
 	WriteKubeconfig     string `yaml:"write-kubeconfig,omitempty"`      // Write kubeconfig for admin client to this file
 	WriteKubeconfigMode string `yaml:"write-kubeconfig-mode,omitempty"` // Write kubeconfig with this mode
 

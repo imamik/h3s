@@ -2,10 +2,10 @@ package components
 
 import (
 	"github.com/hetznercloud/hcloud-go/v2/hcloud"
-	"h3s/internal/clustercontext"
+	"h3s/internal/cluster"
 )
 
-func HCloudSecrets(ctx clustercontext.ClusterContext, network *hcloud.Network) string {
+func HCloudSecrets(ctx *cluster.Cluster, network *hcloud.Network) string {
 	return kubectlApply(`
 apiVersion: "v1"
 kind: "Secret"

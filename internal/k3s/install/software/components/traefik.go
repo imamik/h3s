@@ -3,7 +3,7 @@ package components
 import (
 	"fmt"
 	"github.com/hetznercloud/hcloud-go/v2/hcloud"
-	"h3s/internal/clustercontext"
+	"h3s/internal/cluster"
 	"h3s/internal/utils/template"
 	"strings"
 )
@@ -15,7 +15,7 @@ const (
 )
 
 func valuesContent(
-	ctx clustercontext.ClusterContext,
+	ctx *cluster.Cluster,
 	lb *hcloud.LoadBalancer,
 ) string {
 	values := template.CompileTemplate(`
@@ -82,7 +82,7 @@ additionalArguments:
 }
 
 func TraefikHelmChart(
-	ctx clustercontext.ClusterContext,
+	ctx *cluster.Cluster,
 	lb *hcloud.LoadBalancer,
 ) string {
 	return kubectlApply(`
@@ -134,7 +134,7 @@ func WaitForTraefikCRDs() string {
 	})
 }
 
-func TraefikDashboard(ctx clustercontext.ClusterContext) string {
+func TraefikDashboard(ctx *cluster.Cluster) string {
 	return kubectlApply(`
 apiVersion: v1
 kind: Secret

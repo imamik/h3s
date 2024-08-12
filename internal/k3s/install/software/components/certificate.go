@@ -2,23 +2,23 @@ package components
 
 import (
 	"encoding/base64"
-	"h3s/internal/clustercontext"
+	"h3s/internal/cluster"
 	"strings"
 )
 
-func domainKebap(ctx clustercontext.ClusterContext) string {
+func domainKebap(ctx *cluster.Cluster) string {
 	return strings.ReplaceAll(ctx.Config.Domain, ".", "-")
 }
 
-func wildcardTlS(ctx clustercontext.ClusterContext) string {
+func wildcardTlS(ctx *cluster.Cluster) string {
 	return domainKebap(ctx) + "-wildcard-tls"
 }
 
-func wildcardIssuer(ctx clustercontext.ClusterContext) string {
+func wildcardIssuer(ctx *cluster.Cluster) string {
 	return domainKebap(ctx) + "-wildcard-issuer"
 }
 
-func WildcardCertificate(ctx clustercontext.ClusterContext) string {
+func WildcardCertificate(ctx *cluster.Cluster) string {
 	env := "staging"
 	server := "https://acme-staging-v02.api.letsencrypt.org/directory"
 	hetznerDNSTokenBase64 := base64.StdEncoding.EncodeToString([]byte(ctx.Credentials.HetznerDNSToken))

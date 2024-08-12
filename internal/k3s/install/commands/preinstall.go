@@ -1,11 +1,11 @@
 package commands
 
 import (
-	"h3s/internal/clustercontext"
+	"h3s/internal/cluster"
 	"h3s/internal/utils/template"
 )
 
-func PreInstallCommand(ctx clustercontext.ClusterContext, configYaml string) string {
+func PreInstallCommand(ctx *cluster.Cluster, configYaml string) string {
 	return template.CompileTemplate(`
 set -ex
 
