@@ -76,6 +76,13 @@ func Survey(k3sReleases []releases.Release) (config.Config, error) {
 		Value(&conf.CertManager.Email).
 		Run()
 
+	huh.NewSelect[config.Image]().
+		Title("Base Image").
+		Description("The base image to use for the nodes").
+		Options(imageOptions...).
+		Value(&conf.Image).
+		Run()
+
 	huh.NewConfirm().
 		Title("Control Plane as Worker Pool").
 		Description("Use the control plane controlPlaneNodes as workers").

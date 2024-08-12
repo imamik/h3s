@@ -28,6 +28,15 @@ type CertManager struct {
 	Production bool   `yaml:"production"` // Whether to use the production Let's Encrypt server
 }
 
+type Image string
+
+const (
+	ImageMicroOS    Image = "microos"
+	ImageUbuntu2004 Image = "ubuntu-20.04"
+	ImageUbuntu2204 Image = "ubuntu-22.04"
+	ImageUbuntu2404 Image = "ubuntu-24.04"
+)
+
 // Config represents the main configuration structure for the h3s application
 type Config struct {
 	Name         string             `yaml:"name"`                   // Name of the cluster
@@ -37,6 +46,7 @@ type Config struct {
 	Domain       string             `yaml:"domain"`                 // Domain name for the cluster
 	CertManager  CertManager        `yaml:"cert_manager"`           // Certificate manager configuration
 	PublicIps    bool               `yaml:"public_ips"`             // Whether to assign public IPs to nodes
+	Image        Image              `yaml:"image"`                  // Whether to use MicroOS as the base image
 	ControlPlane ControlPlane       `yaml:"control_plane"`          // Control plane configuration
 	WorkerPools  []NodePool         `yaml:"worker_pools,omitempty"` // Worker node pool configurations
 }

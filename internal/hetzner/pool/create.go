@@ -77,10 +77,18 @@ func CreatePool(
 	addEvent, logEvents := logger.NewEventLogger(logger.Pool, logger.Create, ctx.GetName(pool.Name))
 	defer logEvents()
 
-	img, err := image.Get(ctx, config.GetArchitecture(pool.Instance))
-	if err != nil {
-		addEvent(logger.Failure, err)
-		return nil
+	var img *hcloud.Image
+	var err error
+	if ctx.Config.Image == config.ImageMicroOS {
+		img, err = image.Get(ctx, config.GetArchitecture(pool.Instance))
+		if err != nil {
+			addEvent(logger.Failure, err)
+			return nil
+		}
+	} else {
+		img = &hcloud.Image{
+			Name: string(ctx.Config.Image),
+		}
 	}
 
 	placementGroup := placementgroup.Create(ctx, pool, isControlPlane, isWorker)

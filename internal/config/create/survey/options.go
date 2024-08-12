@@ -3,6 +3,7 @@ package survey
 import (
 	"github.com/charmbracelet/huh"
 	"github.com/hetznercloud/hcloud-go/v2/hcloud"
+	"h3s/internal/config"
 	"h3s/internal/k3s/releases"
 )
 
@@ -23,4 +24,11 @@ var networkZoneOptions = []huh.Option[hcloud.NetworkZone]{
 	huh.NewOption(string(hcloud.NetworkZoneEUCentral), hcloud.NetworkZoneEUCentral),
 	huh.NewOption(string(hcloud.NetworkZoneUSEast), hcloud.NetworkZoneUSEast),
 	huh.NewOption(string(hcloud.NetworkZoneUSWest), hcloud.NetworkZoneUSWest),
+}
+
+var imageOptions = []huh.Option[config.Image]{
+	huh.NewOption("MicroOS", config.ImageMicroOS),
+	huh.NewOption("Ubuntu 24.04", config.ImageUbuntu2404),
+	huh.NewOption("Ubuntu 22.04", config.ImageUbuntu2204),
+	huh.NewOption("Ubuntu 20.04", config.ImageUbuntu2004),
 }
