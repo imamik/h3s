@@ -1,6 +1,7 @@
 package ip
 
 import (
+	"fmt"
 	"github.com/hetznercloud/hcloud-go/v2/hcloud"
 	"net/netip"
 )
@@ -12,10 +13,10 @@ func FirstAvailable(server *hcloud.Server) string {
 	case !server.PublicNet.IPv6.IsUnspecified():
 		network, ok := netip.AddrFromSlice(server.PublicNet.IPv6.IP)
 		if ok {
-			return network.Next().String()
+			return fmt.Sprintf("[%s]", network.Next().String())
 		}
-	case len(server.PrivateNet) > 0:
-		return server.PrivateNet[0].IP.String()
+	default:
+		return Private(server)
 	}
 	return ""
 }

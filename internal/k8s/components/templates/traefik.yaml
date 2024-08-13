@@ -1,0 +1,64 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: "{{ .TraefikNamespace }}"
+---
+apiVersion: helm.cattle.io/v1
+kind: HelmChart
+metadata:
+  name: traefik
+  namespace: kube-system
+spec:
+  chart: traefik
+  version: "{{ .TraefikVersion }}"
+  repo: https://traefik.github.io/charts
+  targetNamespace: "{{ .TraefikNamespace }}"
+  createNamespace: true
+  bootstrap: true
+  valuesContent: |-
+    image:
+      tag: "{{ .TraefikImageTag }}"
+    deployment:
+      replicas: {{ .TraefikReplicaCount }}
+    globalArguments:
+      - "--serversTransport.insecureSkipVerify=true"
+    service:
+      enabled: true
+      type: LoadBalancer
+      annotations:
+        "load-balancer.hetzner.cloud/name": "{{ .LoadbalancerName }}"
+        "load-balancer.hetzner.cloud/use-private-ip": "true"
+        "load-balancer.hetzner.cloud/disable-private-ingress": "false"
+        "load-balancer.hetzner.cloud/disable-public-network": "false"
+        "load-balancer.hetzner.cloud/ipv6-disabled": "false"
+        "load-balancer.hetzner.cloud/location": "{{ .LoadbalancerLocation }}"
+        "load-balancer.hetzner.cloud/type": "lb11"
+        "load-balancer.hetzner.cloud/uses-proxyprotocol": "true"
+        "load-balancer.hetzner.cloud/algorithm-type": "round_robin"
+        "load-balancer.hetzner.cloud/health-check-interval": "5s"
+        "load-balancer.hetzner.cloud/health-check-timeout": "3s"
+        "load-balancer.hetzner.cloud/health-check-retries": "3"
+    ports:
+      web:
+        redirectTo:
+          port: websecure
+        proxyProtocol:
+          trustedIPs:
+            - 127.0.0.1/32
+            - 10.0.0.0/8
+        forwardedHeaders:
+          trustedIPs:
+            - 127.0.0.1/32
+            - 10.0.0.0/8
+      websecure:
+        proxyProtocol:
+          trustedIPs:
+            - 127.0.0.1/32
+            - 10.0.0.0/8
+        forwardedHeaders:
+          trustedIPs:
+            - 127.0.0.1/32
+            - 10.0.0.0/8
+    additionalArguments:
+      - "--providers.kubernetesingress.ingressendpoint.publishedservice={{ .TraefikNamespace }}/traefik"
+      - "--api.dashboard=true"

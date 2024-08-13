@@ -2,23 +2,34 @@ package credentials
 
 import (
 	"fmt"
-	"hcloud-k3s-cli/internal/config"
-	"os"
+	"h3s/internal/config/path"
+	"h3s/internal/utils/file"
 )
 
-func Get(conf config.Config) (ProjectCredentials, error) {
-	credentials, err := initialize()
-	if err != nil {
-		fmt.Println(err)
-		return ProjectCredentials{}, err
-	}
-	projectCredentials, ok := credentials[conf.Name]
-	if ok {
-		return projectCredentials, nil
+func Get() (*ProjectCredentials, error) {
+	p := string(path.SecretsFileName)
+	f := file.New(p)
+	if !f.Exists() {
+		return nil, fmt.Errorf("credentials file not found")
 	}
 
-	fallbackCredentials := ProjectCredentials{
-		HCloudToken: os.Getenv("HCLOUD_TOKEN"),
+	var credentials *ProjectCredentials
+	err := f.Load().UnmarshalYamlTo(&credentials)
+	if err != nil || credentials == nil {
+		return nil, err
 	}
-	return fallbackCredentials, fmt.Errorf("project not found in credentials file")
+
+	err = ValidateHCloudToken(credentials.HCloudToken)
+	if err != nil {
+		err = fmt.Errorf("missing valid Hetzner Cloud Token - Use 'h3s create credentials' command - %s", err)
+		return nil, err
+	}
+
+	err = ValidateHetznerDNSToken(credentials.HetznerDNSToken)
+	if err != nil {
+		err = fmt.Errorf("missing valid Hetzner DNS Token - Use 'h3s create credentials' command - %s", err)
+		return nil, err
+	}
+
+	return credentials, nil
 }

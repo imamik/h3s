@@ -1,0 +1,37 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: traefik-dashboard-auth-secret
+  namespace: "{{ .TraefikNamespace }}"
+type: kubernetes.io/basic-auth
+stringData:
+  username: "admin"
+  password: "pass"
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: traefik-dashboard-auth
+  namespace: "{{ .TraefikNamespace }}"
+spec:
+  basicAuth:
+    secret: traefik-dashboard-auth-secret
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: traefik-dashboard
+  namespace: "{{ .TraefikNamespace }}"
+  annotations:
+    traefik.ingress.kubernetes.io/router.tls: "true"
+spec:
+  entryPoints:
+    - websecure
+  routes:
+  - match: Host({{ .TraefikHost }})
+    kind: Rule
+    services:
+    - name: api@internal
+      kind: TraefikService
+    middlewares:
+    - name: traefik-dashboard-auth

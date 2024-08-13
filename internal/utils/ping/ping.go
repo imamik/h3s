@@ -3,7 +3,7 @@ package ping
 import (
 	"fmt"
 	"github.com/hetznercloud/hcloud-go/v2/hcloud"
-	"hcloud-k3s-cli/internal/utils/logger"
+	"h3s/internal/utils/logger"
 	"os/exec"
 	"time"
 )

@@ -4,7 +4,7 @@ import (
 	"crypto/rand"
 	"encoding/hex"
 	"github.com/charmbracelet/huh"
-	"hcloud-k3s-cli/internal/config"
+	"h3s/internal/config"
 )
 
 func surveyName() string {
@@ -34,6 +34,13 @@ func surveyCredentials() ProjectCredentials {
 		Description("The api token to create resources for the given project").
 		Validate(ValidateHCloudToken).
 		Value(&projectCredentials.HCloudToken).
+		Run()
+
+	huh.NewInput().
+		Title("Hetzner DNS Token").
+		Description("The dns token to create dns entries for the given project").
+		Validate(ValidateHetznerDNSToken).
+		Value(&projectCredentials.HetznerDNSToken).
 		Run()
 
 	projectCredentials.K3sToken = generateToken(32)

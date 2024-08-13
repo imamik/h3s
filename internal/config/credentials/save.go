@@ -1,21 +1,12 @@
 package credentials
 
 import (
-	"fmt"
-	"hcloud-k3s-cli/internal/utils/yaml"
+	"h3s/internal/config/path"
+	"h3s/internal/utils/file"
 )
 
-func save(projectName string, projectCredentials ProjectCredentials) {
-	credentials, err := initialize()
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-
-	credentials[projectName] = projectCredentials
-	err = yaml.Save(credentials, path)
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
+func SaveCredentials(projectCredentials ProjectCredentials) error {
+	p := string(path.SecretsFileName)
+	_, err := file.New(p).SetYaml(projectCredentials).Save()
+	return err
 }

@@ -1,0 +1,11 @@
+apiVersion: helm.cattle.io/v1
+kind: HelmChart
+metadata:
+  name: kubernetes-dashboard
+  namespace: kube-system
+spec:
+  chart: kubernetes-dashboard
+  version: "{{ .K8sDashboardVersion }}"
+  repo: https://kubernetes.github.io/dashboard/
+  targetNamespace: "{{ .K8sDashboardNamespace }}"
+  createNamespace: true

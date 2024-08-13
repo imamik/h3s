@@ -4,14 +4,21 @@ import (
 	"fmt"
 	"github.com/hetznercloud/hcloud-go/v2/hcloud"
 	"golang.org/x/crypto/ssh"
-	"hcloud-k3s-cli/internal/clustercontext"
-	"hcloud-k3s-cli/internal/utils/ip"
+	"h3s/internal/cluster"
+	"h3s/internal/utils/ip"
 	"log"
+	"os/exec"
 	"time"
 )
 
+func ExecuteLocal(command string) (string, error) {
+	cmd := exec.Command("sh", "-c", command)
+	output, err := cmd.CombinedOutput()
+	return string(output), err
+}
+
 func ExecuteWithSsh(
-	ctx clustercontext.ClusterContext,
+	ctx *cluster.Cluster,
 	remote *hcloud.Server,
 	command string,
 ) (string, error) {
@@ -39,43 +46,40 @@ func ExecuteWithSsh(
 }
 
 func ExecuteViaProxy(
-	ctx clustercontext.ClusterContext,
-	proxy *hcloud.Server,
+	ctx *cluster.Cluster,
+	gateway *hcloud.Server,
 	remote *hcloud.Server,
 	command string,
 ) (string, error) {
-	proxyIp := ip.FirstAvailable(proxy)
+	if gateway == nil {
+		return ExecuteWithSsh(ctx, remote, command)
+	}
+
+	proxyIp := ip.FirstAvailable(gateway)
 	remoteIp := ip.FirstAvailable(remote)
 	removeKnownHostsEntry(proxyIp)
 
-	// SSH client configuration
 	sshConfig, err := ConfigSsh(ctx)
 	if err != nil {
 		return "", fmt.Errorf("unable to create SSH config: %w", err)
 	}
 
-	// Connect to proxy
-	fmt.Printf("Connecting to proxy (%s)\n", proxyIp)
 	proxyConn, err := dialWithRetries(proxyIp, sshConfig, 5*time.Second, 5)
 	if err != nil {
-		return "", fmt.Errorf("unable to connect to proxy: %w", err)
+		return "", fmt.Errorf("unable to connect to gateway: %w", err)
 	}
 	defer func(proxyConn *ssh.Client) {
 		err := proxyConn.Close()
 		if err != nil {
-			fmt.Printf("unable to close proxy connection: %v\n", err)
+			fmt.Printf("unable to close gateway connection: %v\n", err)
 		}
 	}(proxyConn)
 
-	// Create a tunnel to the remote server via the proxy
-	fmt.Printf("Creating tunnel to remote (%s)\n", remoteIp)
 	tunnel, err := proxyConn.Dial("tcp", remoteIp+":22")
 	if err != nil {
 		return "", fmt.Errorf("unable to create tunnel to remote: %w", err)
 	}
 
-	// Establish SSH connection to remote server through the tunnel
-	fmt.Printf("Establishing connection to remote (%s)\n", remoteIp)
 	clientConn, chans, reqs, err := ssh.NewClientConn(tunnel, remoteIp+":22", sshConfig)
 	if err != nil {
 		return "", fmt.Errorf("unable to establish connection to remote: %w", err)

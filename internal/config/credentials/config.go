@@ -1,7 +1,10 @@
 package credentials
 
-func Config() {
-	projectName := surveyName()
+func Configure() error {
 	projectCredentials := surveyCredentials()
-	save(projectName, projectCredentials)
+	err := SaveCredentials(projectCredentials)
+	if err != nil {
+		return err
+	}
+	return nil
 }
