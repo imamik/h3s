@@ -26,6 +26,7 @@ func getAll(ctx *cluster.Cluster) ([]*hcloud.Server, error) {
 			LabelSelector: label,
 		},
 	})
+
 	if err != nil {
 		logger.LogResourceEvent(logger.Server, logger.Get, label, logger.Failure, servers, err)
 		return nil, err
@@ -42,10 +43,11 @@ func getAll(ctx *cluster.Cluster) ([]*hcloud.Server, error) {
 // GetAll returns all servers in the cluster, sorted by name & grouped by role (ControlPlane, Worker, Gateway, Other)
 func GetAll(ctx *cluster.Cluster) (*AllServers, error) {
 
+	var err error
 	var nodes []*hcloud.Server
 
 	for {
-		nodes, err := getAll(ctx)
+		nodes, err = getAll(ctx)
 		if err != nil {
 			return nil, err
 		}

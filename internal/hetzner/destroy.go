@@ -5,7 +5,6 @@ import (
 	"h3s/internal/hetzner/dns"
 	"h3s/internal/hetzner/gateway"
 	"h3s/internal/hetzner/loadbalancers"
-	"h3s/internal/hetzner/microos"
 	"h3s/internal/hetzner/network"
 	"h3s/internal/hetzner/pool"
 	"h3s/internal/hetzner/sshkey"
@@ -34,7 +33,7 @@ func Destroy(ctx *cluster.Cluster) error {
 	deleteResource(ctx, &wg, gateway.Delete)
 	deleteResource(ctx, &wg, loadbalancers.Delete)
 	deleteResource(ctx, &wg, pool.Delete)
-	deleteResource(ctx, &wg, microos.Delete)
+	// deleteResource(ctx, &wg, microos.Delete)
 	deleteResource(ctx, &wg, dns.Delete)
 
 	wg.Wait()             // Wait for all deletions to complete
