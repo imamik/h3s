@@ -5,7 +5,7 @@ metadata:
   namespace: kube-system
 spec:
   chart: kubernetes-dashboard
-  version: "{{ .Version }}"
+  version: "{{ .K8sDashboardVersion }}"
   repo: https://kubernetes.github.io/dashboard/
-  targetNamespace: "{{ .Namespace }}"
+  targetNamespace: "{{ .K8sDashboardNamespace }}"
   createNamespace: true

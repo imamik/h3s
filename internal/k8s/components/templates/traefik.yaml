@@ -7,14 +7,14 @@ spec:
   chart: traefik
   version: "{{ .TraefikVersion }}"
   repo: https://traefik.github.io/charts
-  targetNamespace: "{{ .Namespace }}"
+  targetNamespace: "{{ .TraefikNamespace }}"
   createNamespace: true
   bootstrap: true
   valuesContent: |-
     image:
       tag: "{{ .TraefikImageTag }}"
     deployment:
-      replicas: "{{ .ReplicaCount }}"
+      replicas: {{ .TraefikReplicaCount }}
     globalArguments:
       - "--serversTransport.insecureSkipVerify=true"
     service:
@@ -55,5 +55,5 @@ spec:
             - 127.0.0.1/32
             - 10.0.0.0/8
     additionalArguments:
-      - "--providers.kubernetesingress.ingressendpoint.publishedservice={{ .Namespace }}/traefik"
+      - "--providers.kubernetesingress.ingressendpoint.publishedservice={{ .TraefikNamespace }}/traefik"
       - "--api.dashboard=true"

@@ -5,9 +5,9 @@ metadata:
   namespace: kube-system
 spec:
   chart: cert-manager
-  version: "{{ .Version }}"
+  version: "{{ .CertManagerVersion }}"
   repo: https://charts.jetstack.io
-  targetNamespace: "{{ .Namespace }}"
+  targetNamespace: "{{ .CertManagerNamespace }}"
   createNamespace: true
   valuesContent: |-
     crds:

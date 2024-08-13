@@ -21,7 +21,7 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: kubernetes-dashboard-ingress
-  namespace: "{{ .Namespace }}"
+  namespace: "{{ .K8sDashboardNamespace }}"
   annotations:
     traefik.ingress.kubernetes.io/router.tls: "true"
 spec:

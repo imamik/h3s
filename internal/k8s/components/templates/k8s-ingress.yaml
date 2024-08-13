@@ -9,7 +9,7 @@ metadata:
 spec:
   ingressClassName: traefik
   rules:
-    - host: "{{ .Domain }}"
+    - host: "k3s.{{ .Domain }}"
       http:
         paths:
           - path: /
@@ -21,5 +21,5 @@ spec:
                   number: 443
   tls:
     - hosts:
-        - "{{ .Domain }}"
+        - "k3s.{{ .Domain }}"
       secretName: "{{ .WildcardTLS }}"

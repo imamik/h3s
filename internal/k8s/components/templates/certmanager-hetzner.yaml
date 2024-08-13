@@ -5,8 +5,8 @@ metadata:
   namespace: kube-system
 spec:
   chart: cert-manager-webhook-hetzner
-  version: "{{ .Version }}"
+  version: "{{ .CertManagerHetznerVersion }}"
   repo: https://vadimkim.github.io/cert-manager-webhook-hetzner
-  targetNamespace: "{{ .Namespace }}"
+  targetNamespace: "{{ .CertManagerNamespace }}"
   set:
     groupName: "{{ .Domain }}"

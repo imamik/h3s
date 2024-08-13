@@ -37,36 +37,36 @@ func installComponents(
 ) (string, error) {
 	cmdArr := []string{
 		// Setup Secrets
-		components.HCloudSecrets(ctx, net),
+		components.HCloudSecrets(ctx, net, lb),
 
 		// Install Hetzner CCM (Cloud Controller Manager)
-		components.CCM(ctx, net),
+		components.CCM(ctx, net, lb),
 
 		// Install Hetzner CSI (Cloud Storage Interface)
-		components.CSIHelmChart(),
+		components.CSIHelmChart(ctx, net, lb),
 
 		// Install Cert-Manager
-		components.CertManagerHelmChart(),
+		components.CertManagerHelmChart(ctx, net, lb),
 		components.WaitForCertManagerCRDs(),
-		components.CertManagerHetznerHelmChart(ctx),
+		components.CertManagerHetznerHelmChart(ctx, net, lb),
 
 		// Install Traefik
-		components.TraefikHelmChart(ctx, lb),
+		components.TraefikHelmChart(ctx, net, lb),
 		components.WaitForTraefikCRDs(),
 
 		// Install Wildcard Certificate
-		components.WildcardCertificate(ctx),
+		components.WildcardCertificate(ctx, net, lb),
 
 		// Setup K8s Dashboard
-		components.K8sDashboardHelmChart(),
+		components.K8sDashboardHelmChart(ctx, net, lb),
 		components.WaitForK8sDashboardNamespace(),
-		components.K8sDashboardAccess(ctx),
+		components.K8sDashboardAccess(ctx, net, lb),
 
 		// Setup Traefik Dashboard
-		components.TraefikDashboard(ctx),
+		components.TraefikDashboard(ctx, net, lb),
 
 		// Configure K3s API Server Endpoint
-		components.K8sIngress(ctx),
+		components.K8sIngress(ctx, net, lb),
 	}
 
 	for _, cmd := range cmdArr {
