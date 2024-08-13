@@ -10,6 +10,8 @@ import (
 	"h3s/internal/hetzner/server"
 	"h3s/internal/k8s/components"
 	"h3s/internal/utils/ssh"
+	"h3s/internal/utils/template"
+	"strings"
 )
 
 func Install(ctx *cluster.Cluster) error {
@@ -28,6 +30,51 @@ func Install(ctx *cluster.Cluster) error {
 	return nil
 }
 
+func kubectlApply(tpl string, data map[string]interface{}) string {
+	yaml := template.CompileTemplate(tpl, data)
+	cmd := strings.TrimSpace(yaml)
+	return "kubectl apply -f - <<EOF\n" + cmd + "\nEOF"
+}
+
+func waitForCRDs(component string, resources []string) string {
+	waitCmd := "kubectl wait --for=condition=established --timeout=30s " + strings.Join(resources, " ") + " >/dev/null 2>&1"
+	return fmt.Sprintf(`
+echo "Waiting for CRDs of %s to be established"
+for i in {1..5}; do
+	echo "Attempt $i"
+	if %s; then
+		if [ "$i" -gt 1 ]; then
+			sleep 10
+		fi
+		echo "Established successfully"
+		exit 0
+	fi
+	sleep 10
+done
+echo "Timed out"
+exit 1
+`, component, waitCmd)
+}
+
+func waitForNamespace(namespace string) string {
+	return fmt.Sprintf(`
+echo "Waiting for namespace %s to be established"
+for i in {1..5}; do
+	echo "Attempt $i"
+	if kubectl get namespace %s >/dev/null 2>&1; then
+		if [ "$i" -gt 1 ]; then
+			sleep 10
+		fi
+		echo "Established successfully"
+		exit 0
+	fi
+	sleep 10
+done
+echo "Timed out"
+exit 1
+`, namespace, namespace)
+}
+
 func installComponents(
 	ctx *cluster.Cluster,
 	net *hcloud.Network,
@@ -35,38 +82,40 @@ func installComponents(
 	gateway *hcloud.Server,
 	remote *hcloud.Server,
 ) (string, error) {
+	vars := components.GetVars(ctx, net, lb)
+
 	cmdArr := []string{
 		// Setup Secrets
-		components.HCloudSecrets(ctx, net, lb),
+		kubectlApply(components.Yaml.HcloudSecrets, vars),
 
 		// Install Hetzner CCM (Cloud Controller Manager)
-		components.CCM(ctx, net, lb),
+		kubectlApply(components.Yaml.CCM, vars),
 
 		// Install Hetzner CSI (Cloud Storage Interface)
-		components.CSIHelmChart(ctx, net, lb),
+		kubectlApply(components.Yaml.CSI, vars),
 
 		// Install Cert-Manager
-		components.CertManagerHelmChart(ctx, net, lb),
-		components.WaitForCertManagerCRDs(),
-		components.CertManagerHetznerHelmChart(ctx, net, lb),
+		kubectlApply(components.Yaml.CertManager, vars),
+		waitForCRDs("Cert-Manager", components.CertManagerCrds),
+		kubectlApply(components.Yaml.CertManagerHetzner, vars),
 
 		// Install Traefik
-		components.TraefikHelmChart(ctx, net, lb),
-		components.WaitForTraefikCRDs(),
+		kubectlApply(components.Yaml.Traefik, vars),
+		waitForCRDs("Traefik", components.TraefikCrds),
 
 		// Install Wildcard Certificate
-		components.WildcardCertificate(ctx, net, lb),
+		kubectlApply(components.Yaml.Certificate, vars),
 
 		// Setup K8s Dashboard
-		components.K8sDashboardHelmChart(ctx, net, lb),
-		components.WaitForK8sDashboardNamespace(),
-		components.K8sDashboardAccess(ctx, net, lb),
+		kubectlApply(components.Yaml.K8sDashboard, vars),
+		waitForNamespace(components.K8sDashboardNamespace),
+		kubectlApply(components.Yaml.K8sDashboardConfig, vars),
 
 		// Setup Traefik Dashboard
-		components.TraefikDashboard(ctx, net, lb),
+		kubectlApply(components.Yaml.TraefikDashboard, vars),
 
 		// Configure K3s API Server Endpoint
-		components.K8sIngress(ctx, net, lb),
+		kubectlApply(components.Yaml.K8sIngress, vars),
 	}
 
 	for _, cmd := range cmdArr {
@@ -76,6 +125,8 @@ func installComponents(
 		}
 	}
 
-	return ssh.ExecuteLocal(components.K3sAPIServerConfig(ctx))
+	// Configure K3s API Server Endpoint
+	clusterCmd := fmt.Sprintf("kubectl config set-cluster default --server=https://k3s.%s", ctx.Config.Domain)
+	return ssh.ExecuteLocal(clusterCmd)
 
 }

@@ -22,6 +22,35 @@ const (
 	TraefikImageTag  = "v3.1"
 )
 
+var (
+	TraefikCrds = []string{
+		"crd/accesscontrolpolicies.hub.traefik.io",
+		"crd/apiaccesses.hub.traefik.io",
+		"crd/apiportals.hub.traefik.io",
+		"crd/apiratelimits.hub.traefik.io",
+		"crd/apis.hub.traefik.io",
+		"crd/apiversions.hub.traefik.io",
+		"crd/ingressroutes.traefik.io",
+		"crd/ingressroutetcps.traefik.io",
+		"crd/ingressrouteudps.traefik.io",
+		"crd/middlewares.traefik.io",
+		"crd/middlewaretcps.traefik.io",
+		"crd/serverstransports.traefik.io",
+		"crd/serverstransporttcps.traefik.io",
+		"crd/tlsoptions.traefik.io",
+		"crd/tlsstores.traefik.io",
+		"crd/traefikservices.traefik.io",
+	}
+	CertManagerCrds = []string{
+		"crd/certificaterequests.cert-manager.io",
+		"crd/certificates.cert-manager.io",
+		"crd/challenges.acme.cert-manager.io",
+		"crd/clusterissuers.cert-manager.io",
+		"crd/issuers.cert-manager.io",
+		"crd/orders.acme.cert-manager.io",
+	}
+)
+
 func kebapString(parts ...string) string {
 	var res []string
 	re := regexp.MustCompile(`[^a-zA-Z0-9]+`)
@@ -32,7 +61,7 @@ func kebapString(parts ...string) string {
 	return strings.Join(res, "-")
 }
 
-func getVars(
+func GetVars(
 	ctx *cluster.Cluster,
 	network *hcloud.Network,
 	lb *hcloud.LoadBalancer,
@@ -57,20 +86,19 @@ func getVars(
 		"ClusterCidrIpv4": network.IPRange.String(),
 		"Server":          server,
 
-		"Email": conf.CertManager.Email,
+		"Email":               conf.CertManager.Email,
+		"PrivateKeySecretRef": kebapString(domain, env, "issuer"),
 
 		"HetznerDNSToken": HetznerDNSToken,
 		"HCloudToken":     ctx.Credentials.HCloudToken,
 
 		"Domain": domain,
 
-		"WildcardTLS":         kebapString(domain, "wildcard", "tls"),
-		"WildcardIssuer":      kebapString(domain, "wildcard", "issuer"),
-		"PrivateKeySecretRef": kebapString(domain, env, "issuer"),
+		"WildcardTLS":    kebapString(domain, "wildcard", "tls"),
+		"WildcardIssuer": kebapString(domain, "wildcard", "issuer"),
 
-		"CertManagerVersion":   CertManagerVersion,
-		"CertManagerNamespace": CertManagerNamespace,
-
+		"CertManagerVersion":        CertManagerVersion,
+		"CertManagerNamespace":      CertManagerNamespace,
 		"CertManagerHetznerVersion": CertManagerHetznerVersion,
 
 		"K8sDashboardVersion":   K8sDashboardVersion,
