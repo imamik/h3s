@@ -1,10 +1,14 @@
 package components
 
 import (
+	_ "embed"
 	"encoding/base64"
 	"h3s/internal/cluster"
 	"strings"
 )
+
+//go:embed certificate.yaml
+var certificateYAML string
 
 func domainKebap(ctx *cluster.Cluster) string {
 	return strings.ReplaceAll(ctx.Config.Domain, ".", "-")
@@ -28,65 +32,13 @@ func WildcardCertificate(ctx *cluster.Cluster) string {
 		server = "https://acme-v02.api.letsencrypt.org/directory"
 	}
 
-	return kubectlApply(`
-apiVersion: v1
-kind: Secret
-metadata:
-  name: hetzner-secret
-  namespace: cert-manager
-type: Opaque
-data:
-  api-key: {{ .HetznerDNSToken }}
----
-apiVersion: cert-manager.io/v1
-kind: ClusterIssuer
-metadata:
-  name: {{ .WildcardIssuer }}
-spec:
-  acme:
-    server: {{ .Server }}
-    email: {{ .Email }}
-    privateKeySecretRef:
-      name: {{ .PrivateKeySecretRef }}
-    solvers:
-      - dns01:
-          webhook:
-            groupName: {{ .Domain }}
-            solverName: hetzner
-            config:
-              secretName: hetzner-secret
-              zoneName: {{ .Domain }}
-              apiUrl: https://dns.hetzner.com/api/v1
----
-apiVersion: cert-manager.io/v1
-kind: Certificate
-metadata:
-  name: {{ .WildcardTLS }}
-spec:
-  commonName: {{ .Domain }}
-  secretName: {{ .WildcardTLS }}
-  issuerRef:
-    name: {{ .WildcardIssuer }}
-    kind: ClusterIssuer
-  dnsNames:
-    - {{ .Domain }}
-    - "*.{{ .Domain }}"
----
-apiVersion: traefik.io/v1alpha1
-kind: TLSStore
-metadata:
-  name: default
-spec:
-  defaultCertificate:
-    secretName: {{ .WildcardTLS }}
-`,
-		map[string]interface{}{
-			"Server":              server,
-			"Email":               ctx.Config.CertManager.Email,
-			"HetznerDNSToken":     hetznerDNSTokenBase64,
-			"Domain":              ctx.Config.Domain,
-			"WildcardTLS":         wildcardTlS(ctx),
-			"WildcardIssuer":      wildcardIssuer(ctx),
-			"PrivateKeySecretRef": domainKebap(ctx) + "-" + env + "-issuer",
-		})
+	return kubectlApply(certificateYAML, map[string]interface{}{
+		"Server":              server,
+		"Email":               ctx.Config.CertManager.Email,
+		"HetznerDNSToken":     hetznerDNSTokenBase64,
+		"Domain":              ctx.Config.Domain,
+		"WildcardTLS":         wildcardTlS(ctx),
+		"WildcardIssuer":      wildcardIssuer(ctx),
+		"PrivateKeySecretRef": domainKebap(ctx) + "-" + env + "-issuer",
+	})
 }

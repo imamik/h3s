@@ -1,16 +1,10 @@
 package components
 
+import _ "embed"
+
+//go:embed csi.yaml
+var csiYAML string
+
 func CSIHelmChart() string {
-	return kubectlApply(`
-apiVersion: helm.cattle.io/v1
-kind: HelmChart
-metadata:
-  name: hcloud-csi
-  namespace: kube-system
-spec:
-  chart: hcloud-csi
-  version: 2.8.0
-  repo: https://charts.hetzner.cloud
-  targetNamespace: kube-system
-`, nil)
+	return kubectlApply(csiYAML, nil)
 }

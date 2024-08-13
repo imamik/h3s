@@ -81,7 +81,7 @@ func get(ctx *cluster.Cluster, proxy *hcloud.Server, remote *hcloud.Server) (*Ku
 
 // getUser gets a user token for the kubernetes dashboard
 func getUser(ctx *cluster.Cluster) (*User, error) {
-	userToken, err := k8s.Token(ctx, "default", "admin-user", 365*24)
+	userToken, err := k8s.Token(ctx, "kubernetes-dashboard", "admin-user", 365*24)
 	if err != nil {
 		return nil, err
 	}

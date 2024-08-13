@@ -1,0 +1,25 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: kubernetes-api-ingress
+  namespace: default
+  annotations:
+    traefik.ingress.kubernetes.io/router.tls: "true"
+    traefik.ingress.kubernetes.io/service.serverscheme: "https"
+spec:
+  ingressClassName: traefik
+  rules:
+    - host: "{{ .Domain }}"
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: kubernetes
+                port:
+                  number: 443
+  tls:
+    - hosts:
+        - "{{ .Domain }}"
+      secretName: "{{ .WildcardTLS }}"

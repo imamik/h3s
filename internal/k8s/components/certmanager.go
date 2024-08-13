@@ -1,6 +1,7 @@
 package components
 
 import (
+	_ "embed"
 	"h3s/internal/cluster"
 )
 
@@ -10,35 +11,17 @@ const (
 	CertManagerHetznerVersion = "1.3.1"
 )
 
+//go:embed certmanager.yaml
+var certManagerYAML string
+
+//go:embed certmanager-hetzner.yaml
+var certManagerHetznerYAML string
+
 func CertManagerHelmChart() string {
-	return kubectlApply(`
-apiVersion: helm.cattle.io/v1
-kind: HelmChart
-metadata:
-  name: cert-manager
-  namespace: kube-system
-spec:
-  chart: cert-manager
-  version: {{ .Version }}
-  repo: https://charts.jetstack.io
-  targetNamespace: {{ .Namespace }}
-  createNamespace: true
-  valuesContent: |-
-    crds:
-      enabled: true
-    webhook:
-      enabled: true
-    cainjector:
-      enabled: true
-    startupapicheck:
-      enabled: true
-    ingressShim:
-      enabled: true
-`,
-		map[string]interface{}{
-			"Version":   CertManagerVersion,
-			"Namespace": CertManagerNamespace,
-		})
+	return kubectlApply(certManagerYAML, map[string]interface{}{
+		"Version":   CertManagerVersion,
+		"Namespace": CertManagerNamespace,
+	})
 }
 
 func WaitForCertManagerCRDs() string {
@@ -53,23 +36,9 @@ func WaitForCertManagerCRDs() string {
 }
 
 func CertManagerHetznerHelmChart(ctx *cluster.Cluster) string {
-	return kubectlApply(`
-apiVersion: helm.cattle.io/v1
-kind: HelmChart
-metadata:
-  name: cert-manager-webhook-hetzner
-  namespace: kube-system
-spec:
-  chart: cert-manager-webhook-hetzner
-  version: {{ .Version }}
-  repo: https://vadimkim.github.io/cert-manager-webhook-hetzner
-  targetNamespace: {{ .Namespace }}
-  set:
-    groupName: {{ .Domain }}
-`,
-		map[string]interface{}{
-			"Version":   CertManagerHetznerVersion,
-			"Namespace": CertManagerNamespace,
-			"Domain":    ctx.Config.Domain,
-		})
+	return kubectlApply(certManagerHetznerYAML, map[string]interface{}{
+		"Version":   CertManagerHetznerVersion,
+		"Namespace": CertManagerNamespace,
+		"Domain":    ctx.Config.Domain,
+	})
 }

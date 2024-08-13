@@ -40,9 +40,7 @@ func installComponents(
 		components.HCloudSecrets(ctx, net),
 
 		// Install Hetzner CCM (Cloud Controller Manager)
-		components.CCMServiceAccount(),
-		components.CCMRoleBinding(),
-		components.CCMSettings(ctx, net),
+		components.CCM(ctx, net),
 
 		// Install Hetzner CSI (Cloud Storage Interface)
 		components.CSIHelmChart(),
@@ -68,7 +66,7 @@ func installComponents(
 		components.TraefikDashboard(ctx),
 
 		// Configure K3s API Server Endpoint
-		components.K3sAPI(ctx),
+		components.K8sIngress(ctx),
 	}
 
 	for _, cmd := range cmdArr {
