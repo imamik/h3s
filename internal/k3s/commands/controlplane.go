@@ -82,20 +82,30 @@ func ControlPlane(
 	}
 
 	configYamlStr, err := yaml.Marshal(configYaml)
-
 	if err != nil {
 		return err
 	}
 
-	commandArr := []string{
-		PreInstallCommand(ctx, string(configYamlStr)),
-		K3sInstall(ctx, true),
-		SeLinux(),
-		PostInstall(),
-		K3sStartServer(isFirst),
+	preInstallCmd, err := PreInstallCommand(ctx, string(configYamlStr))
+	if err != nil {
+		return err
 	}
 
-	_, err = ssh.ExecuteViaProxy(ctx, proxy, node, strings.Join(commandArr, "\n"))
+	seLinuxCmd := SeLinux()
+
+	postInstallCmd := PostInstall()
+
+	k3sInstallCmd, err := K3sInstall(ctx, true)
+	if err != nil {
+		return err
+	}
+
+	k3sStartServerCmd, err := K3sStartServer(isFirst)
+
+	commandArr := []string{preInstallCmd, k3sInstallCmd, seLinuxCmd, postInstallCmd, k3sStartServerCmd}
+	cmd := strings.Join(commandArr, "\n")
+
+	_, err = ssh.ExecuteViaProxy(ctx, proxy, node, cmd)
 	if err != nil {
 		return err
 	}

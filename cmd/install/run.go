@@ -13,9 +13,7 @@ func runInstallK3s(_ *cobra.Command, _ []string) error {
 	if err != nil {
 		return err
 	}
-
-	k3s.Install(ctx)
-	return nil
+	return k3s.Install(ctx)
 }
 
 // runInstallComponents installs all components on the h3s cluster
@@ -24,6 +22,5 @@ func runInstallComponents(_ *cobra.Command, _ []string) error {
 	if err != nil {
 		return err
 	}
-	k8s.Install(ctx)
-	return nil
+	return k8s.Install(ctx)
 }

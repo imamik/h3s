@@ -51,14 +51,24 @@ func Worker(
 		return err
 	}
 
-	commandArr := []string{
-		PreInstallCommand(ctx, string(configYamlStr)),
-		K3sInstall(ctx, false),
-		SeLinux(),
-		PostInstall(),
-		K3sStartAgent(),
+	preInstallCmd, err := PreInstallCommand(ctx, string(configYamlStr))
+	if err != nil {
+		return err
 	}
-	_, err = ssh.ExecuteViaProxy(ctx, proxy, node, strings.Join(commandArr, "\n"))
+
+	k3sInstallCmd, err := K3sInstall(ctx, false)
+	if err != nil {
+		return err
+	}
+
+	seLinuxCmd := SeLinux()
+	postInstallCmd := PostInstall()
+	k3sStartAgentCmd := K3sStartAgent()
+
+	cmdArray := []string{preInstallCmd, k3sInstallCmd, seLinuxCmd, postInstallCmd, k3sStartAgentCmd}
+	cmd := strings.Join(cmdArray, "\n")
+
+	_, err = ssh.ExecuteViaProxy(ctx, proxy, node, cmd)
 	if err != nil {
 		return err
 	}

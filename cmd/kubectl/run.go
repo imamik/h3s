@@ -35,18 +35,19 @@ func runKubectl(cmd *cobra.Command, args []string) error {
 }
 
 func runWithKubeConfig(kubeConfigPath string, args []string) (string, error) {
-	command := kubectl.New(args)
-	command.AddKubeConfigPath(kubeConfigPath)
-	return ssh.ExecuteLocal(command.String())
-}
-
-func runWithSSH(ctx *cluster.Cluster, args []string) (string, error) {
-	command := kubectl.New(args)
-	err := command.CompileFiles()
+	cmd, err := kubectl.New(args...).AddKubeConfigPath(kubeConfigPath).String()
 	if err != nil {
 		return "", err
 	}
-	return common.SSH(ctx, command.String())
+	return ssh.ExecuteLocal(cmd)
+}
+
+func runWithSSH(ctx *cluster.Cluster, args []string) (string, error) {
+	cmd, err := kubectl.New(args...).EmbedFileContent().String()
+	if err != nil {
+		return "", err
+	}
+	return common.SSH(ctx, cmd)
 }
 
 func getLocalPathIfExists() (string, bool) {

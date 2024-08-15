@@ -2,7 +2,7 @@ package userdata
 
 import "h3s/internal/utils/template"
 
-func generateWriteFilesCommon(config CloudInitConfig) string {
+func generateWriteFilesCommon(config CloudInitConfig) (string, error) {
 	return template.CompileTemplate(`
 # Disable ssh password authentication
 - content: |

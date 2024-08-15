@@ -4,6 +4,7 @@ import (
 	_ "embed"
 )
 
+// YamlTemplates contains all the YAML templates for the components, embedded into the binary
 type YamlTemplates struct {
 	CCM                string
 	Certificate        string
@@ -51,6 +52,7 @@ var traefikYAML string
 //go:embed traefik-dashboard.yaml
 var traefikDashboard string
 
+// Yaml contains all the YAML templates for the components, embedded into the binary
 var Yaml = YamlTemplates{
 	CCM:                ccmYAML,
 	Certificate:        certificateYAML,

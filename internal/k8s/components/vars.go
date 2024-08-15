@@ -4,25 +4,35 @@ import (
 	"encoding/base64"
 	"fmt"
 	"github.com/hetznercloud/hcloud-go/v2/hcloud"
-	"h3s/internal/cluster"
+	"h3s/internal/config"
+	"h3s/internal/config/credentials"
 	"regexp"
 	"strings"
 )
 
 const (
-	CertManagerNamespace      = "cert-manager"
-	CertManagerVersion        = "v1.15.1"
+	// CertManagerNamespace is the namespace where cert-manager is installed
+	CertManagerNamespace = "cert-manager"
+	// CertManagerVersion is the helm-version of cert-manager to install
+	CertManagerVersion = "v1.15.1"
+	// CertManagerHetznerVersion is the helm-version of the cert-manager-hetzner-dns01-solver to install
 	CertManagerHetznerVersion = "1.3.1"
 
+	// K8sDashboardNamespace is the namespace where the kubernetes-dashboard is installed
 	K8sDashboardNamespace = "kubernetes-dashboard"
-	K8sDashboardVersion   = "3.0.0"
+	// K8sDashboardVersion is the helm-version of the kubernetes-dashboard to install
+	K8sDashboardVersion = "3.0.0"
 
+	// TraefikNamespace is the namespace where traefik is installed
 	TraefikNamespace = "traefik"
-	TraefikVersion   = "29.0.0"
-	TraefikImageTag  = "v3.1"
+	// TraefikVersion is the helm-version of traefik to install
+	TraefikVersion = "29.0.0"
+	// TraefikImageTag is the docker-image-tag of traefik to install
+	TraefikImageTag = "v3.1"
 )
 
 var (
+	// TraefikCrds is a list of all traefik crds
 	TraefikCrds = []string{
 		"crd/accesscontrolpolicies.hub.traefik.io",
 		"crd/apiaccesses.hub.traefik.io",
@@ -41,6 +51,7 @@ var (
 		"crd/tlsstores.traefik.io",
 		"crd/traefikservices.traefik.io",
 	}
+	// CertManagerCrds is a list of all cert-manager crds
 	CertManagerCrds = []string{
 		"crd/certificaterequests.cert-manager.io",
 		"crd/certificates.cert-manager.io",
@@ -51,6 +62,7 @@ var (
 	}
 )
 
+// kebapString converts a list of strings to a kebap-case string by joining them with a "-" (and removing all non-alphanumeric characters)
 func kebapString(parts ...string) string {
 	var res []string
 	re := regexp.MustCompile(`[^a-zA-Z0-9]+`)
@@ -61,17 +73,18 @@ func kebapString(parts ...string) string {
 	return strings.Join(res, "-")
 }
 
+// GetVars returns a map of variables that are used in the yaml-templates
 func GetVars(
-	ctx *cluster.Cluster,
+	conf *config.Config,
+	creds *credentials.ProjectCredentials,
 	network *hcloud.Network,
 	lb *hcloud.LoadBalancer,
 ) map[string]interface{} {
-	conf := ctx.Config
 	domain := conf.Domain
 
 	env := "staging"
 	server := "https://acme-staging-v02.api.letsencrypt.org/directory"
-	HetznerDNSToken := base64.StdEncoding.EncodeToString([]byte(ctx.Credentials.HetznerDNSToken))
+	HetznerDNSToken := base64.StdEncoding.EncodeToString([]byte(creds.HetznerDNSToken))
 
 	if conf.CertManager.Production {
 		env = "production"
@@ -90,7 +103,7 @@ func GetVars(
 		"PrivateKeySecretRef": kebapString(domain, env, "issuer"),
 
 		"HetznerDNSToken": HetznerDNSToken,
-		"HCloudToken":     ctx.Credentials.HCloudToken,
+		"HCloudToken":     creds.HCloudToken,
 
 		"Domain": domain,
 
@@ -107,7 +120,7 @@ func GetVars(
 		"TraefikNamespace":    TraefikNamespace,
 		"TraefikVersion":      TraefikVersion,
 		"TraefikImageTag":     TraefikImageTag,
-		"TraefikHost":         fmt.Sprintf("\\`traefik.%s\\`", ctx.Config.Domain),
+		"TraefikHost":         fmt.Sprintf("\\`traefik.%s\\`", domain),
 		"TraefikReplicaCount": 1,
 	}
 }

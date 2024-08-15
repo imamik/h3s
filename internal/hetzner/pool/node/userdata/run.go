@@ -4,7 +4,7 @@ import (
 	"h3s/internal/utils/template"
 )
 
-func generateRunCmdCommon(config CloudInitConfig) string {
+func generateRunCmdCommon(config CloudInitConfig) (string, error) {
 	return template.CompileTemplate(`
 # ensure that /var uses full available disk size, thanks to btrfs this is easy
 - [btrfs, 'filesystem', 'resize', 'max', '/var']

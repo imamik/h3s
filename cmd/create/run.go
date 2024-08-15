@@ -36,22 +36,24 @@ func runCreateCredentials(_ *cobra.Command, _ []string) error {
 // runCreateCluster creates a h3s cluster
 func runCreateCluster(_ *cobra.Command, _ []string) error {
 	// Load the cluster context
-	ctx, err := cluster.Context()
+	clr, err := cluster.Context()
 	if err != nil {
 		return err
 	}
 
 	// Create the cluster resources
-	hetzner.Create(ctx)
+	hetzner.Create(clr)
 
 	// Install k3s on the cluster
-	k3s.Install(ctx)
+	k3s.Install(clr)
 
 	// Install additional software on the cluster (traefik, cert-manager, csi etc.)
-	k8s.Install(ctx)
+	k8s.Install(clr)
+
+	k8s.SetServer(clr)
 
 	// Download the kubeconfig file
-	err = kubeconfig.Download(ctx)
+	err = kubeconfig.Download(clr)
 	if err != nil {
 		return err
 	}

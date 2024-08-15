@@ -14,7 +14,17 @@ type CloudInitConfig struct {
 	DNSServers        []string
 }
 
-func GenerateCloudInitConfig(config CloudInitConfig) string {
+func GenerateCloudInitConfig(config CloudInitConfig) (string, error) {
+	writeFilesCommon, err := generateWriteFilesCommon(config)
+	if err != nil {
+		return "", err
+	}
+
+	runCmdCommon, err := generateRunCmdCommon(config)
+	if err != nil {
+		return "", err
+	}
+
 	return template.CompileTemplate(`#cloud-config
 
 debug: True
@@ -56,7 +66,7 @@ runcmd:
 		"SSHMaxAuthTries":   config.SSHMaxAuthTries,
 		"K3sRegistries":     config.K3sRegistries,
 		"DNSServers":        config.DNSServers,
-		"WriteFilesCommon":  generateWriteFilesCommon(config),
-		"RunCmdCommon":      generateRunCmdCommon(config),
+		"WriteFilesCommon":  writeFilesCommon,
+		"RunCmdCommon":      runCmdCommon,
 	})
 }

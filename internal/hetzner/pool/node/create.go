@@ -51,7 +51,7 @@ func create(
 	networks := []*hcloud.Network{network}
 	sshKeys := []*hcloud.SSHKey{sshKey}
 
-	usrData := userdata.GenerateCloudInitConfig(userdata.CloudInitConfig{
+	usrData, err := userdata.GenerateCloudInitConfig(userdata.CloudInitConfig{
 		Hostname:        name,
 		SSHPort:         22,
 		SSHMaxAuthTries: 5,

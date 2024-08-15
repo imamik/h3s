@@ -5,7 +5,7 @@ import (
 	"h3s/internal/utils/template"
 )
 
-func PreInstallCommand(ctx *cluster.Cluster, configYaml string) string {
+func PreInstallCommand(ctx *cluster.Cluster, configYaml string) (string, error) {
 	return template.CompileTemplate(`
 set -ex
 

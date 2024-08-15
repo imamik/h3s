@@ -21,7 +21,7 @@ func getMinorVersion(version string) string {
 	}
 }
 
-func K3sInstall(ctx *cluster.Cluster, isControlPlane bool) string {
+func K3sInstall(ctx *cluster.Cluster, isControlPlane bool) (string, error) {
 	tpl := "curl -sfL https://get.k3s.io | INSTALL_K3S_SKIP_START=true INSTALL_K3S_SKIP_SELINUX_RPM=true INSTALL_K3S_CHANNEL={{ .InitialK3sChannel }} INSTALL_K3S_EXEC='{{ .ServerOrAgent }} {{ .K3sExecServerArgs }}' sh -"
 
 	k3sExecArgs := ""
@@ -38,7 +38,7 @@ func K3sInstall(ctx *cluster.Cluster, isControlPlane bool) string {
 	})
 }
 
-func K3sStartServer(initCluster bool) string {
+func K3sStartServer(initCluster bool) (string, error) {
 	until := `
 	until systemctl status k3s > /dev/null; do
 		systemctl start k3s 2> /dev/null
