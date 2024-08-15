@@ -13,7 +13,7 @@ import (
 )
 
 var (
-	Version = version.Create(0, 1, 0).String()
+	Version = version.New(0, 1, 0).String()
 )
 
 // Cmd represents the base command when called without any subcommands

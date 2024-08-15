@@ -99,7 +99,9 @@ func installComponents(clr *cluster.Cluster, gateway, remote *hcloud.Server, var
 		if err != nil {
 			return err
 		}
-		cmd = retryCommand(cmd, step.description)
+		if step.waitForCrds != nil || step.waitForNamespace != "" {
+			cmd = retryCommand(cmd, step.description)
+		}
 		if err := execute(clr, gateway, remote, cmd); err != nil {
 			return err
 		}

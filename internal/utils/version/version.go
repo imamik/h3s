@@ -8,7 +8,7 @@ type Version struct {
 	Patch int // Patch version number - bug fixes
 }
 
-func Create(major, minor, patch int) Version {
+func New(major, minor, patch int) Version {
 	return Version{
 		Major: major,
 		Minor: minor,

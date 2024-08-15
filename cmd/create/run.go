@@ -45,16 +45,22 @@ func runCreateCluster(_ *cobra.Command, _ []string) error {
 	hetzner.Create(clr)
 
 	// Install k3s on the cluster
-	k3s.Install(clr)
+	if err := k3s.Install(clr); err != nil {
+		return err
+	}
 
 	// Install additional software on the cluster (traefik, cert-manager, csi etc.)
-	k8s.Install(clr)
+	if err := k8s.Install(clr); err != nil {
+		return err
+	}
 
-	k8s.SetServer(clr)
+	// Set the k8s server host
+	if err := k8s.SetServer(clr); err != nil {
+		return err
+	}
 
 	// Download the kubeconfig file
-	err = kubeconfig.Download(clr)
-	if err != nil {
+	if err := kubeconfig.Download(clr); err != nil {
 		return err
 	}
 
