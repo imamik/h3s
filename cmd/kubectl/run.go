@@ -5,9 +5,9 @@ import (
 	"h3s/internal/cluster"
 	"h3s/internal/config/path"
 	"h3s/internal/utils/common"
+	"h3s/internal/utils/execute"
 	"h3s/internal/utils/file"
 	"h3s/internal/utils/kubectl"
-	"h3s/internal/utils/ssh"
 )
 
 // runKubectl proxies kubectl commands either directly with the kubeconfig if available or via SSH to the first control plane server
@@ -39,7 +39,7 @@ func runWithKubeConfig(kubeConfigPath string, args []string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	return ssh.ExecuteLocal(cmd)
+	return execute.Local(cmd)
 }
 
 func runWithSSH(ctx *cluster.Cluster, args []string) (string, error) {

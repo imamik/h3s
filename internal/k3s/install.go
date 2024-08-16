@@ -13,7 +13,7 @@ import (
 
 func getNetworkInterface(ctx *cluster.Cluster, proxy *hcloud.Server, remote *hcloud.Server) (string, error) {
 	cmd := "ip -o link show | awk '$2 != \"lo:\" {print $2}' | sed 's/://g' | head -n 1"
-	return ssh.ExecuteViaProxy(ctx, proxy, remote, cmd)
+	return ssh.ExecuteViaProxy(ctx.Config.SSHKeyPaths.PrivateKeyPath, proxy, remote, cmd)
 }
 
 func getServer(firstControlPlane *hcloud.Server) string {
@@ -82,11 +82,8 @@ func Install(ctx *cluster.Cluster) error {
 			return err
 		}
 
-		if _, err := ssh.ExecuteViaProxy(ctx, gate, n, cmd); err != nil {
-			return err
-		}
-
-		return nil
+		_, err = ssh.ExecuteViaProxy(ctx.Config.SSHKeyPaths.PrivateKeyPath, gate, n, cmd)
+		return err
 	}
 
 	for _, n := range nodes.ControlPlane {

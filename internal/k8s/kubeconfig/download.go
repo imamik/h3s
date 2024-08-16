@@ -49,7 +49,7 @@ func Download(ctx *cluster.Cluster) error {
 func get(ctx *cluster.Cluster, proxy *hcloud.Server, remote *hcloud.Server) (*KubeConfig, error) {
 	// Get the kubeconfig from the remote server
 	cmd := "sudo cat /etc/rancher/k3s/k3s.yaml"
-	kubeConfigStr, err := ssh.ExecuteViaProxy(ctx, proxy, remote, cmd)
+	kubeConfigStr, err := ssh.ExecuteViaProxy(ctx.Config.SSHKeyPaths.PrivateKeyPath, proxy, remote, cmd)
 	if err != nil {
 		return nil, err
 	}

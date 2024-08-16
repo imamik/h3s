@@ -21,6 +21,6 @@ func SetServer(clr *cluster.Cluster) error {
 	if err != nil {
 		return err
 	}
-	_, err = ssh.ExecuteViaProxy(clr, gatewayNode, firstControlPlane, cmd)
+	_, err = ssh.ExecuteViaProxy(clr.Config.SSHKeyPaths.PrivateKeyPath, gatewayNode, firstControlPlane, cmd)
 	return err
 }

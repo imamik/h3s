@@ -1,11 +1,11 @@
 package components
 
 import (
-	"encoding/base64"
 	"fmt"
 	"github.com/hetznercloud/hcloud-go/v2/hcloud"
 	"h3s/internal/config"
 	"h3s/internal/config/credentials"
+	"h3s/internal/utils/encode"
 	"regexp"
 	"strings"
 )
@@ -84,7 +84,6 @@ func GetVars(
 
 	env := "staging"
 	server := "https://acme-staging-v02.api.letsencrypt.org/directory"
-	HetznerDNSToken := base64.StdEncoding.EncodeToString([]byte(creds.HetznerDNSToken))
 
 	if conf.CertManager.Production {
 		env = "production"
@@ -102,7 +101,7 @@ func GetVars(
 		"Email":               conf.CertManager.Email,
 		"PrivateKeySecretRef": kebapString(domain, env, "issuer"),
 
-		"HetznerDNSToken": HetznerDNSToken,
+		"HetznerDNSToken": encode.ToBase64(creds.HetznerDNSToken),
 		"HCloudToken":     creds.HCloudToken,
 
 		"Domain": domain,

@@ -25,7 +25,7 @@ func Create(ctx *cluster.Cluster) *hcloud.Server {
 }
 
 func configureGateway(ctx *cluster.Cluster, gateway *hcloud.Server) {
-	ssh.ExecuteWithSsh(ctx, gateway, `
+	ssh.ExecuteWithSsh(ctx.Config.SSHKeyPaths.PrivateKeyPath, gateway, `
 echo 1 > /proc/sys/net/ipv4/ip_forward
 iptables -t nat -A POSTROUTING -s '10.0.0.0/16' -o eth0 -j MASQUERADE
 	`)

@@ -3,17 +3,18 @@ package ping
 import (
 	"fmt"
 	"github.com/hetznercloud/hcloud-go/v2/hcloud"
+	"h3s/internal/utils/execute"
+	"h3s/internal/utils/ip"
 	"h3s/internal/utils/logger"
-	"os/exec"
 	"time"
 )
 
 // Ping pings the server every 5 seconds until it is available.
 func Ping(server *hcloud.Server, timeout time.Duration) {
-	ip := server.PublicNet.IPv4.IP.String()
+	ipAddress := ip.FirstAvailable(server)
 
 	for {
-		if isServerAvailable(ip) {
+		if isServerAvailable(ipAddress) {
 			logger.LogResourceEvent(logger.Server, "Available", server.Name, logger.Success)
 			break
 		}
@@ -26,7 +27,7 @@ func Ping(server *hcloud.Server, timeout time.Duration) {
 
 // isServerAvailable uses the system ping command to check if the server is available.
 func isServerAvailable(ip string) bool {
-	cmd := exec.Command("ping", "-c", "1", ip)
-	err := cmd.Run()
+	cmd := fmt.Sprintf("ping -c 1 %s", ip)
+	_, err := execute.Local(cmd)
 	return err == nil
 }

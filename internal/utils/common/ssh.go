@@ -8,7 +8,8 @@ import (
 )
 
 func SSH(ctx *cluster.Cluster, cmd string) (string, error) {
-	gate, err := gateway.Get(ctx)
+	// Get the gateway
+	gate, err := gateway.GetIfNeeded(ctx)
 	if err != nil {
 		return "", err
 	}
@@ -21,7 +22,7 @@ func SSH(ctx *cluster.Cluster, cmd string) (string, error) {
 	firstControlPlane := nodes.ControlPlane[0]
 
 	// Execute the command on the first control plane node
-	res, err := ssh.ExecuteViaProxy(ctx, gate, firstControlPlane, cmd)
+	res, err := ssh.ExecuteViaProxy(ctx.Config.SSHKeyPaths.PrivateKeyPath, gate, firstControlPlane, cmd)
 	if err != nil {
 		return "", err
 	}

@@ -6,7 +6,7 @@ import (
 	"h3s/internal/cluster"
 	"h3s/internal/k8s"
 	"h3s/internal/k8s/kubeconfig"
-	"os/exec"
+	"h3s/internal/utils/execute"
 )
 
 // runGetKubeConfig gets the kubeconfig for the h3s cluster
@@ -33,10 +33,8 @@ func runGetToken(cmd *cobra.Command, _ []string) error {
 	}
 
 	// Build the command to copy the bearer token to the clipboard
-	copyCmd := exec.Command("sh", "-c", fmt.Sprintf("printf '%%s' \"%s\" | pbcopy", b))
-
-	// Run the command
-	if err := copyCmd.Run(); err != nil {
+	localCmd := fmt.Sprintf("printf '%%s' \"%s\" | pbcopy", b)
+	if _, err := execute.Local(localCmd); err != nil {
 		cmd.PrintErrf("Failed to copy bearer token to clipboard: %v\n", err)
 		return err
 	}

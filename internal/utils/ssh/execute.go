@@ -4,30 +4,25 @@ import (
 	"fmt"
 	"github.com/hetznercloud/hcloud-go/v2/hcloud"
 	"golang.org/x/crypto/ssh"
-	"h3s/internal/cluster"
 	"h3s/internal/utils/ip"
 	"log"
-	"os/exec"
 	"strings"
 	"time"
 )
 
-func ExecuteLocal(command string) (string, error) {
-	cmd := exec.Command("sh", "-c", command)
-	output, err := cmd.CombinedOutput()
-	return string(output), err
-}
-
+// ExecuteWithSsh executes a command on a remote server using SSH
 func ExecuteWithSsh(
-	ctx *cluster.Cluster,
+	privateSshKeyPath string,
 	remote *hcloud.Server,
 	command string,
 ) (string, error) {
 	remoteIp := ip.FirstAvailable(remote)
-	removeKnownHostsEntry(remoteIp)
+	if err := removeKnownHostsEntry(remoteIp); err != nil {
+		return "", err
+	}
 
 	// SSH client configuration
-	sshConfig, err := ConfigSsh(ctx)
+	sshConfig, err := getConfig(privateSshKeyPath)
 	if err != nil {
 		return "", fmt.Errorf("unable to create SSH config: %w", err)
 	}
@@ -38,33 +33,41 @@ func ExecuteWithSsh(
 		log.Fatalf("Failed to dial: %s", err)
 	}
 
-	res, err := Run(client, command)
+	// Run the command
+	res, err := run(client, command)
 	if err != nil {
 		return "", err
 	}
 
-	return res, nil
+	return strings.TrimSpace(res), nil
 }
 
+// ExecuteViaProxy executes a command on a remote server using a gateway server
 func ExecuteViaProxy(
-	ctx *cluster.Cluster,
+	privateSshKeyPath string,
 	gateway *hcloud.Server,
 	remote *hcloud.Server,
 	command string,
 ) (string, error) {
+	// If the gateway is nil, execute the command directly on the remote server
 	if gateway == nil {
-		return ExecuteWithSsh(ctx, remote, command)
+		return ExecuteWithSsh(privateSshKeyPath, remote, command)
 	}
 
+	// Find the first available IP address of the gateway and the remote server
 	proxyIp := ip.FirstAvailable(gateway)
 	remoteIp := ip.FirstAvailable(remote)
-	removeKnownHostsEntry(proxyIp)
+	if err := removeKnownHostsEntry(proxyIp); err != nil {
+		return "", err
+	}
 
-	sshConfig, err := ConfigSsh(ctx)
+	// SSH client configuration
+	sshConfig, err := getConfig(privateSshKeyPath)
 	if err != nil {
 		return "", fmt.Errorf("unable to create SSH config: %w", err)
 	}
 
+	// Connect to the gateway
 	proxyConn, err := dialWithRetries(proxyIp, sshConfig, 5*time.Second, 5)
 	if err != nil {
 		return "", fmt.Errorf("unable to connect to gateway: %w", err)
@@ -76,22 +79,24 @@ func ExecuteViaProxy(
 		}
 	}(proxyConn)
 
+	// Create a tunnel to the remote server
 	tunnel, err := proxyConn.Dial("tcp", remoteIp+":22")
 	if err != nil {
 		return "", fmt.Errorf("unable to create tunnel to remote: %w", err)
 	}
 
+	// Connect to the remote server through the tunnel
 	clientConn, chans, reqs, err := ssh.NewClientConn(tunnel, remoteIp+":22", sshConfig)
 	if err != nil {
 		return "", fmt.Errorf("unable to establish connection to remote: %w", err)
 	}
 	client := ssh.NewClient(clientConn, chans, reqs)
 
-	res, err := Run(client, command)
+	// Run the command
+	res, err := run(client, command)
 	if err != nil {
 		return "", err
 	}
 
 	return strings.TrimSpace(res), nil
-
 }

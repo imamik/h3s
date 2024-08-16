@@ -45,7 +45,7 @@ func execute(
 		time.Sleep(waitTime)
 	}
 
-	_, err := ssh.ExecuteWithSsh(ctx, server, cmd)
+	_, err := ssh.ExecuteWithSsh(ctx.Config.SSHKeyPaths.PrivateKeyPath, server, cmd)
 	if err != nil {
 		logger.LogResourceEvent(logger.Server, "Execute", server.Name, logger.Failure, err)
 		return

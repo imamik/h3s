@@ -33,13 +33,6 @@ func Install(clr *cluster.Cluster) error {
 	return installComponents(clr, gatewayNode, firstControlPlane, vars)
 }
 
-func execute(clr *cluster.Cluster, gateway, remote *hcloud.Server, cmd string) error {
-	if _, err := ssh.ExecuteViaProxy(clr, gateway, remote, cmd); err != nil {
-		return fmt.Errorf("command execution failed: %w", err)
-	}
-	return nil
-}
-
 func retryCommand(command string, description string) string {
 	return fmt.Sprintf(`
 echo "Waiting for %s"
@@ -102,8 +95,8 @@ func installComponents(clr *cluster.Cluster, gateway, remote *hcloud.Server, var
 		if step.waitForCrds != nil || step.waitForNamespace != "" {
 			cmd = retryCommand(cmd, step.description)
 		}
-		if err := execute(clr, gateway, remote, cmd); err != nil {
-			return err
+		if _, err := ssh.ExecuteViaProxy(clr.Config.SSHKeyPaths.PrivateKeyPath, gateway, remote, cmd); err != nil {
+			return fmt.Errorf("command execution failed: %w", err)
 		}
 	}
 

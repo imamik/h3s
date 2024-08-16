@@ -55,9 +55,9 @@ func runCreateCluster(_ *cobra.Command, _ []string) error {
 	}
 
 	// Set the k8s server host
-	if err := k8s.SetServer(clr); err != nil {
-		return err
-	}
+	//if err := k8s.SetServer(clr); err != nil {
+	//	return err
+	//}
 
 	// Download the kubeconfig file
 	if err := kubeconfig.Download(clr); err != nil {

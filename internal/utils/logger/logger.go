@@ -7,16 +7,17 @@ import (
 )
 
 var (
-	logOnlyLatest = true
-	logLive       = false
+	logOnlyLatest = true  // logOnlyLatest determines if only the latest event should be logged
+	logLive       = false // logLive determines if events should be logged live or stacked until explicitly logged
 )
 
 const (
-	COLOR_GREEN = "\033[32m"
-	COLOR_RED   = "\033[31m"
-	COLOR_RESET = "\033[0m"
+	ColorGreen = "\033[32m" // ColorGreen is the color code to print green in the terminal
+	ColorRed   = "\033[31m" // ColorRed is the color code to print red in the terminal
+	ColorReset = "\033[0m"  // ColorReset is the color code to reset the terminal color
 )
 
+// normalize returns a string with a fixed length
 func normalize(s string, l int) string {
 	if len(s) > l-3 {
 		return s[:l-3] + "..."
@@ -24,10 +25,12 @@ func normalize(s string, l int) string {
 	return s + strings.Repeat(" ", l-len(s))
 }
 
+// LogError prints an error message to the console
 func LogError(err ...any) {
 	log.Println(err...)
 }
 
+// NewEventLogger creates a new logger
 func NewEventLogger(resource LogResource, action interface{}, id string) (AddEventFunc, LogFunc) {
 	var events []ResourceEvent
 	addEvent := AddEventFunc(func(status LogCrudStatus, err ...any) {
@@ -55,6 +58,8 @@ func NewEventLogger(resource LogResource, action interface{}, id string) (AddEve
 	addEvent(Initialized)
 	return addEvent, logEvents
 }
+
+// LogResourceEvent logs a resource event
 func LogResourceEvent(
 	resource LogResource,
 	action interface{},
@@ -89,9 +94,9 @@ func LogResourceEvent(
 
 	switch status {
 	case Success:
-		log.Println(COLOR_GREEN + fmt.Sprint(logLine...) + COLOR_RESET)
+		log.Println(ColorGreen + fmt.Sprint(logLine...) + ColorReset)
 	case Failure:
-		log.Println(COLOR_RED + fmt.Sprint(logLine...) + COLOR_RESET)
+		log.Println(ColorRed + fmt.Sprint(logLine...) + ColorReset)
 	default:
 		log.Println(logLine...)
 	}
