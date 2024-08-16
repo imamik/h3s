@@ -85,12 +85,12 @@ func installComponents(clr *cluster.Cluster, gateway, remote *hcloud.Server, var
 			step.description = fmt.Sprintf("Apply Component %s", step.description)
 		}
 		if step.waitForNamespace != "" {
-			kubectlCmd = kubectl.New().GetResource(step.waitForNamespace)
-			step.description = fmt.Sprintf("Wait for Namespace %s", step.waitForNamespace)
+			kubectlCmd = kubectl.New().GetResource("namespace " + step.waitForNamespace).DevNull()
+			step.description = fmt.Sprintf("Wait for Namespace %s", step.description)
 		}
 		if step.waitForCrds != nil {
-			kubectlCmd = kubectl.New().WaitForEstablished(step.waitForCrds...)
-			step.description = fmt.Sprintf("Wait for %v", step.waitForCrds)
+			kubectlCmd = kubectl.New().WaitForEstablished(step.waitForCrds...).DevNull()
+			step.description = fmt.Sprintf("Wait for %v", step.description)
 		}
 		if kubectlCmd == nil {
 			return fmt.Errorf("no command to execute")

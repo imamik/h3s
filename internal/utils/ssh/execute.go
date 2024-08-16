@@ -8,6 +8,7 @@ import (
 	"h3s/internal/utils/ip"
 	"log"
 	"os/exec"
+	"strings"
 	"time"
 )
 
@@ -91,6 +92,6 @@ func ExecuteViaProxy(
 		return "", err
 	}
 
-	return res, nil
+	return strings.TrimSpace(res), nil
 
 }

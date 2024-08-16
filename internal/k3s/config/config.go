@@ -1,7 +1,12 @@
 package config
 
-// K3sServerConfig represents the configuration options for k3s server command
-type K3sServerConfig struct {
+// CommonConfig represents the configuration options for k3s agents and servers
+type CommonConfig struct {
+	// Cluster Join
+	Token     string `yaml:"token,omitempty"`      // Token to use for authentication
+	TokenFile string `yaml:"token-file,omitempty"` // Token file to use for authentication
+	Server    string `yaml:"server,omitempty"`     // Server to connect to
+
 	// Config and Logging
 	ConfigFile      string `yaml:"config,omitempty"`          // Load configuration from FILE (default: "/etc/rancher/k3s/config.yaml")
 	Debug           bool   `yaml:"debug,omitempty"`           // Turn on debug logs
@@ -10,15 +15,64 @@ type K3sServerConfig struct {
 	LogFile         string `yaml:"log,omitempty"`             // Log to file
 	AlsoLogToStderr bool   `yaml:"alsologtostderr,omitempty"` // Log to standard error as well as file (if set)
 
+	// Data Directory
+	DataDir string `yaml:"data-dir,omitempty"` // Folder to hold state (default: "/var/lib/rancher/k3s")
+
+	// Node Configuration
+	NodeName   string   `yaml:"node-name,omitempty"`    // Node name
+	WithNodeID bool     `yaml:"with-node-id,omitempty"` // Append id to node name
+	NodeLabel  []string `yaml:"node-label,omitempty"`   // Registering and starting kubelet with set of labels
+	NodeTaint  []string `yaml:"node-taint,omitempty"`   // Registering kubelet with set of taints
+
+	// Security
+	SELinux               bool `yaml:"selinux,omitempty"`                 // Enable SELinux in containerd
+	ProtectKernelDefaults bool `yaml:"protect-kernel-defaults,omitempty"` // Kernel tuning behavior. If set, error if kernel tunables are different than kubelet defaults.
+
+	// Agent Networking
+	NodeIP         []string `yaml:"node-ip,omitempty"`          // IPv4/IPv6 addresses to advertise for node
+	NodeExternalIP []string `yaml:"node-external-ip,omitempty"` // IPv4/IPv6 external IP addresses to advertise for node
+	ResolvConf     string   `yaml:"resolv-conf,omitempty"`      // Kubelet resolv.conf file
+	FlannelIface   string   `yaml:"flannel-iface,omitempty"`    // Override default flannel interface
+	FlannelConf    string   `yaml:"flannel-conf,omitempty"`     // Override default flannel config file
+	FlannelCNIConf string   `yaml:"flannel-cni-conf,omitempty"` // Override default flannel cni config file
+
+	// Agent Flags
+	KubeletArg []string `yaml:"kubelet-arg,omitempty"` // Customized flag for kubelet process
+
+	// Load Balancer
+	LBServerPort int `yaml:"lb-server-port,omitempty"` // Local port for supervisor client load-balancer (default: 6444)
+
+	// Experimental Features
+	Rootless         bool `yaml:"rootless,omitempty"`           // Run rootless
+	PreferBundledBin bool `yaml:"prefer-bundled-bin,omitempty"` // Prefer bundled userspace binaries over host binaries
+}
+
+// AgentConfig represents the configuration options for k3s agent command
+type AgentConfig struct {
+	CommonConfig `yaml:",inline"`
+
+	// Node Configuration
+	ImageCredentialProviderBinDir string `yaml:"image-credential-provider-bin-dir,omitempty"` // The path to the directory where credential provider plugin binaries are located (default: "/var/lib/rancher/credentialprovider/bin")
+	ImageCredentialProviderConfig string `yaml:"image-credential-provider-config,omitempty"`  // The path to the credential provider plugin config file (default: "/var/lib/rancher/credentialprovider/config.yaml")
+
+	// Runtime Configuration
+	ContainerRuntimeEndpoint string `yaml:"container-runtime-endpoint,omitempty"` // Disable embedded containerd and use the CRI socket at the given path; when used with --docker this sets the docker socket path
+	PauseImage               string `yaml:"pause-image,omitempty"`                // Customized pause image for containerd or docker sandbox (default: "rancher/mirrored-pause:3.6")
+	Snapshotter              string `yaml:"snapshotter,omitempty"`                // Override default containerd snapshotter (default: "overlayfs")
+	PrivateRegistry          string `yaml:"private-registry,omitempty"`           // Private registry configuration file (default: "/etc/rancher/k3s/registries.yaml")
+	Docker                   bool   `yaml:"docker,omitempty"`                     // (experimental) Use cri-dockerd instead of containerd
+}
+
+// ServerConfig represents the configuration options for k3s server command
+type ServerConfig struct {
+	CommonConfig `yaml:",inline"`
+
 	// Listener Configuration
 	BindAddress      string   `yaml:"bind-address,omitempty"`      // k3s bind address (default: 0.0.0.0)
 	HTTPSListenPort  int      `yaml:"https-listen-port,omitempty"` // HTTPS listen port (default: 6443)
 	AdvertiseAddress string   `yaml:"advertise-address,omitempty"` // IPv4 address that apiserver uses to advertise to members of the cluster (default: node-external-ip/node-ip)
 	AdvertisePort    int      `yaml:"advertise-port,omitempty"`    // Port that apiserver uses to advertise to members of the cluster (default: listen-port) (default: 0)
 	TLSSAN           []string `yaml:"tls-san,omitempty"`           // Add additional hostnames or IPv4/IPv6 addresses as Subject Alternative Names on the server TLS cert
-
-	// data Directory
-	DataDir string `yaml:"data-dir,omitempty"` // Folder to hold state (default: /var/lib/rancher/k3s or ${HOME}/.rancher/k3s if not root)
 
 	// Networking Configuration
 	ClusterCIDR          string `yaml:"cluster-cidr,omitempty"`            // IPv4/IPv6 network CIDRs to use for pod IPs (default: 10.42.0.0/16)
@@ -37,11 +91,8 @@ type K3sServerConfig struct {
 	WriteKubeconfigMode string `yaml:"write-kubeconfig-mode,omitempty"` // Write kubeconfig with this mode
 
 	// Cluster Join
-	Token          string `yaml:"token,omitempty"`            // Shared secret used to join a server or agent to a cluster
-	TokenFile      string `yaml:"token-file,omitempty"`       // File containing the token
 	AgentToken     string `yaml:"agent-token,omitempty"`      // Shared secret used to join agents to the cluster, but not servers
 	AgentTokenFile string `yaml:"agent-token-file,omitempty"` // File containing the agent secret
-	Server         string `yaml:"server,omitempty"`           // Server to connect to, used to join a cluster
 
 	// Cluster Management
 	ClusterInit             bool   `yaml:"cluster-init,omitempty"`               // Initialize a new cluster using embedded Etcd
@@ -92,46 +143,9 @@ type K3sServerConfig struct {
 	DisableNetworkPolicy   bool     `yaml:"disable-network-policy,omitempty"`   // Disable k3s default network policy controller
 	DisableHelmController  bool     `yaml:"disable-helm-controller,omitempty"`  // Disable Helm controller
 
-	// Node Configuration
-	NodeName   string   `yaml:"node-name,omitempty"`    // Node name
-	WithNodeID bool     `yaml:"with-node-id,omitempty"` // Append id to node name
-	NodeLabel  []string `yaml:"node-label,omitempty"`   // Registering and starting kubelet with set of labels
-	NodeTaint  []string `yaml:"node-taint,omitempty"`   // Registering kubelet with set of taints
-
-	// Image Credential Provider
-	ImageCredentialProviderBinDir string `yaml:"image-credential-provider-bin-dir,omitempty"` // The path to the directory where credential provider plugin binaries are located (default: "/var/lib/rancher/credentialprovider/bin")
-	ImageCredentialProviderConfig string `yaml:"image-credential-provider-config,omitempty"`  // The path to the credential provider plugin config file (default: "/var/lib/rancher/credentialprovider/config.yaml")
-
-	// Runtime Configuration
-	Docker                   bool   `yaml:"docker,omitempty"`                     // (experimental) Use cri-dockerd instead of containerd
-	ContainerRuntimeEndpoint string `yaml:"container-runtime-endpoint,omitempty"` // Disable embedded containerd and use the CRI socket at the given path; when used with --docker this sets the docker socket path
-	PauseImage               string `yaml:"pause-image,omitempty"`                // Customized pause image for containerd or docker sandbox (default: "rancher/mirrored-pause:3.6")
-	Snapshotter              string `yaml:"snapshotter,omitempty"`                // Override default containerd snapshotter (default: "overlayfs")
-	PrivateRegistry          string `yaml:"private-registry,omitempty"`           // Private registry configuration file (default: "/etc/rancher/k3s/registries.yaml")
-	SystemDefaultRegistry    string `yaml:"system-default-registry,omitempty"`    // Private registry to be used for all system images
-
-	// Agent Networking
-	NodeIP         []string `yaml:"node-ip,omitempty"`          // IPv4/IPv6 addresses to advertise for node
-	NodeExternalIP []string `yaml:"node-external-ip,omitempty"` // IPv4/IPv6 external IP addresses to advertise for node
-	ResolvConf     string   `yaml:"resolv-conf,omitempty"`      // Kubelet resolv.conf file
-	FlannelIface   string   `yaml:"flannel-iface,omitempty"`    // Override default flannel interface
-	FlannelConf    string   `yaml:"flannel-conf,omitempty"`     // Override default flannel config file
-	FlannelCNIConf string   `yaml:"flannel-cni-conf,omitempty"` // Override default flannel cni config file
-
-	// Agent Flags
-	KubeletArg   []string `yaml:"kubelet-arg,omitempty"`    // Customized flag for kubelet process
-	KubeProxyArg []string `yaml:"kube-proxy-arg,omitempty"` // Customized flag for kube-proxy process
-
 	// Security
-	ProtectKernelDefaults bool `yaml:"protect-kernel-defaults,omitempty"` // Kernel tuning behavior. If set, error if kernel tunables are different than kubelet defaults.
-	SecretsEncryption     bool `yaml:"secrets-encryption,omitempty"`      // Enable secret encryption at rest
-	SELinux               bool `yaml:"selinux,omitempty"`                 // Enable SELinux in containerd
+	SecretsEncryption bool `yaml:"secrets-encryption,omitempty"` // Enable secret encryption at rest
 
 	// Experimental Features
-	EnablePprof      bool `yaml:"enable-pprof,omitempty"`       // Enable pprof endpoint on supervisor port
-	Rootless         bool `yaml:"rootless,omitempty"`           // Run rootless
-	PreferBundledBin bool `yaml:"prefer-bundled-bin,omitempty"` // Prefer bundled userspace binaries over host binaries
-
-	// Load Balancer
-	LBServerPort int `yaml:"lb-server-port,omitempty"` // Local port for supervisor client load-balancer (default: 6444)
+	EnablePprof bool `yaml:"enable-pprof,omitempty"` // Enable pprof endpoint on supervisor port
 }

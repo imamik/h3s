@@ -1,11 +1,10 @@
-package commands
+package config
 
 import (
-	"h3s/internal/cluster"
 	"h3s/internal/utils/template"
 )
 
-func PreInstallCommand(ctx *cluster.Cluster, configYaml string) (string, error) {
+func preInstall(publicIps bool, configYaml string) (string, error) {
 	return template.CompileTemplate(`
 set -ex
 
@@ -37,6 +36,14 @@ timeout 180s /bin/sh -c 'while ! ping -c 1 {{ .Address }} >/dev/null 2>&1; do ec
 `, map[string]interface{}{
 		"ConfigYaml":         configYaml,
 		"Address":            "cloudflare.com",
-		"OnlyPrivateNetwork": ctx.Config.PublicIps == false,
+		"OnlyPrivateNetwork": publicIps,
 	})
+}
+
+func postInstall() string {
+	return "restorecon -v /usr/local/bin/k3s"
+}
+
+func SeLinux() string {
+	return "/sbin/semodule -v -i /usr/share/selinux/packages/k3s.pp"
 }

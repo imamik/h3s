@@ -4,35 +4,54 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"net/http"
 	"strings"
 	"time"
 )
 
 const (
+	// k3sReleasesURL is the URL to fetch k3s releases from
 	k3sReleasesURL = "https://api.github.com/repos/k3s-io/k3s/releases"
-	rc             = "Release Candidate"
-	stable         = "Stable"
+	// rc is the string representation of a release candidate
+	rc = "Release Candidate"
+	// stable is the string representation of a stable release
+	stable = "Stable"
 )
 
+// Release represents a k3s release as returned by the GitHub API
 type Release struct {
-	Name        string    `json:"name"`
-	Prerelease  bool      `json:"prerelease"`
-	Draft       bool      `json:"draft"`
+	// Name is the name of the release
+	Name string `json:"name"`
+	// Prerelease is true if the release is a release candidate
+	Prerelease bool `json:"prerelease"`
+	// Draft is true if the release is a draft
+	Draft bool `json:"draft"`
+	// PublishedAt is the time the release was published
 	PublishedAt time.Time `json:"published_at"`
 }
 
+// getAllReleases fetches all k3s releases from the GitHub API
 func getAllReleases() ([]Release, error) {
+	// Fetch releases from the GitHub API
 	res, err := http.Get(k3sReleasesURL)
 	if err != nil {
 		return nil, err
 	}
-	defer res.Body.Close()
+
+	// Close the response body when the function returns
+	defer func(Body io.ReadCloser) {
+		err := Body.Close()
+		if err != nil {
+			fmt.Println("Error closing response body")
+		}
+	}(res.Body)
 
 	if res.StatusCode != http.StatusOK {
 		return nil, errors.New("failed to fetch releases")
 	}
 
+	// Decode the response body into a slice of Release structs
 	var releases []Release
 	if err := json.NewDecoder(res.Body).Decode(&releases); err != nil {
 		return nil, err
@@ -41,6 +60,7 @@ func getAllReleases() ([]Release, error) {
 	return releases, nil
 }
 
+// GetFilteredReleases fetches all k3s releases from the GitHub API and then filters them based on the provided flags
 func GetFilteredReleases(prerelease bool, stable bool, limit int) ([]Release, error) {
 	releases, err := getAllReleases()
 	if err != nil {
