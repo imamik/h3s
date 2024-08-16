@@ -44,7 +44,7 @@ func Destroy(ctx *cluster.Cluster) error {
 
 	wg.Wait() // Wait for all deletions to complete
 
-	err := file.New("./k3s.yaml").Delete()
+	err := file.New("./h3s-kubeconfig.yaml").Delete()
 	if err != nil {
 		return err // Ignore error
 	}

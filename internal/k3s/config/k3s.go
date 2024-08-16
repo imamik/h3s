@@ -20,6 +20,7 @@ func getMinorVersion(version string) string {
 	}
 }
 
+// K3sInstall generates a command to install k3s with the specified version and role (control plane or agent).
 func K3sInstall(k3sVersion string, isControlPlane bool) (string, error) {
 	tpl := "curl -sfL https://get.k3s.io | INSTALL_K3S_SKIP_START=true INSTALL_K3S_SKIP_SELINUX_RPM=true INSTALL_K3S_CHANNEL={{ .InitialK3sChannel }} INSTALL_K3S_EXEC='{{ .ServerOrAgent }} {{ .K3sExecServerArgs }}' sh -"
 
@@ -37,7 +38,8 @@ func K3sInstall(k3sVersion string, isControlPlane bool) (string, error) {
 	})
 }
 
-func K3sStartServer(initCluster bool) (string, error) {
+// K3sStartControlPlane generates a script to start the k3s control plane and wait for it to be ready.
+func K3sStartControlPlane(initCluster bool) (string, error) {
 	until := `
 	until systemctl status k3s > /dev/null; do
 		systemctl start k3s 2> /dev/null
@@ -72,6 +74,7 @@ EOF
 	})
 }
 
+// K3sStartAgent starts the k3s agent service and waits for it to be ready.
 func K3sStartAgent() string {
 	return `
 systemctl start k3s-agent 2> /dev/null

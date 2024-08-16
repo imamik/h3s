@@ -45,6 +45,11 @@ func (c *Command) String() (string, error) {
 	return strings.Join(c.args, " "), nil
 }
 
+func (c *Command) Namespace(namespace string) *Command {
+	c.AddArgs("-n", namespace)
+	return c
+}
+
 func (c *Command) ApplyTemplate(tpl string, data map[string]interface{}) *Command {
 	content, err := template.CompileTemplate(tpl, data)
 	if err != nil {

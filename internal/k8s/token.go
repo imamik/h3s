@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"h3s/internal/cluster"
 	"h3s/internal/utils/common"
+	"h3s/internal/utils/kubectl"
 	"strings"
 )
 
@@ -11,7 +12,14 @@ import (
 func Token(ctx *cluster.Cluster, namespace string, user string, hours int) (string, error) {
 	// Create the command to execute on the remote server
 	duration := fmt.Sprintf("%dh", hours)
-	cmd := fmt.Sprintf("kubectl -n %s create token %s --duration=%s", namespace, user, duration)
+	cmd, err := kubectl.
+		New().
+		Namespace(namespace).
+		AddArgs("create", "token", user, fmt.Sprintf("--duration=%s", duration)).
+		String()
+	if err != nil {
+		return "", err
+	}
 
 	// Execute the command on the remote server
 	bearer, err := common.SSH(ctx, cmd)

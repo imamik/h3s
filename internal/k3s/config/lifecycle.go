@@ -40,10 +40,11 @@ timeout 180s /bin/sh -c 'while ! ping -c 1 {{ .Address }} >/dev/null 2>&1; do ec
 	})
 }
 
+// postInstall sets up SELinux policies for the k3s binary.
+// It restores the security context of the k3s binary and installs the SELinux module for k3s.
 func postInstall() string {
-	return "restorecon -v /usr/local/bin/k3s"
-}
-
-func SeLinux() string {
-	return "/sbin/semodule -v -i /usr/share/selinux/packages/k3s.pp"
+	return `
+restorecon -v /usr/local/bin/k3s
+/sbin/semodule -v -i /usr/share/selinux/packages/k3s.pp
+`
 }
