@@ -1,6 +1,7 @@
 package placementgroup
 
 import (
+	"errors"
 	"github.com/hetznercloud/hcloud-go/v2/hcloud"
 	"h3s/internal/cluster"
 	"h3s/internal/config"
@@ -10,17 +11,23 @@ import (
 func Get(
 	ctx *cluster.Cluster,
 	pool config.NodePool,
-) *hcloud.PlacementGroup {
+) (*hcloud.PlacementGroup, error) {
 	name := getName(ctx, pool)
-	addEvent, logEvents := logger.NewEventLogger(logger.PlacementGroup, logger.Get, name)
-	defer logEvents()
+
+	l := logger.New(nil, logger.PlacementGroup, logger.Get, name)
+	defer l.LogEvents()
 
 	placementGroup, _, err := ctx.CloudClient.PlacementGroup.GetByName(ctx.Context, name)
-	if err != nil || placementGroup == nil {
-		addEvent(logger.Failure, err)
-		return nil
+	if err != nil {
+		l.AddEvent(logger.Failure, err)
+		return nil, err
+	}
+	if placementGroup == nil {
+		err = errors.New("placement group is nil")
+		l.AddEvent(logger.Failure, err)
+		return nil, err
 	}
 
-	addEvent(logger.Success)
-	return placementGroup
+	l.AddEvent(logger.Success)
+	return placementGroup, nil
 }

@@ -1,54 +1,69 @@
 package network
 
 import (
+	"errors"
 	"github.com/hetznercloud/hcloud-go/v2/hcloud"
 	"h3s/internal/cluster"
-	"h3s/internal/utils/ip"
 	"h3s/internal/utils/logger"
+	"net"
 )
 
-func Create(ctx *cluster.Cluster) *hcloud.Network {
-	network := Get(ctx)
-	if network == nil {
-		network = create(ctx)
+func Create(ctx *cluster.Cluster) (*hcloud.Network, error) {
+	network, err := Get(ctx)
+	if network != nil && err == nil {
+		return network, nil
 	}
-	return network
+	return create(ctx)
 }
 
-func create(ctx *cluster.Cluster) *hcloud.Network {
+func create(ctx *cluster.Cluster) (*hcloud.Network, error) {
 	networkName := getName(ctx)
 
-	addEvent, logEvents := logger.NewEventLogger(logger.Network, logger.Create, networkName)
-	defer logEvents()
+	l := logger.New(nil, logger.Network, logger.Create, networkName)
+	defer l.LogEvents()
 
+	_, ipRange, err := net.ParseCIDR("10.0.0.0/16")
+	if err != nil {
+		return nil, err
+	}
 	network, _, err := ctx.CloudClient.Network.Create(ctx.Context, hcloud.NetworkCreateOpts{
 		Name:    networkName,
-		IPRange: ip.GetIpRange("10.0.0.0/16"),
+		IPRange: ipRange,
 		Labels:  ctx.GetLabels(),
 	})
-	if err != nil || network == nil {
-		addEvent(logger.Failure, err)
-		return nil
+	if err != nil {
+		l.AddEvent(logger.Failure, err)
+		return nil, err
+	}
+	if network == nil {
+		err = errors.New("network is nil")
+		l.AddEvent(logger.Failure, err)
+		return nil, err
 	}
 
-	addEvent(logger.Success)
-	logEvents()
-	addEvent, logEvents = logger.NewEventLogger(logger.Subnet, logger.Create, networkName)
+	l.AddEvent(logger.Success)
+	l.LogEvents()
+	l = logger.New(nil, logger.Subnet, logger.Create, networkName)
 
 	subnet := hcloud.NetworkSubnet{
 		Type:        hcloud.NetworkSubnetTypeServer,
-		IPRange:     ip.GetIpRange("10.0.0.0/16"),
+		IPRange:     ipRange,
 		NetworkZone: ctx.Config.NetworkZone,
 	}
 
 	subNet, _, err := ctx.CloudClient.Network.AddSubnet(ctx.Context, network, hcloud.NetworkAddSubnetOpts{
 		Subnet: subnet,
 	})
-	if err != nil || subNet == nil {
-		addEvent(logger.Failure, err)
-		return nil
+	if err != nil {
+		l.AddEvent(logger.Failure, err)
+		return nil, err
+	}
+	if subNet == nil {
+		err = errors.New("subnet is nil")
+		l.AddEvent(logger.Failure, err)
+		return nil, err
 	}
 
-	addEvent(logger.Success)
-	return network
+	l.AddEvent(logger.Success)
+	return network, nil
 }

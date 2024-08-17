@@ -17,11 +17,20 @@ func Provision(
 	ctx *cluster.Cluster,
 	architecture hcloud.Architecture,
 	server *hcloud.Server,
-) {
-	execute(ctx, server, commands.DownloadImage(architecture), false, false)
-	execute(ctx, server, commands.WriteImage(), false, true)
-	execute(ctx, server, commands.Packages(), true, true)
-	execute(ctx, server, commands.CleanUp(), true, false)
+) error {
+	if err := execute(ctx, server, commands.DownloadImage(architecture), false, false); err != nil {
+		return err
+	}
+	if err := execute(ctx, server, commands.WriteImage(), false, true); err != nil {
+		return err
+	}
+	if err := execute(ctx, server, commands.Packages(), true, true); err != nil {
+		return err
+	}
+	if err := execute(ctx, server, commands.CleanUp(), true, false); err != nil {
+		return err
+	}
+	return nil
 }
 
 func execute(
@@ -30,29 +39,26 @@ func execute(
 	cmd string,
 	pauseBefore bool,
 	expectDisconnect bool,
-) {
+) error {
+	l := logger.New(nil, logger.Server, "Execute", server.Name)
 	ping.Ping(server, waitTime)
 
 	if pauseBefore {
-		logger.LogResourceEvent(
-			logger.Server,
-			"Execute",
-			server.Name,
-			logger.Initialized,
-			fmt.Sprintf("Waiting for %d sec", waitTime),
-			waitTime,
-		)
+		l.AddEvent(logger.Initialized, fmt.Sprintf("Waiting for %d sec", waitTime))
 		time.Sleep(waitTime)
 	}
 
 	_, err := ssh.ExecuteWithSsh(ctx.Config.SSHKeyPaths.PrivateKeyPath, server, cmd)
 	if err != nil {
-		logger.LogResourceEvent(logger.Server, "Execute", server.Name, logger.Failure, err)
-		return
+		l.AddEvent(logger.Failure, err)
+		return err
 	}
 
 	if expectDisconnect {
-		logger.LogResourceEvent(logger.Server, "Execute", server.Name, logger.Initialized, "Expecting disconnect")
+		l.AddEvent(logger.Initialized, "Expecting disconnect")
 		time.Sleep(waitTime)
+		l.AddEvent(logger.Success, "Added wait time")
 	}
+
+	return nil
 }

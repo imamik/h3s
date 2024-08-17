@@ -19,6 +19,9 @@ type AllServers struct {
 }
 
 func getAll(ctx *cluster.Cluster) ([]*hcloud.Server, error) {
+	l := logger.New(nil, logger.Server, logger.Get, "All")
+	defer l.LogEvents()
+
 	label := fmt.Sprintf("project=%s", ctx.Config.Name)
 
 	servers, err := ctx.CloudClient.Server.AllWithOpts(ctx.Context, hcloud.ServerListOpts{
@@ -28,31 +31,36 @@ func getAll(ctx *cluster.Cluster) ([]*hcloud.Server, error) {
 	})
 
 	if err != nil {
-		logger.LogResourceEvent(logger.Server, logger.Get, label, logger.Failure, servers, err)
+		l.AddEvent(logger.Failure, err)
 		return nil, err
 	}
 	if servers == nil || len(servers) == 0 {
-		logger.LogResourceEvent(logger.Server, logger.Get, label, logger.Failure, servers, err)
-		return nil, errors.New("no servers found")
+		err = errors.New("no servers found")
+		l.AddEvent(logger.Failure, err)
+		return nil, err
 	}
 
-	logger.LogResourceEvent(logger.Server, logger.Get, label, logger.Success)
+	l.AddEvent(logger.Success)
 	return servers, nil
 }
 
 // GetAll returns all servers in the cluster, sorted by name & grouped by role (ControlPlane, Worker, Gateway, Other)
 func GetAll(ctx *cluster.Cluster) (*AllServers, error) {
+	l := logger.New(nil, logger.Server, logger.Get, "All")
+	defer l.LogEvents()
 
 	var err error
 	var nodes []*hcloud.Server
-
 	for {
 		nodes, err = getAll(ctx)
 		if err != nil {
+			l.AddEvent(logger.Failure, err)
 			return nil, err
 		}
 		if len(nodes) == 0 {
-			return nil, errors.New("no nodes found")
+			err = errors.New("no nodes found")
+			l.AddEvent(logger.Failure, err)
+			return nil, err
 		}
 
 		allNodesHavePrivateIP := true
@@ -67,7 +75,7 @@ func GetAll(ctx *cluster.Cluster) (*AllServers, error) {
 			break
 		}
 
-		fmt.Println("Not all nodes have an assigned private IP. Retrying in 10 seconds...")
+		l.AddEvent(logger.Info, "Not all nodes have an assigned private IP. Retrying in 10 seconds...")
 		time.Sleep(10 * time.Second)
 	}
 

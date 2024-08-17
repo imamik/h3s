@@ -7,10 +7,14 @@ import (
 	"sync"
 )
 
-func Delete(ctx *cluster.Cluster) {
+func Delete(ctx *cluster.Cluster) error {
+	l := logger.New(nil, logger.DNSRecord, logger.Delete, "All records")
+	defer l.LogEvents()
+
 	records, err := Get(ctx)
 	if err != nil {
-		return
+		l.AddEvent(logger.Failure, err)
+		return err
 	}
 
 	var wg sync.WaitGroup
@@ -18,19 +22,21 @@ func Delete(ctx *cluster.Cluster) {
 		recordId := record.Name + " | " + record.Type + " | " + record.Value
 
 		go func(recordId string, record api.Record) {
-			addEvent, logEvents := logger.NewEventLogger(logger.DNSRecord, logger.Delete, recordId)
-			defer logEvents()
+			logr := logger.New(l, logger.DNSRecord, logger.Delete, recordId)
+			defer logr.LogEvents()
 
 			wg.Add(1)
 			defer wg.Done()
 
 			err := ctx.DNSClient.DeleteRecord(ctx.Context, record.ID)
 			if err != nil {
-				addEvent(logger.Failure, err)
+				logr.AddEvent(logger.Failure, err)
 			} else {
-				addEvent(logger.Success)
+				logr.AddEvent(logger.Success)
 			}
 		}(recordId, record)
 	}
 	wg.Wait()
+
+	return nil
 }

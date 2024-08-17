@@ -1,15 +1,21 @@
 package logger
 
+// ResourceEvent is a log event, which contains the resource, the id, the action, the status and an error
 type ResourceEvent struct {
-	Resource LogResource
-	ID       string
-	Action   interface{}
-	Status   LogCrudStatus
-	Err      []any
+	Resource LogResource   // Resource is the resource of the event
+	ID       string        // ID is the id of the resource
+	Action   interface{}   // Action is the action of the event
+	Status   LogCrudStatus // Status is the status of the event
+	Err      []any         // Err is the error of the event
 }
 
-type AddEventFunc func(status LogCrudStatus, err ...any)
-type LogFunc func()
+const (
+	ColorGreen     = "\033[32m" // ColorGreen is the color code to print green in the terminal
+	ColorRed       = "\033[31m" // ColorRed is the color code to print red in the terminal
+	ColorLightGrey = "\033[37m" // ColorLightGrey is the color code to print light grey in the terminal
+	ColorDefault   = ColorLightGrey
+	ColorReset     = "\033[0m" // ColorReset is the color code to reset the terminal color
+)
 
 type LogResource string
 
@@ -45,6 +51,7 @@ type LogCrudStatus string
 
 const (
 	Initialized LogCrudStatus = "Init"
+	Info        LogCrudStatus = "Info"
 	Success     LogCrudStatus = "Success"
 	Failure     LogCrudStatus = "Failure"
 )

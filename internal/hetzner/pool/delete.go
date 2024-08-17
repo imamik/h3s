@@ -9,7 +9,7 @@ import (
 	"sync"
 )
 
-func Delete(ctx *cluster.Cluster) {
+func Delete(ctx *cluster.Cluster) error {
 	var wg sync.WaitGroup
 
 	// Delete control plane pool
@@ -29,12 +29,14 @@ func Delete(ctx *cluster.Cluster) {
 	}
 
 	wg.Wait()
+	return nil
 }
 
-func deletePool(ctx *cluster.Cluster, pool config.NodePool) {
-	addEvent, logEvents := logger.NewEventLogger(logger.Pool, logger.Delete, ctx.GetName(pool.Name))
-	defer logEvents()
+func deletePool(ctx *cluster.Cluster, pool config.NodePool) error {
+	l := logger.New(nil, logger.Pool, logger.Delete, ctx.GetName(pool.Name))
+	defer l.LogEvents()
 
+	// Delete all nodes
 	var wg sync.WaitGroup
 	for i := 0; i < pool.Nodes; i++ {
 		wg.Add(1)
@@ -44,6 +46,13 @@ func deletePool(ctx *cluster.Cluster, pool config.NodePool) {
 		}(i)
 	}
 	wg.Wait()
-	placementgroup.Delete(ctx, pool)
-	addEvent(logger.Success)
+
+	// Delete placement group
+	err := placementgroup.Delete(ctx, pool)
+	if err != nil {
+		return err
+	}
+
+	l.AddEvent(logger.Success)
+	return nil
 }

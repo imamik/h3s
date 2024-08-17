@@ -2,74 +2,77 @@ package logger
 
 import (
 	"fmt"
+	"h3s/internal/utils/str"
 	"log"
-	"strings"
 )
 
-var (
-	logOnlyLatest = true  // logOnlyLatest determines if only the latest event should be logged
-	logLive       = false // logLive determines if events should be logged live or stacked until explicitly logged
-)
+// EventLogger is a struct that collects and logs events
+type EventLogger struct {
+	logOnlyLatest bool            // logOnlyLatest determines if only the latest event should be logged
+	logLive       bool            // logLive determines if events should be logged live or stacked until explicitly logged
+	events        []ResourceEvent // events is a list of ResourceEvent
+	resource      LogResource     // resource is the resource of the events
+	action        interface{}     // action is the action of the event
+	id            string          // id is the id of the resource
+}
 
-const (
-	ColorGreen = "\033[32m" // ColorGreen is the color code to print green in the terminal
-	ColorRed   = "\033[31m" // ColorRed is the color code to print red in the terminal
-	ColorReset = "\033[0m"  // ColorReset is the color code to reset the terminal color
-)
-
-// normalize returns a string with a fixed length
-func normalize(s string, l int) string {
-	if len(s) > l-3 {
-		return s[:l-3] + "..."
+// New creates a new event logger
+func New(reuse *EventLogger, resource LogResource, action interface{}, id string) *EventLogger {
+	var e EventLogger
+	if reuse != nil {
+		e = *reuse
+	} else {
+		e = EventLogger{
+			logOnlyLatest: false,
+			logLive:       false,
+			events:        []ResourceEvent{},
+			resource:      resource,
+			action:        action,
+			id:            id,
+		}
 	}
-	return s + strings.Repeat(" ", l-len(s))
+	e.AddEvent(Initialized)
+	return &e
 }
 
-// LogError prints an error message to the console
-func LogError(err ...any) {
-	log.Println(err...)
+// AddEvent adds an event to the event logger
+func (l *EventLogger) AddEvent(status LogCrudStatus, err ...any) {
+	event := ResourceEvent{
+		Resource: l.resource,
+		ID:       l.id,
+		Action:   l.action,
+		Status:   status,
+		Err:      err,
+	}
+	l.events = append(l.events, event)
+	if l.logLive {
+		l.LogLatest()
+	}
 }
 
-// NewEventLogger creates a new logger
-func NewEventLogger(resource LogResource, action interface{}, id string) (AddEventFunc, LogFunc) {
-	var events []ResourceEvent
-	addEvent := AddEventFunc(func(status LogCrudStatus, err ...any) {
-		events = append(events, ResourceEvent{
-			Resource: resource,
-			ID:       id,
-			Action:   action,
-			Status:   status,
-			Err:      err,
-		})
-		if logLive {
-			LogResourceEvent(resource, action, id, status, err...)
+// LogEvents logs all events in the event logger (or only the latest event if logOnlyLatest is set)
+func (l *EventLogger) LogEvents() {
+	if l.logOnlyLatest {
+		l.LogLatest()
+	} else {
+		for i, event := range l.events {
+			l.logEvent(event, true, i == 0, i == len(l.events)-1)
 		}
-	})
-	logEvents := LogFunc(func() {
-		if logOnlyLatest {
-			latest := events[len(events)-1]
-			LogResourceEvent(latest.Resource, latest.Action, latest.ID, latest.Status, latest.Err...)
-		} else {
-			for _, e := range events {
-				LogResourceEvent(e.Resource, e.Action, e.ID, e.Status, e.Err...)
-			}
-		}
-	})
-	addEvent(Initialized)
-	return addEvent, logEvents
+	}
 }
 
-// LogResourceEvent logs a resource event
-func LogResourceEvent(
-	resource LogResource,
-	action interface{},
-	id string,
-	status LogCrudStatus,
-	err ...any,
-) {
+func (l *EventLogger) LogLatest() {
+	lastIndex := len(l.events) - 1
+	event := l.events[lastIndex]
+	l.logEvent(event, false, false, true)
+}
+
+// logEvent logs the event with the appropriate color
+func (l *EventLogger) logEvent(e ResourceEvent, group bool, isFirst bool, isLast bool) {
+
+	// Build the action string
 	var actionStr string
-
-	switch v := action.(type) {
+	switch v := e.Action.(type) {
 	case LogCrudMethod:
 		actionStr = string(v)
 	case string:
@@ -79,25 +82,39 @@ func LogResourceEvent(
 		return
 	}
 
+	// Build the log line, composed of the action, resource, id, status and error with normalized lengths
 	var logLine []any
+	if group {
+		if isFirst && isLast {
+			logLine = append(logLine, "[")
+		} else if isFirst {
+			logLine = append(logLine, "⎡")
+		} else if isLast {
+			logLine = append(logLine, "⎣")
+		} else {
+			logLine = append(logLine, "├")
+		}
+	}
 	logLine = append(
 		logLine,
-		normalize(actionStr, 24),
-		normalize(string(resource), 24),
-		normalize(id, 48),
-		normalize(string(status), 24),
+		str.NormalizeLength(actionStr, 24),
+		str.NormalizeLength(string(e.Resource), 24),
+		str.NormalizeLength(e.ID, 48),
+		str.NormalizeLength(string(e.Status), 24),
 	)
 
-	for _, e := range err {
+	// Add the error messages to the log line
+	for _, e := range e.Err {
 		logLine = append(logLine, e)
 	}
 
-	switch status {
+	// Log the line with the appropriate color (green for success, red for failure)
+	switch e.Status {
 	case Success:
 		log.Println(ColorGreen + fmt.Sprint(logLine...) + ColorReset)
 	case Failure:
 		log.Println(ColorRed + fmt.Sprint(logLine...) + ColorReset)
 	default:
-		log.Println(logLine...)
+		log.Println(ColorDefault + fmt.Sprint(logLine...) + ColorReset)
 	}
 }

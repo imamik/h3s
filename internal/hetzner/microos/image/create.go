@@ -10,11 +10,13 @@ func Create(
 	ctx *cluster.Cluster,
 	server *hcloud.Server,
 	architecture hcloud.Architecture,
-) *hcloud.Image {
+) (*hcloud.Image, error) {
 	name := getName(ctx, architecture)
-	logger.LogResourceEvent(logger.Image, logger.Create, name, logger.Initialized)
-	logger.LogResourceEvent(logger.Image, "...", name, logger.Initialized)
-	logger.LogResourceEvent(logger.Image, "This will take time", name, logger.Success)
+	l := logger.New(nil, logger.Image, logger.Create, name)
+	l.AddEvent("...")
+	l.AddEvent("This will take time")
+	l.LogEvents()
+	defer l.LogEvents()
 
 	res, _, err := ctx.CloudClient.Server.CreateImage(ctx.Context, server, &hcloud.ServerCreateImageOpts{
 		Type: hcloud.ImageTypeSnapshot,
@@ -25,14 +27,15 @@ func Create(
 		Description: &name,
 	})
 	if err != nil {
-		logger.LogResourceEvent(logger.Image, logger.Create, name, logger.Failure, err)
+		l.AddEvent(logger.Failure, err)
+		return nil, err
 	}
 
 	if err := ctx.CloudClient.Action.WaitFor(ctx.Context, res.Action); err != nil {
-		logger.LogResourceEvent(logger.Image, logger.Create, name, logger.Failure, err)
+		l.AddEvent(logger.Failure, err)
+		return nil, err
 	}
 
-	logger.LogResourceEvent(logger.Image, logger.Create, name, logger.Success)
-
-	return res.Image
+	l.AddEvent(logger.Success)
+	return res.Image, nil
 }

@@ -1,6 +1,7 @@
 package placementgroup
 
 import (
+	"errors"
 	"github.com/hetznercloud/hcloud-go/v2/hcloud"
 	"h3s/internal/cluster"
 	"h3s/internal/config"
@@ -13,10 +14,11 @@ func create(
 	pool config.NodePool,
 	isControlPlane bool,
 	isWorker bool,
-) *hcloud.PlacementGroup {
+) (*hcloud.PlacementGroup, error) {
 	name := getName(ctx, pool)
-	addEvent, logEvents := logger.NewEventLogger(logger.PlacementGroup, logger.Create, name)
-	defer logEvents()
+
+	l := logger.New(nil, logger.PlacementGroup, logger.Create, name)
+	defer l.LogEvents()
 
 	res, _, err := ctx.CloudClient.PlacementGroup.Create(ctx.Context, hcloud.PlacementGroupCreateOpts{
 		Name: name,
@@ -29,17 +31,20 @@ func create(
 		}),
 	})
 	if err != nil {
-		addEvent(logger.Failure, err)
+		l.AddEvent(logger.Failure, err)
+		return nil, err
 	}
 	if res.PlacementGroup == nil {
-		addEvent(logger.Failure, "Empty Response")
+		err = errors.New("placement group is nil")
+		l.AddEvent(logger.Failure, err)
+		return nil, err
 	}
 	if err := ctx.CloudClient.Action.WaitFor(ctx.Context, res.Action); err != nil {
-		addEvent(logger.Failure, err)
+		l.AddEvent(logger.Failure, err)
 	}
 
-	addEvent(logger.Success)
-	return res.PlacementGroup
+	l.AddEvent(logger.Success)
+	return res.PlacementGroup, nil
 }
 
 func Create(
@@ -47,10 +52,10 @@ func Create(
 	pool config.NodePool,
 	isControlPlane bool,
 	isWorker bool,
-) *hcloud.PlacementGroup {
-	placementGroup := Get(ctx, pool)
-	if placementGroup == nil {
-		placementGroup = create(ctx, pool, isControlPlane, isWorker)
+) (*hcloud.PlacementGroup, error) {
+	placementGroup, err := Get(ctx, pool)
+	if placementGroup != nil && err == nil {
+		return placementGroup, nil
 	}
-	return placementGroup
+	return create(ctx, pool, isControlPlane, isWorker)
 }

@@ -9,20 +9,22 @@ import (
 func Delete(
 	ctx *cluster.Cluster,
 	pool config.NodePool,
-) {
-	addEvent, logEvents := logger.NewEventLogger(logger.PlacementGroup, logger.Delete, ctx.GetName(pool.Name))
-	defer logEvents()
+) error {
+	l := logger.New(nil, logger.PlacementGroup, logger.Delete, ctx.GetName(pool.Name))
+	defer l.LogEvents()
 
-	placementGroup := Get(ctx, pool)
-	if placementGroup == nil {
-		return
+	placementGroup, err := Get(ctx, pool)
+	if placementGroup == nil && err.Error() == "placement group is nil" {
+		l.AddEvent(logger.Success, "no placement group found to delete")
+		return nil
 	}
 
-	_, err := ctx.CloudClient.PlacementGroup.Delete(ctx.Context, placementGroup)
+	_, err = ctx.CloudClient.PlacementGroup.Delete(ctx.Context, placementGroup)
 	if err != nil {
-		addEvent(logger.Failure, err)
-		return
+		l.AddEvent(logger.Failure, err)
+		return err
 	}
 
-	addEvent(logger.Success)
+	l.AddEvent(logger.Success)
+	return nil
 }

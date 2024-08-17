@@ -16,17 +16,21 @@ import (
 func deleteResource(
 	ctx *cluster.Cluster,
 	wg *sync.WaitGroup,
-	deleteFunc func(*cluster.Cluster),
+	deleteFunc func(*cluster.Cluster) error,
 ) {
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		deleteFunc(ctx)
+		err := deleteFunc(ctx)
+		if err != nil {
+			return
+		}
 	}()
 }
 
 func Destroy(ctx *cluster.Cluster) error {
-	logger.LogResourceEvent(logger.Cluster, logger.Delete, ctx.Config.Name, logger.Initialized)
+	l := logger.New(nil, logger.Cluster, logger.Delete, ctx.Config.Name)
+	defer l.LogEvents()
 
 	var wg sync.WaitGroup
 
@@ -49,6 +53,6 @@ func Destroy(ctx *cluster.Cluster) error {
 		return err // Ignore error
 	}
 
-	logger.LogResourceEvent(logger.Cluster, logger.Delete, ctx.Config.Name, logger.Success)
+	l.AddEvent(logger.Success)
 	return nil
 }

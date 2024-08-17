@@ -1,7 +1,6 @@
 package dns
 
 import (
-	"fmt"
 	"h3s/internal/cluster"
 	"h3s/internal/hetzner/dns/utils"
 	"h3s/internal/hetzner/loadbalancers"
@@ -9,12 +8,22 @@ import (
 	"sync"
 )
 
-func Create(ctx *cluster.Cluster) {
-	lb := loadbalancers.Get(ctx)
+func Create(ctx *cluster.Cluster) error {
+	l := logger.New(nil, logger.DNSRecord, logger.Create, "")
+	defer l.LogEvents()
+
+	// Get load balancer
+	lb, err := loadbalancers.Get(ctx)
+	if err != nil {
+		l.AddEvent(logger.Failure, err)
+		return err
+	}
+
+	// Get zone
 	zone, err := GetZone(ctx)
 	if err != nil {
-		fmt.Println("errors getting zone:", err)
-		return
+		l.AddEvent(logger.Failure, err)
+		return err
 	}
 
 	records := utils.GetExpectedRecords(lb, zone)
@@ -24,19 +33,21 @@ func Create(ctx *cluster.Cluster) {
 		recordId := record.Name + " | " + record.Type + " | " + record.Value
 
 		go func() {
-			addEvent, logEvents := logger.NewEventLogger(logger.DNSRecord, logger.Create, recordId)
-			defer logEvents()
+			logr := logger.New(l, logger.DNSRecord, logger.Create, recordId)
+			defer logr.LogEvents()
 
 			wg.Add(1)
 			defer wg.Done()
 
 			_, err := ctx.DNSClient.CreateRecord(ctx.Context, record)
 			if err != nil {
-				addEvent(logger.Failure, err)
+				logr.AddEvent(logger.Failure, err)
 			} else {
-				addEvent(logger.Success)
+				logr.AddEvent(logger.Success)
 			}
 		}()
 	}
 	wg.Wait()
+
+	return nil
 }

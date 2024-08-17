@@ -10,21 +10,23 @@ func Delete(
 	ctx *cluster.Cluster,
 	pool config.NodePool,
 	i int,
-) {
-	server := Get(ctx, pool, i)
+) error {
+	l := logger.New(nil, logger.Server, logger.Delete, getName(ctx, pool, i))
+	defer l.LogEvents()
 
-	if server == nil {
-		return
+	server, err := Get(ctx, pool, i)
+
+	if server == nil && err.Error() == "server is nil" {
+		l.AddEvent(logger.Success, "no server found to delete")
+		return nil
 	}
 
-	addEvent, logEvents := logger.NewEventLogger(logger.Server, logger.Delete, server.Name)
-	defer logEvents()
-
-	_, _, err := ctx.CloudClient.Server.DeleteWithResult(ctx.Context, server)
+	_, _, err = ctx.CloudClient.Server.DeleteWithResult(ctx.Context, server)
 	if err != nil {
-		addEvent(logger.Failure, err)
-		return
+		l.AddEvent(logger.Failure, err)
+		return err
 	}
 
-	addEvent(logger.Success)
+	l.AddEvent(logger.Success)
+	return nil
 }

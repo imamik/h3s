@@ -11,15 +11,18 @@ import (
 	"h3s/internal/utils/ssh"
 )
 
+// getNetworkInterface calls the ip command on the remote server to get the network interface name
 func getNetworkInterface(ctx *cluster.Cluster, proxy *hcloud.Server, remote *hcloud.Server) (string, error) {
 	cmd := "ip -o link show | awk '$2 != \"lo:\" {print $2}' | sed 's/://g' | head -n 1"
 	return ssh.ExecuteViaProxy(ctx.Config.SSHKeyPaths.PrivateKeyPath, proxy, remote, cmd)
 }
 
+// getServer returns the server address
 func getServer(firstControlPlane *hcloud.Server) string {
-	return "https://" + ip.Private(firstControlPlane) + ":6443"
+	return "https://" + ip.Private(firstControlPlane).String() + ":6443"
 }
 
+// getTlsSan returns the SANs (Subject Alternative Names) for the TLS certificate of the k3s server
 func getTlsSan(domain string, lb *hcloud.LoadBalancer, controlPlaneNodes []*hcloud.Server) []string {
 	tlsSan := []string{
 		"127.0.0.1",
@@ -39,16 +42,26 @@ func getTlsSan(domain string, lb *hcloud.LoadBalancer, controlPlaneNodes []*hclo
 	}
 
 	for _, node := range controlPlaneNodes {
-		tlsSan = append(tlsSan, ip.Private(node))
+		tlsSan = append(tlsSan, ip.Private(node).String())
 	}
 
 	return tlsSan
 }
 
 func Install(ctx *cluster.Cluster) error {
-	lb := loadbalancers.Get(ctx)
-	gate, _ := gateway.GetIfNeeded(ctx)
+	// Get load balancer
+	lb, err := loadbalancers.Get(ctx)
+	if err != nil {
+		return err
+	}
 
+	// Get gateway
+	gate, err := gateway.GetIfNeeded(ctx)
+	if err != nil {
+		return err
+	}
+
+	// Get all nodes
 	nodes, err := server.GetAll(ctx)
 	if err != nil {
 		return err
@@ -73,7 +86,7 @@ func Install(ctx *cluster.Cluster) error {
 			TlsSAN:                tlsSAN,
 			ControlPlanesAsWorker: ctx.Config.ControlPlane.AsWorkerPool,
 			NodeName:              n.Name,
-			NodeIp:                nodeIp,
+			NodeIp:                nodeIp.String(),
 			NetworkInterface:      networkInterface,
 			PublicIps:             ctx.Config.PublicIps,
 			K3sVersion:            ctx.Config.K3sVersion,

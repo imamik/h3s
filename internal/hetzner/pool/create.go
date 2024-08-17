@@ -1,6 +1,7 @@
 package pool
 
 import (
+	"fmt"
 	"github.com/hetznercloud/hcloud-go/v2/hcloud"
 	"h3s/internal/cluster"
 	"h3s/internal/config"
@@ -13,19 +14,35 @@ import (
 	"sync"
 )
 
-func CreatePools(ctx *cluster.Cluster) []*hcloud.Server {
-	sshKey := sshkey.Get(ctx)
-	net := network.Get(ctx)
+func CreatePools(ctx *cluster.Cluster) ([]*hcloud.Server, error) {
+	l := logger.New(nil, logger.Pool, logger.Create, "All")
+	defer l.LogEvents()
+
+	// Get ssh key & network
+	sshKey, err := sshkey.Get(ctx)
+	if err != nil {
+		l.AddEvent(logger.Failure, err)
+		return nil, err
+	}
+
+	// Get network
+	net, err := network.Get(ctx)
+	if err != nil {
+		l.AddEvent(logger.Failure, err)
+		return nil, err
+	}
 
 	// Create a channel to collect the nodes & setup a WaitGroup
 	nodeCh := make(chan []*hcloud.Server)
+	errCh := make(chan error)
 	var wg sync.WaitGroup
 
 	// Create control plane pool in a goroutine
 	wg.Add(1)
 	go func() {
+		logr := logger.New(l, logger.Pool, logger.Create, "Control Plane")
 		defer wg.Done()
-		nodeCh <- CreatePool(
+		nodes, err := CreatePool(
 			ctx,
 			sshKey,
 			net,
@@ -33,14 +50,21 @@ func CreatePools(ctx *cluster.Cluster) []*hcloud.Server {
 			true,
 			ctx.Config.ControlPlane.AsWorkerPool,
 		)
+		if err != nil {
+			logr.AddEvent(logger.Failure, err)
+			errCh <- err
+			return
+		}
+		nodeCh <- nodes
 	}()
 
 	// Create worker pools in separate goroutines
 	for _, pool := range ctx.Config.WorkerPools {
+		logr := logger.New(l, logger.Pool, logger.Create, ctx.GetName(pool.Name))
 		wg.Add(1)
 		go func(pool config.NodePool) {
 			defer wg.Done()
-			nodeCh <- CreatePool(
+			nodes, err := CreatePool(
 				ctx,
 				sshKey,
 				net,
@@ -48,6 +72,12 @@ func CreatePools(ctx *cluster.Cluster) []*hcloud.Server {
 				false,
 				true,
 			)
+			if err != nil {
+				logr.AddEvent(logger.Failure, err)
+				errCh <- err
+				return
+			}
+			nodeCh <- nodes
 		}(pool)
 	}
 
@@ -55,6 +85,7 @@ func CreatePools(ctx *cluster.Cluster) []*hcloud.Server {
 	go func() {
 		wg.Wait()
 		close(nodeCh)
+		close(errCh)
 	}()
 
 	// Collect the nodes from the channel
@@ -63,7 +94,17 @@ func CreatePools(ctx *cluster.Cluster) []*hcloud.Server {
 		nodes = append(nodes, n...)
 	}
 
-	return nodes
+	// Check and handle errors
+	var errors []error
+	for err := range errCh {
+		errors = append(errors, err)
+	}
+	if len(errors) > 0 {
+		l.AddEvent(logger.Failure, errors)
+		return nil, fmt.Errorf("failed to create pools: %v", errors)
+	}
+
+	return nodes, nil
 }
 
 func CreatePool(
@@ -73,36 +114,39 @@ func CreatePool(
 	pool config.NodePool,
 	isControlPlane bool,
 	isWorker bool,
-) []*hcloud.Server {
-	addEvent, logEvents := logger.NewEventLogger(logger.Pool, logger.Create, ctx.GetName(pool.Name))
-	defer logEvents()
+) ([]*hcloud.Server, error) {
+	l := logger.New(nil, logger.Pool, logger.Create, ctx.GetName(pool.Name))
+	defer l.LogEvents()
 
 	var img *hcloud.Image
 	var err error
 	if ctx.Config.Image == config.ImageMicroOS {
 		img, err = image.Get(ctx, config.GetArchitecture(pool.Instance))
 		if err != nil {
-			addEvent(logger.Failure, err)
-			return nil
+			l.AddEvent(logger.Failure, err)
+			return nil, err
 		}
 	} else {
-		img = &hcloud.Image{
-			Name: string(ctx.Config.Image),
-		}
+		img = &hcloud.Image{Name: string(ctx.Config.Image)}
 	}
 
-	placementGroup := placementgroup.Create(ctx, pool, isControlPlane, isWorker)
+	placementGroup, err := placementgroup.Create(ctx, pool, isControlPlane, isWorker)
+	if err != nil {
+		l.AddEvent(logger.Failure, err)
+		return nil, err
+	}
 
 	// Create a channel to collect the nodes & setup a WaitGroup
 	var nodes []*hcloud.Server
 	nodeCh := make(chan *hcloud.Server, pool.Nodes)
+	errCh := make(chan error)
 	var wg sync.WaitGroup
 
 	for i := 0; i < pool.Nodes; i++ {
 		wg.Add(1) // Increment the WaitGroup counter
 		go func(i int) {
 			defer wg.Done() // Decrement the counter when the goroutine completes
-			nodeCh <- node.Create(
+			n, err := node.Create(
 				ctx,
 				sshKey,
 				network,
@@ -113,18 +157,30 @@ func CreatePool(
 				isControlPlane,
 				isWorker,
 			)
+			if err != nil {
+				l.AddEvent(logger.Failure, err)
+				errCh <- err
+				return
+			}
+			nodeCh <- n
 		}(i)
 	}
 
 	// Wait for all goroutines to finish & close the channel
 	wg.Wait()
 	close(nodeCh)
+	close(errCh)
 
 	// Collect the nodes from the channel
 	for n := range nodeCh {
 		nodes = append(nodes, n)
 	}
 
-	addEvent(logger.Success)
-	return nodes
+	// Check for errors
+	if err, ok := <-errCh; ok {
+		return nil, err
+	}
+
+	l.AddEvent(logger.Success)
+	return nodes, nil
 }

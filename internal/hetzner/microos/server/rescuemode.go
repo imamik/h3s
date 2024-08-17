@@ -12,24 +12,28 @@ func RescueMode(
 	ctx *cluster.Cluster,
 	sshKey *hcloud.SSHKey,
 	server *hcloud.Server,
-) string {
-	logger.LogResourceEvent(logger.Server, RescueModeLog, server.Name, logger.Initialized)
+) (string, error) {
+	l := logger.New(nil, logger.Server, RescueModeLog, server.Name)
+	defer l.LogEvents()
 
 	res, _, err := ctx.CloudClient.Server.EnableRescue(ctx.Context, server, hcloud.ServerEnableRescueOpts{
 		Type:    hcloud.ServerRescueTypeLinux64,
 		SSHKeys: []*hcloud.SSHKey{sshKey},
 	})
 	if err != nil {
-		logger.LogResourceEvent(logger.Server, RescueModeLog, server.Name, logger.Failure, err)
+		l.AddEvent(logger.Failure, err)
+		return "", err
 	}
 	if err := ctx.CloudClient.Action.WaitFor(ctx.Context, res.Action); err != nil {
-		logger.LogResourceEvent(logger.Server, RescueModeLog, server.Name, logger.Failure, err)
+		l.AddEvent(logger.Failure, err)
+		return "", err
 	}
 
-	logger.LogResourceEvent(logger.Server, RescueModeLog, server.Name, logger.Success)
+	l.AddEvent(logger.Success)
+	if err := Reboot(ctx, server); err != nil {
+		return "", err
+	}
 
-	Reboot(ctx, server)
-
-	return res.RootPassword
+	return res.RootPassword, nil
 
 }

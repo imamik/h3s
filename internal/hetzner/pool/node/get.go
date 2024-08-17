@@ -1,6 +1,7 @@
 package node
 
 import (
+	"errors"
 	"github.com/hetznercloud/hcloud-go/v2/hcloud"
 	"h3s/internal/cluster"
 	"h3s/internal/config"
@@ -11,17 +12,23 @@ func Get(
 	ctx *cluster.Cluster,
 	pool config.NodePool,
 	i int,
-) *hcloud.Server {
+) (*hcloud.Server, error) {
 	name := getName(ctx, pool, i)
-	addEvent, logEvents := logger.NewEventLogger(logger.Server, logger.Get, name)
-	defer logEvents()
+
+	l := logger.New(nil, logger.Server, logger.Get, name)
+	defer l.LogEvents()
 
 	server, _, err := ctx.CloudClient.Server.GetByName(ctx.Context, name)
-	if err != nil || server == nil {
-		addEvent(logger.Failure, err)
-		return nil
+	if err != nil {
+		l.AddEvent(logger.Failure, err)
+		return nil, err
+	}
+	if server == nil {
+		err = errors.New("server is nil")
+		l.AddEvent(logger.Failure, err)
+		return nil, err
 	}
 
-	addEvent(logger.Success)
-	return server
+	l.AddEvent(logger.Success)
+	return server, nil
 }

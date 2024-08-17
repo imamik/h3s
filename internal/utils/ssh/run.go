@@ -2,6 +2,7 @@ package ssh
 
 import (
 	"bufio"
+	"errors"
 	"fmt"
 	"golang.org/x/crypto/ssh"
 	"h3s/internal/utils/logger"
@@ -11,16 +12,23 @@ import (
 
 // dialWithRetries dials the SSH server with retries
 func dialWithRetries(ip string, sshConfig *ssh.ClientConfig, retryInterval time.Duration, maxRetries int) (*ssh.Client, error) {
+	l := logger.New(nil, logger.Server, "Dial", ip)
+	defer l.LogEvents()
+
 	for i := 0; i < maxRetries; i++ {
 		c, err := ssh.Dial("tcp", ip+":22", sshConfig)
 		if err == nil && c != nil {
-			return c, err
+			return c, nil
 		}
 		retryBackoff := time.Duration(i+1) * retryInterval
-		logger.LogResourceEvent(logger.Server, "SSH", ip, logger.Failure, fmt.Sprintf("Failed to dial: %s, retrying in %s", err, retryBackoff))
+		err = fmt.Errorf("failed to dial %s, retrying in %s, errors: %s", ip, retryBackoff, err)
+		l.AddEvent(logger.Failure, err)
 		time.Sleep(retryBackoff)
 	}
-	return nil, fmt.Errorf("failed to dial %s after %d retries", ip, maxRetries)
+
+	err := fmt.Sprintf("Failed to dial %s after %d retries", ip, maxRetries)
+	l.AddEvent(logger.Failure, err)
+	return nil, errors.New(err)
 }
 
 func run(client *ssh.Client, command string) (string, error) {

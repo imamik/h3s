@@ -9,19 +9,23 @@ import (
 func Delete(
 	ctx *cluster.Cluster,
 	architecture hcloud.Architecture,
-) {
-	server := Get(ctx, architecture)
+) error {
+	l := logger.New(nil, logger.Server, logger.Delete, getName(ctx, architecture))
+	defer l.LogEvents()
 
-	if server == nil {
-		return
+	server, err := Get(ctx, architecture)
+
+	if server == nil && err.Error() == "server is nil" {
+		l.AddEvent(logger.Success, "no server found to delete")
+		return nil
 	}
 
-	logger.LogResourceEvent(logger.Server, logger.Delete, server.Name, logger.Initialized)
-
-	_, _, err := ctx.CloudClient.Server.DeleteWithResult(ctx.Context, server)
+	_, _, err = ctx.CloudClient.Server.DeleteWithResult(ctx.Context, server)
 	if err != nil {
-		logger.LogResourceEvent(logger.Server, logger.Delete, server.Name, logger.Failure, err)
+		l.AddEvent(logger.Failure, err)
+		return err
 	}
 
-	logger.LogResourceEvent(logger.Server, logger.Delete, server.Name, logger.Success)
+	l.AddEvent(logger.Success)
+	return nil
 }

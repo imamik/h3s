@@ -8,16 +8,20 @@ import (
 
 const RebootLog = "Reboot"
 
-func Reboot(ctx *cluster.Cluster, server *hcloud.Server) {
-	logger.LogResourceEvent(logger.Server, RebootLog, server.Name, logger.Initialized)
+func Reboot(ctx *cluster.Cluster, server *hcloud.Server) error {
+	l := logger.New(nil, logger.Server, RebootLog, server.Name)
+	defer l.LogEvents()
 
 	action, _, err := ctx.CloudClient.Server.Reset(ctx.Context, server)
 	if err != nil {
-		logger.LogResourceEvent(logger.Server, RebootLog, server.Name, logger.Failure, err)
+		l.AddEvent(logger.Failure, err)
+		return err
 	}
 	if err := ctx.CloudClient.Action.WaitFor(ctx.Context, action); err != nil {
-		logger.LogResourceEvent(logger.Server, RebootLog, server.Name, logger.Failure, err)
+		l.AddEvent(logger.Failure, err)
+		return err
 	}
 
-	logger.LogResourceEvent(logger.Server, RebootLog, server.Name, logger.Success)
+	l.AddEvent(logger.Success)
+	return nil
 }

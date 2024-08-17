@@ -15,9 +15,8 @@ import (
 )
 
 func Create(ctx *cluster.Cluster) {
-	addEvent, logEvents := logger.NewEventLogger(logger.Cluster, logger.Create, ctx.Config.Name)
-	addEvent(logger.Initialized)
-	defer logEvents()
+	l := logger.New(nil, logger.Cluster, logger.Create, ctx.Config.Name)
+	defer l.LogEvents()
 
 	var wg sync.WaitGroup
 	if ctx.Config.Image == config.ImageMicroOS {
@@ -60,5 +59,5 @@ func Create(ctx *cluster.Cluster) {
 	}
 	wg.Wait()
 
-	addEvent(logger.Success)
+	l.AddEvent(logger.Success)
 }

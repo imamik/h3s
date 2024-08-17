@@ -5,20 +5,21 @@ import (
 	"h3s/internal/utils/logger"
 )
 
-func Delete(ctx *cluster.Cluster) {
-	balancer := Get(ctx)
-	if balancer == nil {
-		return
+func Delete(ctx *cluster.Cluster) error {
+	l := logger.New(nil, logger.LoadBalancer, logger.Delete, "")
+	defer l.LogEvents()
+
+	balancer, err := Get(ctx)
+	if balancer == nil && err.Error() == "load balancer is nil" {
+		return nil
 	}
 
-	addEvent, logEvents := logger.NewEventLogger(logger.LoadBalancer, logger.Delete, balancer.Name)
-	defer logEvents()
-
-	_, err := ctx.CloudClient.LoadBalancer.Delete(ctx.Context, balancer)
+	_, err = ctx.CloudClient.LoadBalancer.Delete(ctx.Context, balancer)
 	if err != nil {
-		addEvent(logger.Failure, err)
-		return
+		l.AddEvent(logger.Failure, err)
+		return err
 	}
 
-	addEvent(logger.Success)
+	l.AddEvent(logger.Success)
+	return nil
 }

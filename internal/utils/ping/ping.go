@@ -11,14 +11,16 @@ import (
 
 // Ping pings the server every 5 seconds until it is available.
 func Ping(server *hcloud.Server, timeout time.Duration) {
+	l := logger.New(nil, logger.Server, "Ping", server.Name)
+	defer l.LogEvents()
 	ipAddress := ip.FirstAvailable(server)
 
 	for {
 		if isServerAvailable(ipAddress) {
-			logger.LogResourceEvent(logger.Server, "Available", server.Name, logger.Success)
+			l.AddEvent(logger.Success)
 			break
 		}
-		logger.LogResourceEvent(logger.Server, "Not Available", server.Name, logger.Failure, fmt.Sprintf("Retry in %s", timeout))
+		l.AddEvent(logger.Failure, fmt.Sprintf("Server %s is not available", server.Name), fmt.Sprintf("Retry in %s", timeout))
 		time.Sleep(timeout)
 	}
 

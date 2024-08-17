@@ -1,6 +1,7 @@
 package node
 
 import (
+	"errors"
 	"github.com/hetznercloud/hcloud-go/v2/hcloud"
 	"h3s/internal/cluster"
 	"h3s/internal/config"
@@ -19,12 +20,12 @@ func Create(
 	i int,
 	isControlPlane bool,
 	isWorker bool,
-) *hcloud.Server {
-	server := Get(ctx, pool, i)
-	if server == nil {
-		server = create(ctx, sshKey, network, image, placementGroup, pool, i, isControlPlane, isWorker)
+) (*hcloud.Server, error) {
+	server, err := Get(ctx, pool, i)
+	if server != nil && err == nil {
+		return server, nil
 	}
-	return server
+	return create(ctx, sshKey, network, image, placementGroup, pool, i, isControlPlane, isWorker)
 }
 
 func create(
@@ -37,10 +38,11 @@ func create(
 	i int,
 	isControlPlane bool,
 	isWorker bool,
-) *hcloud.Server {
+) (*hcloud.Server, error) {
 	name := getName(ctx, pool, i)
-	addEvent, logEvents := logger.NewEventLogger(logger.Server, logger.Create, name)
-	defer logEvents()
+
+	l := logger.New(nil, logger.Server, logger.Create, name)
+	defer l.LogEvents()
 
 	serverType := hcloud.ServerType{Name: string(pool.Instance)}
 	location := hcloud.Location{Name: string(pool.Location)}
@@ -78,22 +80,23 @@ func create(
 		}),
 	})
 	if err != nil {
-		addEvent(logger.Failure, err)
-		return nil
+		l.AddEvent(logger.Failure, err)
+		return nil, err
 	}
 	if res.Server == nil {
-		addEvent(logger.Failure, "Empty Response")
-		return nil
+		err = errors.New("server is nil")
+		l.AddEvent(logger.Failure, err)
+		return nil, err
 	}
 	if err := ctx.CloudClient.Action.WaitFor(ctx.Context, res.Action); err != nil {
-		addEvent(logger.Failure, err)
-		return nil
+		l.AddEvent(logger.Failure, err)
+		return nil, err
 	}
 	if err := ctx.CloudClient.Action.WaitFor(ctx.Context, res.NextActions...); err != nil {
-		addEvent(logger.Failure, err)
-		return nil
+		l.AddEvent(logger.Failure, err)
+		return nil, err
 	}
 
-	addEvent(logger.Success)
-	return res.Server
+	l.AddEvent(logger.Success)
+	return res.Server, nil
 }

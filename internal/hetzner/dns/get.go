@@ -1,6 +1,7 @@
 package dns
 
 import (
+	"errors"
 	"h3s/internal/cluster"
 	"h3s/internal/hetzner/dns/api"
 	"h3s/internal/hetzner/dns/utils"
@@ -8,35 +9,46 @@ import (
 )
 
 func Get(ctx *cluster.Cluster) ([]api.Record, error) {
+	l := logger.New(nil, logger.DNSRecord, logger.Get, "All records")
+	defer l.LogEvents()
+
+	// Get zone
 	zone, err := GetZone(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	logger.LogResourceEvent(logger.DNSRecord, "Load All", ctx.Config.Domain, logger.Initialized)
+	// Get records
 	records, err := ctx.DNSClient.GetRecordsByZoneID(ctx.Context, zone.ID)
-	if err != nil || records == nil {
-		logger.LogResourceEvent(logger.DNSRecord, "Load All", ctx.Config.Domain, logger.Failure)
+	if err != nil {
+		l.AddEvent(logger.Failure, err)
+		return nil, err
+	}
+	if records == nil {
+		err = errors.New("records is nil")
+		l.AddEvent(logger.Failure, err)
 		return nil, err
 	}
 
-	logger.LogResourceEvent(logger.DNSRecord, "Load All", ctx.Config.Domain, logger.Success)
+	l.AddEvent(logger.Success)
 	return utils.FilterFoundRecords(*records), nil
 }
 
 func GetZone(ctx *cluster.Cluster) (*api.Zone, error) {
-	logger.LogResourceEvent(logger.DNSZone, logger.Get, ctx.Config.Domain, logger.Initialized)
+	l := logger.New(nil, logger.DNSZone, logger.Get, ctx.Config.Domain)
+	defer l.LogEvents()
 
 	zone, err := ctx.DNSClient.GetZoneByName(ctx.Context, ctx.Config.Domain)
 	if err != nil {
-		logger.LogResourceEvent(logger.DNSZone, logger.Get, ctx.Config.Domain, logger.Failure)
+		l.AddEvent(logger.Failure, err)
 		return nil, err
 	}
 	if zone == nil {
-		logger.LogResourceEvent(logger.DNSZone, logger.Get, ctx.Config.Domain, logger.Failure, "Zone not found")
+		err = errors.New("zone is nil")
+		l.AddEvent(logger.Failure, err)
 		return nil, err
 	}
 
-	logger.LogResourceEvent(logger.DNSZone, logger.Get, ctx.Config.Domain, logger.Success)
+	l.AddEvent(logger.Success)
 	return zone, nil
 }

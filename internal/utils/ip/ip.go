@@ -3,7 +3,6 @@ package ip
 import (
 	"fmt"
 	"github.com/hetznercloud/hcloud-go/v2/hcloud"
-	"h3s/internal/utils/logger"
 	"net"
 	"net/netip"
 )
@@ -22,24 +21,15 @@ func FirstAvailable(server *hcloud.Server) string {
 			return fmt.Sprintf("[%s]", network.Next().String())
 		}
 	default:
-		return Private(server)
+		return Private(server).String()
 	}
 	return ""
 }
 
 // Private returns the first private IP address of a server
-func Private(server *hcloud.Server) string {
+func Private(server *hcloud.Server) net.IP {
 	if len(server.PrivateNet) > 0 {
-		return server.PrivateNet[0].IP.String()
+		return server.PrivateNet[0].IP
 	}
-	return ""
-}
-
-// GetIpRange returns the IP range of a CIDR string
-func GetIpRange(s string) *net.IPNet {
-	_, ipRange, err := net.ParseCIDR(s)
-	if err != nil {
-		logger.LogError("Invalid IP Range", err)
-	}
-	return ipRange
+	return nil
 }

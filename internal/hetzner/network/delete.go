@@ -5,20 +5,22 @@ import (
 	"h3s/internal/utils/logger"
 )
 
-func Delete(ctx *cluster.Cluster) {
-	network := Get(ctx)
-	if network == nil {
-		return
+func Delete(ctx *cluster.Cluster) error {
+	l := logger.New(nil, logger.Network, logger.Delete, getName(ctx))
+	defer l.LogEvents()
+
+	network, err := Get(ctx)
+	if network == nil && err.Error() == "network is nil" {
+		l.AddEvent(logger.Success, "no network found to delete")
+		return nil
 	}
 
-	addEvent, logEvents := logger.NewEventLogger(logger.Network, logger.Delete, network.Name)
-	defer logEvents()
-
-	_, err := ctx.CloudClient.Network.Delete(ctx.Context, network)
+	_, err = ctx.CloudClient.Network.Delete(ctx.Context, network)
 	if err != nil {
-		addEvent(logger.Failure, err)
-		return
+		l.AddEvent(logger.Failure, err)
+		return err
 	}
 
-	addEvent(logger.Success)
+	l.AddEvent(logger.Success)
+	return nil
 }

@@ -1,45 +1,68 @@
 package gateway
 
 import (
+	"errors"
 	"github.com/hetznercloud/hcloud-go/v2/hcloud"
 	"h3s/internal/cluster"
 	"h3s/internal/hetzner/network"
 	"h3s/internal/utils/ip"
 	"h3s/internal/utils/logger"
+	"net"
 )
 
-func Delete(ctx *cluster.Cluster) {
-	net := network.Get(ctx)
-	server, err := Get(ctx)
-	if err != nil || server == nil {
-		return
+func Delete(ctx *cluster.Cluster) error {
+	// Get network
+	network, err := network.Get(ctx)
+	if err != nil {
+		return err
 	}
 
-	deleteGatewayRoute(ctx, net, server)
-	delete(ctx, server)
+	// Get gateway server
+	server, err := Get(ctx)
+	if err != nil {
+		return err
+	}
+	if server == nil {
+		return errors.New("no gateway server found")
+	}
+
+	// Delete gateway route
+	if err := deleteGatewayRoute(ctx, network, server); err != nil {
+		return err
+	}
+
+	return delete(ctx, server)
 }
 
-func deleteGatewayRoute(ctx *cluster.Cluster, net *hcloud.Network, proxy *hcloud.Server) {
+func deleteGatewayRoute(ctx *cluster.Cluster, network *hcloud.Network, proxy *hcloud.Server) error {
 	if len(proxy.PrivateNet) == 0 {
-		return
+		return errors.New("no private network found")
 	}
-	ctx.CloudClient.Network.DeleteRoute(ctx.Context, net, hcloud.NetworkDeleteRouteOpts{
+	_, ipRange, err := net.ParseCIDR("0.0.0.0/0")
+	if err != nil {
+		return err
+	}
+
+	_, _, err = ctx.CloudClient.Network.DeleteRoute(ctx.Context, network, hcloud.NetworkDeleteRouteOpts{
 		Route: hcloud.NetworkRoute{
-			Destination: ip.GetIpRange("0.0.0.0/0"),
-			Gateway:     proxy.PrivateNet[0].IP,
+			Destination: ipRange,
+			Gateway:     ip.Private(proxy),
 		},
 	})
+	return err
 }
 
-func delete(ctx *cluster.Cluster, server *hcloud.Server) {
-	addEvent, logEvents := logger.NewEventLogger(logger.Server, logger.Delete, server.Name)
-	defer logEvents()
+func delete(ctx *cluster.Cluster, server *hcloud.Server) error {
+	l := logger.New(nil, logger.Server, logger.Delete, server.Name)
+	defer l.LogEvents()
 
+	// Delete server
 	_, _, err := ctx.CloudClient.Server.DeleteWithResult(ctx.Context, server)
 	if err != nil {
-		addEvent(logger.Failure, err)
-		return
+		l.AddEvent(logger.Failure, err)
+		return err
 	}
 
-	addEvent(logger.Success)
+	l.AddEvent(logger.Success)
+	return nil
 }

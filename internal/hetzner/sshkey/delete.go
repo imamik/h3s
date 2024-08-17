@@ -5,21 +5,22 @@ import (
 	"h3s/internal/utils/logger"
 )
 
-func Delete(ctx *cluster.Cluster) {
-	sshKey := Get(ctx)
+func Delete(ctx *cluster.Cluster) error {
+	l := logger.New(nil, logger.SSHKey, logger.Delete, getName(ctx))
+	defer l.LogEvents()
 
-	if sshKey == nil {
-		return
+	sshKey, err := Get(ctx)
+	if sshKey == nil && err.Error() == "ssh key is nil" {
+		l.AddEvent(logger.Success, "no ssh key found to delete")
+		return nil
 	}
 
-	addEvent, logEvents := logger.NewEventLogger(logger.SSHKey, logger.Delete, sshKey.Name)
-	defer logEvents()
-
-	_, err := ctx.CloudClient.SSHKey.Delete(ctx.Context, sshKey)
+	_, err = ctx.CloudClient.SSHKey.Delete(ctx.Context, sshKey)
 	if err != nil {
-		addEvent(logger.Failure, err)
-		return
+		l.AddEvent(logger.Failure, err)
+		return err
 	}
 
-	addEvent(logger.Success)
+	l.AddEvent(logger.Success)
+	return nil
 }

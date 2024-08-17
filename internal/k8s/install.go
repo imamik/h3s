@@ -10,18 +10,35 @@ import (
 	"h3s/internal/hetzner/server"
 	"h3s/internal/k8s/components"
 	"h3s/internal/utils/kubectl"
+	"h3s/internal/utils/logger"
 	"h3s/internal/utils/ssh"
 )
 
 func Install(clr *cluster.Cluster) error {
-	net := network.Get(clr)
-	lb := loadbalancers.Get(clr)
+	l := logger.New(nil, logger.Server, logger.Create, "gateway")
+	defer l.LogEvents()
 
+	// Get network
+	net, err := network.Get(clr)
+	if err != nil {
+		l.AddEvent(logger.Failure, err)
+		return err
+	}
+
+	// Get load balancer
+	lb, err := loadbalancers.Get(clr)
+	if err != nil {
+		l.AddEvent(logger.Failure, err)
+		return err
+	}
+
+	// Get gateway node
 	gatewayNode, err := gateway.GetIfNeeded(clr)
 	if err != nil {
 		return fmt.Errorf("failed to get gateway node: %w", err)
 	}
 
+	// Get all nodes
 	nodes, err := server.GetAll(clr)
 	if err != nil {
 		return fmt.Errorf("failed to get all nodes: %w", err)

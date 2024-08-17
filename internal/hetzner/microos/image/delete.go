@@ -6,18 +6,28 @@ import (
 	"h3s/internal/utils/logger"
 )
 
-func Delete(ctx *cluster.Cluster, architecture hcloud.Architecture) {
+func Delete(ctx *cluster.Cluster, architecture hcloud.Architecture) error {
+	l := logger.New(nil, logger.Image, logger.Delete, getName(ctx, architecture))
+	defer l.LogEvents()
+
 	img, err := Get(ctx, architecture)
-	if err != nil || img == nil {
-		return
+
+	if img == nil && err == nil {
+		l.AddEvent(logger.Success, "no image found to delete")
+		return nil
 	}
 
-	logger.LogResourceEvent(logger.Image, logger.Delete, img.Name, logger.Initialized)
+	if err != nil {
+		l.AddEvent(logger.Failure, err)
+		return err
+	}
 
 	_, err = ctx.CloudClient.Image.Delete(ctx.Context, img)
 	if err != nil {
-		logger.LogResourceEvent(logger.Image, logger.Delete, img.Name, logger.Failure, err)
+		l.AddEvent(logger.Failure, err)
+		return err
 	}
 
-	logger.LogResourceEvent(logger.Image, logger.Delete, img.Name, logger.Success)
+	l.AddEvent(logger.Success)
+	return nil
 }

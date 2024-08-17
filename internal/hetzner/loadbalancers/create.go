@@ -1,28 +1,33 @@
 package loadbalancers
 
 import (
+	"errors"
 	"github.com/hetznercloud/hcloud-go/v2/hcloud"
 	"h3s/internal/cluster"
 	"h3s/internal/hetzner/network"
 	"h3s/internal/utils/logger"
 )
 
-func Create(ctx *cluster.Cluster) *hcloud.LoadBalancer {
-	balancer := Get(ctx)
-	if balancer == nil {
-		net := network.Get(ctx)
-		return create(ctx, net)
+func Create(ctx *cluster.Cluster) (*hcloud.LoadBalancer, error) {
+	balancer, err := Get(ctx)
+	if balancer != nil && err == nil {
+		return balancer, nil
 	}
-	return balancer
+	net, err := network.Get(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return create(ctx, net)
 }
 
 func create(
 	ctx *cluster.Cluster,
 	net *hcloud.Network,
-) *hcloud.LoadBalancer {
+) (*hcloud.LoadBalancer, error) {
 	name := getName(ctx)
-	addEvent, logEvents := logger.NewEventLogger(logger.LoadBalancer, logger.Create, name)
-	defer logEvents()
+
+	l := logger.New(nil, logger.LoadBalancer, logger.Create, name)
+	defer l.LogEvents()
 
 	algorithm := hcloud.LoadBalancerAlgorithm{
 		Type: "round_robin",
@@ -44,30 +49,36 @@ func create(
 	res, _, err := ctx.CloudClient.LoadBalancer.Create(ctx.Context, opts)
 
 	if err != nil {
-		addEvent(logger.Failure, err)
-		return nil
+		l.AddEvent(logger.Failure, err)
+		return nil, err
 	}
 	if res.LoadBalancer == nil {
-		addEvent(logger.Failure, "Empty response")
-		return nil
+		err = errors.New("load balancer is nil")
+		l.AddEvent(logger.Failure, err)
+		return nil, err
 	}
 	if err := ctx.CloudClient.Action.WaitFor(ctx.Context, res.Action); err != nil {
-		addEvent(logger.Failure, err)
-		return nil
+		l.AddEvent(logger.Failure, err)
+		return nil, err
 	}
 
-	balancer := Get(ctx)
+	balancer, err := Get(ctx)
+	if err != nil {
+		l.AddEvent(logger.Failure, err)
+		return nil, err
+	}
+
 	_, _, err = ctx.CloudClient.RDNS.ChangeDNSPtr(ctx.Context, balancer, balancer.PublicNet.IPv4.IP, &ctx.Config.Domain)
 	if err != nil {
-		addEvent(logger.Failure, err)
-		return nil
+		l.AddEvent(logger.Failure, err)
+		return nil, err
 	}
 	_, _, err = ctx.CloudClient.RDNS.ChangeDNSPtr(ctx.Context, balancer, balancer.PublicNet.IPv6.IP, &ctx.Config.Domain)
 	if err != nil {
-		addEvent(logger.Failure, err)
-		return nil
+		l.AddEvent(logger.Failure, err)
+		return nil, err
 	}
 
-	addEvent(logger.Success)
-	return balancer
+	l.AddEvent(logger.Success)
+	return balancer, nil
 }

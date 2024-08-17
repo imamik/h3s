@@ -1,6 +1,7 @@
 package server
 
 import (
+	"errors"
 	"github.com/hetznercloud/hcloud-go/v2/hcloud"
 	"h3s/internal/cluster"
 	"h3s/internal/config"
@@ -20,10 +21,10 @@ func Create(
 	architecture hcloud.Architecture,
 	sshKey *hcloud.SSHKey,
 	location config.Location,
-) *hcloud.Server {
-	server := Get(ctx, architecture)
-	if server != nil {
-		return server
+) (*hcloud.Server, error) {
+	server, err := Get(ctx, architecture)
+	if server != nil && err == nil {
+		return server, nil
 	}
 	return create(ctx, architecture, sshKey, location)
 }
@@ -32,10 +33,12 @@ func create(
 	ctx *cluster.Cluster,
 	architecture hcloud.Architecture,
 	sshKey *hcloud.SSHKey,
-	l config.Location,
-) *hcloud.Server {
+	loc config.Location,
+) (*hcloud.Server, error) {
 	name := getName(ctx, architecture)
-	logger.LogResourceEvent(logger.Server, logger.Create, name, logger.Initialized)
+
+	l := logger.New(nil, logger.Server, logger.Create, name)
+	defer l.LogEvents()
 
 	instance := ARMInstanceType
 	if architecture == hcloud.ArchitectureX86 {
@@ -46,7 +49,7 @@ func create(
 		Name:       name,
 		Image:      &hcloud.Image{Name: LinuxImage},
 		ServerType: &hcloud.ServerType{Name: string(instance)},
-		Location:   &hcloud.Location{Name: string(l)},
+		Location:   &hcloud.Location{Name: string(loc)},
 		SSHKeys:    []*hcloud.SSHKey{sshKey},
 		PublicNet: &hcloud.ServerCreatePublicNet{
 			EnableIPv4: true,
@@ -58,19 +61,24 @@ func create(
 		}),
 	})
 	if err != nil {
-		logger.LogResourceEvent(logger.Server, logger.Create, name, logger.Failure, err)
+		l.AddEvent(logger.Failure, err)
+		return nil, err
 	}
 	if res.Server == nil {
-		logger.LogResourceEvent(logger.Server, logger.Create, name, logger.Failure, "Empty Response")
+		err = errors.New("server is nil")
+		l.AddEvent(logger.Failure, err)
+		return nil, err
 	}
 
 	if err := ctx.CloudClient.Action.WaitFor(ctx.Context, res.Action); err != nil {
-		logger.LogResourceEvent(logger.Server, logger.Create, name, logger.Failure, err)
+		l.AddEvent(logger.Failure, err)
+		return nil, err
 	}
 	if err := ctx.CloudClient.Action.WaitFor(ctx.Context, res.NextActions...); err != nil {
-		logger.LogResourceEvent(logger.Server, logger.Create, name, logger.Failure, err)
+		l.AddEvent(logger.Failure, err)
+		return nil, err
 	}
 
-	logger.LogResourceEvent(logger.Server, logger.Create, name, logger.Success)
-	return res.Server
+	l.AddEvent(logger.Success)
+	return res.Server, nil
 }

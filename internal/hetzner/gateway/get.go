@@ -8,16 +8,24 @@ import (
 
 func Get(ctx *cluster.Cluster) (*hcloud.Server, error) {
 	name := getName(ctx)
-	addEvent, logEvents := logger.NewEventLogger(logger.Server, logger.Create, name)
-	defer logEvents()
 
+	l := logger.New(nil, logger.Server, logger.Get, name)
+	defer l.LogEvents()
+
+	// Get server by name
 	server, _, err := ctx.CloudClient.Server.GetByName(ctx.Context, name)
 	if err != nil {
-		addEvent(logger.Failure, err)
+		l.AddEvent(logger.Failure, err)
 		return nil, err
 	}
 
-	addEvent(logger.Success)
+	// Check if server is nil
+	if server == nil {
+		err = nil
+		l.AddEvent(logger.Failure, err)
+		return nil, err
+	}
+
 	return server, nil
 }
 
