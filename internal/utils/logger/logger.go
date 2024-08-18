@@ -41,6 +41,8 @@ func (l *EventLogger) AddEvent(status LogCrudStatus, err ...any) {
 		Status:   status,
 		Err:      err,
 		Depth:    0,
+		IsFirst:  len(l.events) == 0,
+		IsLast:   false,
 	}
 	l.events = append(l.events, event)
 	if l.logLive {
@@ -55,6 +57,10 @@ func (l *EventLogger) AppendEvents(events []ResourceEvent) {
 
 // LogEvents logs all events in the event logger (or only the latest event if logOnlyLatest is set)
 func (l *EventLogger) LogEvents() {
+	// Set the last event to be the last event
+	if len(l.events) > 0 {
+		l.events[len(l.events)-1].IsLast = true
+	}
 	if l.parent != nil {
 		// Increase the depth of the events
 		for i := range l.events {
@@ -64,8 +70,8 @@ func (l *EventLogger) LogEvents() {
 	} else if l.logOnlyLatest || l.logLive {
 		l.LogLatest()
 	} else {
-		for i, event := range l.events {
-			l.logEvent(event, true, i == 0, i == len(l.events)-1)
+		for _, event := range l.events {
+			l.logEvent(event, true)
 		}
 	}
 	l.events = []ResourceEvent{}
@@ -74,11 +80,11 @@ func (l *EventLogger) LogEvents() {
 func (l *EventLogger) LogLatest() {
 	lastIndex := len(l.events) - 1
 	event := l.events[lastIndex]
-	l.logEvent(event, false, false, true)
+	l.logEvent(event, false)
 }
 
 // logEvent logs the event with the appropriate color
-func (l *EventLogger) logEvent(e ResourceEvent, group bool, isFirst bool, isLast bool) {
+func (l *EventLogger) logEvent(e ResourceEvent, group bool) {
 
 	// Build the action string
 	var actionStr string
@@ -99,11 +105,11 @@ func (l *EventLogger) logEvent(e ResourceEvent, group bool, isFirst bool, isLast
 		for i := 0; i < e.Depth; i++ {
 			logLine = append(logLine, "│ ")
 		}
-		if isFirst && isLast {
+		if e.IsFirst && e.IsLast {
 			logLine = append(logLine, "●─")
-		} else if isFirst {
+		} else if e.IsFirst {
 			logLine = append(logLine, "┌─")
-		} else if isLast {
+		} else if e.IsLast {
 			logLine = append(logLine, "└─")
 		} else {
 			logLine = append(logLine, "├─")

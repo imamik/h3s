@@ -8,6 +8,8 @@ type ResourceEvent struct {
 	Status   LogCrudStatus // Status is the status of the event
 	Err      []any         // Err is the error of the event
 	Depth    int           // Depth is the depth of the event (0 is the root event, 1 is a child event, ...)
+	IsFirst  bool          // IsFirst is true if the event is the first event in the list
+	IsLast   bool          // IsLast is true if the event is the last event in the list
 }
 
 const (
