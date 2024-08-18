@@ -7,6 +7,7 @@ type ResourceEvent struct {
 	Action   interface{}   // Action is the action of the event
 	Status   LogCrudStatus // Status is the status of the event
 	Err      []any         // Err is the error of the event
+	Depth    int           // Depth is the depth of the event (0 is the root event, 1 is a child event, ...)
 }
 
 const (
@@ -42,7 +43,7 @@ type LogCrudMethod string
 
 const (
 	Create LogCrudMethod = "Create"
-	Get    LogCrudMethod = "Load"
+	Get    LogCrudMethod = "Get"
 	Update LogCrudMethod = "Update"
 	Delete LogCrudMethod = "Delete"
 )

@@ -14,22 +14,19 @@ type EventLogger struct {
 	resource      LogResource     // resource is the resource of the events
 	action        interface{}     // action is the action of the event
 	id            string          // id is the id of the resource
+	parent        *EventLogger    // parent is the parent event logger
 }
 
 // New creates a new event logger
-func New(reuse *EventLogger, resource LogResource, action interface{}, id string) *EventLogger {
-	var e EventLogger
-	if reuse != nil {
-		e = *reuse
-	} else {
-		e = EventLogger{
-			logOnlyLatest: false,
-			logLive:       false,
-			events:        []ResourceEvent{},
-			resource:      resource,
-			action:        action,
-			id:            id,
-		}
+func New(parent *EventLogger, resource LogResource, action interface{}, id string) *EventLogger {
+	e := EventLogger{
+		parent:        parent,
+		events:        []ResourceEvent{},
+		logOnlyLatest: false,
+		logLive:       false,
+		resource:      resource,
+		action:        action,
+		id:            id,
 	}
 	e.AddEvent(Initialized)
 	return &e
@@ -43,6 +40,7 @@ func (l *EventLogger) AddEvent(status LogCrudStatus, err ...any) {
 		Action:   l.action,
 		Status:   status,
 		Err:      err,
+		Depth:    0,
 	}
 	l.events = append(l.events, event)
 	if l.logLive {
@@ -50,15 +48,27 @@ func (l *EventLogger) AddEvent(status LogCrudStatus, err ...any) {
 	}
 }
 
+// AppendEvents appends a list of events to the event logger
+func (l *EventLogger) AppendEvents(events []ResourceEvent) {
+	l.events = append(l.events, events...)
+}
+
 // LogEvents logs all events in the event logger (or only the latest event if logOnlyLatest is set)
 func (l *EventLogger) LogEvents() {
-	if l.logOnlyLatest {
+	if l.parent != nil {
+		// Increase the depth of the events
+		for i := range l.events {
+			l.events[i].Depth++
+		}
+		l.parent.AppendEvents(l.events)
+	} else if l.logOnlyLatest || l.logLive {
 		l.LogLatest()
 	} else {
 		for i, event := range l.events {
 			l.logEvent(event, true, i == 0, i == len(l.events)-1)
 		}
 	}
+	l.events = []ResourceEvent{}
 }
 
 func (l *EventLogger) LogLatest() {
@@ -85,14 +95,18 @@ func (l *EventLogger) logEvent(e ResourceEvent, group bool, isFirst bool, isLast
 	// Build the log line, composed of the action, resource, id, status and error with normalized lengths
 	var logLine []any
 	if group {
+		// for every depth level, add the appropriate line
+		for i := 0; i < e.Depth; i++ {
+			logLine = append(logLine, "│ ")
+		}
 		if isFirst && isLast {
-			logLine = append(logLine, "[")
+			logLine = append(logLine, "●─")
 		} else if isFirst {
-			logLine = append(logLine, "⎡")
+			logLine = append(logLine, "┌─")
 		} else if isLast {
-			logLine = append(logLine, "⎣")
+			logLine = append(logLine, "└─")
 		} else {
-			logLine = append(logLine, "├")
+			logLine = append(logLine, "├─")
 		}
 	}
 	logLine = append(

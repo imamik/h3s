@@ -18,11 +18,12 @@ func dialWithRetries(ip string, sshConfig *ssh.ClientConfig, retryInterval time.
 	for i := 0; i < maxRetries; i++ {
 		c, err := ssh.Dial("tcp", ip+":22", sshConfig)
 		if err == nil && c != nil {
+			l.AddEvent(logger.Success)
 			return c, nil
 		}
 		retryBackoff := time.Duration(i+1) * retryInterval
-		err = fmt.Errorf("failed to dial %s, retrying in %s, errors: %s", ip, retryBackoff, err)
 		l.AddEvent(logger.Failure, err)
+		l.AddEvent(logger.Failure, fmt.Errorf("retrying in %s", ip))
 		time.Sleep(retryBackoff)
 	}
 

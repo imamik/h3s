@@ -38,5 +38,6 @@ func Delete(ctx *cluster.Cluster) error {
 	}
 	wg.Wait()
 
+	l.AddEvent(logger.Success)
 	return nil
 }

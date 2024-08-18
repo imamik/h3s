@@ -104,6 +104,7 @@ func CreatePools(ctx *cluster.Cluster) ([]*hcloud.Server, error) {
 		return nil, fmt.Errorf("failed to create pools: %v", errors)
 	}
 
+	l.AddEvent(logger.Success)
 	return nodes, nil
 }
 

@@ -97,5 +97,6 @@ func GetAll(ctx *cluster.Cluster) (*AllServers, error) {
 		}
 	}
 
+	l.AddEvent(logger.Success)
 	return &all, nil
 }

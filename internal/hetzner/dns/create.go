@@ -9,7 +9,7 @@ import (
 )
 
 func Create(ctx *cluster.Cluster) error {
-	l := logger.New(nil, logger.DNSRecord, logger.Create, "")
+	l := logger.New(nil, logger.DNSRecord, logger.Create, "All Records")
 	defer l.LogEvents()
 
 	// Get load balancer
@@ -32,11 +32,10 @@ func Create(ctx *cluster.Cluster) error {
 	for _, record := range records {
 		recordId := record.Name + " | " + record.Type + " | " + record.Value
 
+		wg.Add(1)
 		go func() {
 			logr := logger.New(l, logger.DNSRecord, logger.Create, recordId)
 			defer logr.LogEvents()
-
-			wg.Add(1)
 			defer wg.Done()
 
 			_, err := ctx.DNSClient.CreateRecord(ctx.Context, record)
@@ -49,5 +48,6 @@ func Create(ctx *cluster.Cluster) error {
 	}
 	wg.Wait()
 
+	l.AddEvent(logger.Success)
 	return nil
 }

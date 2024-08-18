@@ -11,6 +11,7 @@ func Delete(ctx *cluster.Cluster) error {
 
 	balancer, err := Get(ctx)
 	if balancer == nil && err.Error() == "load balancer is nil" {
+		l.AddEvent(logger.Success)
 		return nil
 	}
 
