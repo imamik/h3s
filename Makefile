@@ -17,7 +17,14 @@ all: test build
 
 # Build the project
 build:
-	$(GOBUILD) -o $(BINARY_NAME) -v $(MAIN_PACKAGE)
+    # execute the clean command
+	make clean
+	# build production binary with ldflags
+	$(GOBUILD) -ldflags="-s -w" -o $(BINARY_NAME) -v $(MAIN_PACKAGE)
+	# wait 0.1 second
+	sleep 0.1
+	# print file size
+	@echo "File size: $(shell du -sh $(BINARY_NAME))"
 
 # Run all tests
 test:
@@ -51,7 +58,7 @@ build-darwin:
 	CGO_ENABLED=0 GOOS=darwin GOARCH=amd64 $(GOBUILD) -o $(BINARY_NAME)_darwin -v $(MAIN_PACKAGE)
 
 # Build for all supported platforms
-build-all: build-linux build-windows build-darwin
+build-all: test clean build-linux build-windows build-darwin
 
 # Code formatting
 fmt:

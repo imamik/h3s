@@ -3,22 +3,9 @@ package credentials
 import (
 	"crypto/rand"
 	"encoding/hex"
+
 	"github.com/charmbracelet/huh"
-	"h3s/internal/config"
 )
-
-func surveyName() string {
-	var name string
-
-	huh.NewInput().
-		Title("Project Name").
-		Description("Used to name resources. Must be in lower-kebap-case").
-		Validate(config.ValidateName).
-		Value(&name).
-		Run()
-
-	return name
-}
 
 func generateToken(length int) string {
 	bytes := make([]byte, length)
