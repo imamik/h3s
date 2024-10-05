@@ -1,7 +1,6 @@
 package k3s
 
 import (
-	"github.com/hetznercloud/hcloud-go/v2/hcloud"
 	"h3s/internal/cluster"
 	"h3s/internal/hetzner/gateway"
 	"h3s/internal/hetzner/loadbalancers"
@@ -9,6 +8,8 @@ import (
 	"h3s/internal/k3s/config"
 	"h3s/internal/utils/ip"
 	"h3s/internal/utils/ssh"
+
+	"github.com/hetznercloud/hcloud-go/v2/hcloud"
 )
 
 // getNetworkInterface calls the ip command on the remote server to get the network interface name
@@ -56,7 +57,7 @@ func Install(ctx *cluster.Cluster) error {
 	}
 
 	// Get gateway
-	gate, err := gateway.GetIfNeeded(ctx)
+	gate, err := gateway.Get(ctx)
 	if err != nil {
 		return err
 	}
@@ -88,7 +89,6 @@ func Install(ctx *cluster.Cluster) error {
 			NodeName:              n.Name,
 			NodeIp:                nodeIp.String(),
 			NetworkInterface:      networkInterface,
-			PublicIps:             ctx.Config.PublicIps,
 			K3sVersion:            ctx.Config.K3sVersion,
 		})
 		if err != nil {

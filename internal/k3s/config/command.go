@@ -1,8 +1,9 @@
 package config
 
 import (
-	"gopkg.in/yaml.v3"
 	"strings"
+
+	"gopkg.in/yaml.v3"
 )
 
 // CommandConfig represents the configuration options for the k3s agents and control plane commands (installation & server configuration)
@@ -31,8 +32,6 @@ type CommandConfig struct {
 	// NetworkInterface is the network interface to use for flannel
 	NetworkInterface string
 
-	// PublicIps is true if the node has public IPs
-	PublicIps bool
 	// K3sVersion is the version of k3s to install
 	K3sVersion string
 }
@@ -116,7 +115,7 @@ func Command(c CommandConfig) (string, error) {
 	// Generate the installation and configuration commands
 	// it primarily copies the configuration file to the correct location and sets up the environment
 	// if it finds that the server has already been initialized, it will stop the installation
-	preInstallCmd, err := preInstall(c.PublicIps == false, string(configYaml))
+	preInstallCmd, err := preInstall(string(configYaml))
 	if err != nil {
 		return "", err
 	}

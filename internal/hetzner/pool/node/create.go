@@ -2,12 +2,13 @@ package node
 
 import (
 	"errors"
-	"github.com/hetznercloud/hcloud-go/v2/hcloud"
 	"h3s/internal/cluster"
 	"h3s/internal/config"
 	"h3s/internal/hetzner/pool/node/userdata"
 	"h3s/internal/utils/logger"
 	"strconv"
+
+	"github.com/hetznercloud/hcloud-go/v2/hcloud"
 )
 
 func Create(
@@ -47,8 +48,8 @@ func create(
 	serverType := hcloud.ServerType{Name: string(pool.Instance)}
 	location := hcloud.Location{Name: string(pool.Location)}
 	publicNet := hcloud.ServerCreatePublicNet{
-		EnableIPv4: ctx.Config.PublicIps,
-		EnableIPv6: ctx.Config.PublicIps,
+		EnableIPv4: false,
+		EnableIPv6: false,
 	}
 	networks := []*hcloud.Network{network}
 	sshKeys := []*hcloud.SSHKey{sshKey}

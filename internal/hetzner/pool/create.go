@@ -2,7 +2,6 @@ package pool
 
 import (
 	"fmt"
-	"github.com/hetznercloud/hcloud-go/v2/hcloud"
 	"h3s/internal/cluster"
 	"h3s/internal/config"
 	"h3s/internal/hetzner/microos/image"
@@ -12,6 +11,8 @@ import (
 	"h3s/internal/hetzner/sshkey"
 	"h3s/internal/utils/logger"
 	"sync"
+
+	"github.com/hetznercloud/hcloud-go/v2/hcloud"
 )
 
 func CreatePools(ctx *cluster.Cluster) ([]*hcloud.Server, error) {
@@ -119,16 +120,10 @@ func CreatePool(
 	l := logger.New(nil, logger.Pool, logger.Create, ctx.GetName(pool.Name))
 	defer l.LogEvents()
 
-	var img *hcloud.Image
-	var err error
-	if ctx.Config.Image == config.ImageMicroOS {
-		img, err = image.Get(ctx, config.GetArchitecture(pool.Instance))
-		if err != nil {
-			l.AddEvent(logger.Failure, err)
-			return nil, err
-		}
-	} else {
-		img = &hcloud.Image{Name: string(ctx.Config.Image)}
+	img, err := image.Get(ctx, config.GetArchitecture(pool.Instance))
+	if err != nil {
+		l.AddEvent(logger.Failure, err)
+		return nil, err
 	}
 
 	placementGroup, err := placementgroup.Create(ctx, pool, isControlPlane, isWorker)

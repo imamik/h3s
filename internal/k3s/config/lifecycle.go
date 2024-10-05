@@ -4,7 +4,7 @@ import (
 	"h3s/internal/utils/template"
 )
 
-func preInstall(publicIps bool, configYaml string) (string, error) {
+func preInstall(configYaml string) (string, error) {
 	return template.CompileTemplate(`
 set -ex
 
@@ -36,7 +36,7 @@ timeout 180s /bin/sh -c 'while ! ping -c 1 {{ .Address }} >/dev/null 2>&1; do ec
 `, map[string]interface{}{
 		"ConfigYaml":         configYaml,
 		"Address":            "cloudflare.com",
-		"OnlyPrivateNetwork": publicIps,
+		"OnlyPrivateNetwork": true,
 	})
 }
 

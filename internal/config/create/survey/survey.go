@@ -1,11 +1,12 @@
 package survey
 
 import (
-	"github.com/charmbracelet/huh"
-	"github.com/hetznercloud/hcloud-go/v2/hcloud"
 	"h3s/internal/config"
 	"h3s/internal/k3s"
 	"strconv"
+
+	"github.com/charmbracelet/huh"
+	"github.com/hetznercloud/hcloud-go/v2/hcloud"
 )
 
 func Survey(k3sReleases []k3s.Release) (config.Config, error) {
@@ -64,23 +65,10 @@ func Survey(k3sReleases []k3s.Release) (config.Config, error) {
 	controlPlaneNodes, _ := strconv.Atoi(controlPlaneNodesString)
 	conf.ControlPlane.Pool.Nodes = controlPlaneNodes
 
-	huh.NewConfirm().
-		Title("Public IPs").
-		Description("Should the nodes have public IPv4 & IPv6 (alt: all traffic is in private network & gateway is created)").
-		Value(&conf.PublicIps).
-		Run()
-
 	huh.NewInput().
 		Title("Certmanager Email").
 		Description("Email to use for cert-manager (letsencrypt certificate generation process)").
 		Value(&conf.CertManager.Email).
-		Run()
-
-	huh.NewSelect[config.Image]().
-		Title("Base Image").
-		Description("The base image to use for the nodes").
-		Options(imageOptions...).
-		Value(&conf.Image).
 		Run()
 
 	huh.NewConfirm().

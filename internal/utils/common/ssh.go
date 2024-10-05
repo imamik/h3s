@@ -9,7 +9,7 @@ import (
 
 func SSH(ctx *cluster.Cluster, cmd string) (string, error) {
 	// Get the gateway
-	gate, err := gateway.GetIfNeeded(ctx)
+	gate, err := gateway.Get(ctx)
 	if err != nil {
 		return "", err
 	}

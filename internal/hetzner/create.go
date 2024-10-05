@@ -2,7 +2,6 @@ package hetzner
 
 import (
 	"h3s/internal/cluster"
-	"h3s/internal/config"
 	"h3s/internal/hetzner/dns"
 	"h3s/internal/hetzner/gateway"
 	"h3s/internal/hetzner/loadbalancers"
@@ -19,13 +18,11 @@ func Create(ctx *cluster.Cluster) {
 	defer l.LogEvents()
 
 	var wg sync.WaitGroup
-	if ctx.Config.Image == config.ImageMicroOS {
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
-			microos.Create(ctx)
-		}()
-	}
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		microos.Create(ctx)
+	}()
 	wg.Add(1)
 	go func() {
 		sshkey.Create(ctx)
@@ -50,14 +47,11 @@ func Create(ctx *cluster.Cluster) {
 		defer wg.Done()
 		pool.CreatePools(ctx)
 	}()
-	if ctx.Config.PublicIps == false {
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
-			gateway.Create(ctx)
-		}()
-	}
-	wg.Wait()
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		gateway.Create(ctx)
+	}()
 
 	l.AddEvent(logger.Success)
 }

@@ -1,9 +1,10 @@
 package gateway
 
 import (
-	"github.com/hetznercloud/hcloud-go/v2/hcloud"
 	"h3s/internal/cluster"
 	"h3s/internal/utils/logger"
+
+	"github.com/hetznercloud/hcloud-go/v2/hcloud"
 )
 
 func Get(ctx *cluster.Cluster) (*hcloud.Server, error) {
@@ -27,11 +28,4 @@ func Get(ctx *cluster.Cluster) (*hcloud.Server, error) {
 	}
 
 	return server, nil
-}
-
-func GetIfNeeded(ctx *cluster.Cluster) (*hcloud.Server, error) {
-	if ctx.Config.PublicIps {
-		return nil, nil
-	}
-	return Get(ctx)
 }

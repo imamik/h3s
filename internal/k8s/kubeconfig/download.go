@@ -2,8 +2,6 @@ package kubeconfig
 
 import (
 	"errors"
-	"github.com/hetznercloud/hcloud-go/v2/hcloud"
-	"gopkg.in/yaml.v3"
 	"h3s/internal/cluster"
 	"h3s/internal/config/path"
 	"h3s/internal/hetzner/gateway"
@@ -11,12 +9,15 @@ import (
 	"h3s/internal/k8s"
 	"h3s/internal/utils/file"
 	"h3s/internal/utils/ssh"
+
+	"github.com/hetznercloud/hcloud-go/v2/hcloud"
+	"gopkg.in/yaml.v3"
 )
 
 // Download downloads the kubeconfig from the first control plane server
 func Download(ctx *cluster.Cluster) error {
 	// Get the gateway server
-	gatewayServer, err := gateway.GetIfNeeded(ctx)
+	gatewayServer, err := gateway.Get(ctx)
 	if err != nil {
 		return err
 	}

@@ -2,7 +2,6 @@ package k8s
 
 import (
 	"fmt"
-	"github.com/hetznercloud/hcloud-go/v2/hcloud"
 	"h3s/internal/cluster"
 	"h3s/internal/hetzner/gateway"
 	"h3s/internal/hetzner/loadbalancers"
@@ -12,6 +11,8 @@ import (
 	"h3s/internal/utils/kubectl"
 	"h3s/internal/utils/logger"
 	"h3s/internal/utils/ssh"
+
+	"github.com/hetznercloud/hcloud-go/v2/hcloud"
 )
 
 func Install(clr *cluster.Cluster) error {
@@ -33,7 +34,7 @@ func Install(clr *cluster.Cluster) error {
 	}
 
 	// Get gateway node
-	gatewayNode, err := gateway.GetIfNeeded(clr)
+	gatewayNode, err := gateway.Get(clr)
 	if err != nil {
 		return fmt.Errorf("failed to get gateway node: %w", err)
 	}

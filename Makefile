@@ -21,9 +21,10 @@ build:
 	make clean
 	# build production binary with ldflags
 	$(GOBUILD) -ldflags="-s -w" -o $(BINARY_NAME) -v $(MAIN_PACKAGE)
-	# wait 0.1 second
-	sleep 0.1
-	# print file size
+	# wait for the file to be written
+	@while [ ! -f $(BINARY_NAME) ]; do \
+		sleep 0.1; \
+	done
 	@echo "File size: $(shell du -sh $(BINARY_NAME))"
 
 # Run all tests
