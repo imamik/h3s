@@ -89,7 +89,7 @@ func TestMainInvalidArgOutput(t *testing.T) {
 	runMainWithArgs(
 		[]string{"h3s", "invalid"},
 		[]string{
-			"errors: unknown command \"invalid\" for \"h3s\"",
+			"unknown command \"invalid\" for \"h3s\"\nRun 'h3s --help' for usage.",
 		},
 		t)
 }

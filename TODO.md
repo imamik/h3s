@@ -1,4 +1,13 @@
-- if 1 node cluster, ask if loadbalancer is needed
-- make sure to setup firewalls
+- add prometheus and grafana (monitor cluster nodes)
+
+- setup firewalls for gateway
 - Build mechanism to get token from k8s and chache/validate it
-- Build a simple command that dynamically builds the k3s.yaml and uses it to invoke kubectl
+
+CHORE
+- refactor project to meet standards
+- add more tests
+- add more documentation
+- add more examples
+
+- add rancher system upgrade controller
+- add cluster auto-scaler
