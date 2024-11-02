@@ -10,6 +10,7 @@ permissions:
 
 jobs:
   test:
+    needs: golangci
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
