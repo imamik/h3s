@@ -1,7 +1,6 @@
 package create
 
 import (
-	"github.com/spf13/cobra"
 	"h3s/internal/cluster"
 	"h3s/internal/config/create"
 	"h3s/internal/config/credentials"
@@ -9,13 +8,14 @@ import (
 	"h3s/internal/k3s"
 	"h3s/internal/k8s"
 	"h3s/internal/k8s/kubeconfig"
+
+	"github.com/spf13/cobra"
 )
 
 // runCreateConfig creates a new h3s cluster configuration
 func runCreateConfig(cmd *cobra.Command, _ []string) error {
 	// Load the latest 5 stable k3s releases
 	k3sReleases, err := k3s.GetFilteredReleases(false, true, 5)
-
 	// If there was an error, print it and return
 	if err != nil {
 		return err

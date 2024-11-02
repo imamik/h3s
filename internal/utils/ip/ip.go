@@ -2,9 +2,10 @@ package ip
 
 import (
 	"fmt"
-	"github.com/hetznercloud/hcloud-go/v2/hcloud"
 	"net"
 	"net/netip"
+
+	"github.com/hetznercloud/hcloud-go/v2/hcloud"
 )
 
 // FirstAvailable returns the first available IP address of a server

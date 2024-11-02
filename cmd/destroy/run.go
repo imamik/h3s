@@ -1,9 +1,10 @@
 package destroy
 
 import (
-	"github.com/spf13/cobra"
 	"h3s/internal/cluster"
 	"h3s/internal/hetzner"
+
+	"github.com/spf13/cobra"
 )
 
 // runDestroyCluster destroys a h3s cluster (leaving the configuration files)

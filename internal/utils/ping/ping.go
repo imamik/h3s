@@ -2,11 +2,12 @@ package ping
 
 import (
 	"fmt"
-	"github.com/hetznercloud/hcloud-go/v2/hcloud"
 	"h3s/internal/utils/execute"
 	"h3s/internal/utils/ip"
 	"h3s/internal/utils/logger"
 	"time"
+
+	"github.com/hetznercloud/hcloud-go/v2/hcloud"
 )
 
 // Ping pings the server every 5 seconds until it is available.

@@ -1,16 +1,17 @@
 package utils
 
 import (
-	"github.com/hetznercloud/hcloud-go/v2/hcloud"
 	"h3s/internal/hetzner/dns/api"
+
+	"github.com/hetznercloud/hcloud-go/v2/hcloud"
 )
 
 var ttl int64 = 60
 
 func GetExpectedRecords(lb *hcloud.LoadBalancer, zone *api.Zone) []api.CreateRecordOpts {
-	var ipv4 = ""
-	var ipv6 = ""
-	var zoneId = ""
+	ipv4 := ""
+	ipv6 := ""
+	zoneId := ""
 
 	if lb != nil {
 		ipv4 = lb.PublicNet.IPv4.IP.String()

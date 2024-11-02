@@ -3,10 +3,11 @@ package ssh
 import (
 	"bufio"
 	"fmt"
-	"golang.org/x/crypto/ssh"
 	"h3s/internal/utils/file"
 	"os"
 	"strings"
+
+	"golang.org/x/crypto/ssh"
 )
 
 const user = "root"

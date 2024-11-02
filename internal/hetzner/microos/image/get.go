@@ -2,9 +2,10 @@ package image
 
 import (
 	"errors"
-	"github.com/hetznercloud/hcloud-go/v2/hcloud"
 	"h3s/internal/cluster"
 	"h3s/internal/utils/logger"
+
+	"github.com/hetznercloud/hcloud-go/v2/hcloud"
 )
 
 func Get(ctx *cluster.Cluster, architecture hcloud.Architecture) (*hcloud.Image, error) {
@@ -19,7 +20,6 @@ func Get(ctx *cluster.Cluster, architecture hcloud.Architecture) (*hcloud.Image,
 	}
 
 	images, err := ctx.CloudClient.Image.AllWithOpts(ctx.Context, options)
-
 	if err != nil {
 		l.AddEvent(logger.Failure, err)
 		return nil, err

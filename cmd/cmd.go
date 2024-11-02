@@ -13,10 +13,8 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var (
-	// Version represents the current version of the h3s CLI tool
-	Version = version.New(0, 1, 0).String()
-)
+// Version represents the current version of the h3s CLI tool
+var Version = version.New(0, 1, 0).String()
 
 // Cmd represents the base command when called without any subcommands
 var Cmd = &cobra.Command{

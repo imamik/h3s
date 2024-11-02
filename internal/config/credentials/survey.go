@@ -33,5 +33,4 @@ func surveyCredentials() ProjectCredentials {
 	projectCredentials.K3sToken = generateToken(32)
 
 	return projectCredentials
-
 }

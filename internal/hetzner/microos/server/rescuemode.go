@@ -1,9 +1,10 @@
 package server
 
 import (
-	"github.com/hetznercloud/hcloud-go/v2/hcloud"
 	"h3s/internal/cluster"
 	"h3s/internal/utils/logger"
+
+	"github.com/hetznercloud/hcloud-go/v2/hcloud"
 )
 
 const RescueModeLog = "Set Rescue Mode"
@@ -35,5 +36,4 @@ func RescueMode(
 	}
 
 	return res.RootPassword, nil
-
 }

@@ -3,12 +3,13 @@ package server
 import (
 	"errors"
 	"fmt"
-	"github.com/hetznercloud/hcloud-go/v2/hcloud"
 	"h3s/internal/cluster"
 	"h3s/internal/hetzner/pool/node"
 	"h3s/internal/utils/logger"
 	"sort"
 	"time"
+
+	"github.com/hetznercloud/hcloud-go/v2/hcloud"
 )
 
 type AllServers struct {
@@ -29,7 +30,6 @@ func getAll(ctx *cluster.Cluster) ([]*hcloud.Server, error) {
 			LabelSelector: label,
 		},
 	})
-
 	if err != nil {
 		l.AddEvent(logger.Failure, err)
 		return nil, err

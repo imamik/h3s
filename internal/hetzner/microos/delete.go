@@ -1,11 +1,12 @@
 package microos
 
 import (
-	"github.com/hetznercloud/hcloud-go/v2/hcloud"
 	"h3s/internal/cluster"
 	"h3s/internal/config"
 	"h3s/internal/hetzner/microos/image"
 	"h3s/internal/hetzner/microos/server"
+
+	"github.com/hetznercloud/hcloud-go/v2/hcloud"
 )
 
 func Delete(ctx *cluster.Cluster) {

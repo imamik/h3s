@@ -2,12 +2,13 @@ package ssh
 
 import (
 	"fmt"
-	"github.com/hetznercloud/hcloud-go/v2/hcloud"
-	"golang.org/x/crypto/ssh"
 	"h3s/internal/utils/ip"
 	"log"
 	"strings"
 	"time"
+
+	"github.com/hetznercloud/hcloud-go/v2/hcloud"
+	"golang.org/x/crypto/ssh"
 )
 
 // ExecuteWithSsh executes a command on a remote server using SSH

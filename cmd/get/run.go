@@ -2,11 +2,12 @@ package get
 
 import (
 	"fmt"
-	"github.com/spf13/cobra"
 	"h3s/internal/cluster"
 	"h3s/internal/k8s"
 	"h3s/internal/k8s/kubeconfig"
 	"h3s/internal/utils/execute"
+
+	"github.com/spf13/cobra"
 )
 
 // runGetKubeConfig gets the kubeconfig for the h3s cluster

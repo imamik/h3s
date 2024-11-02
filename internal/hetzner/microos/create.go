@@ -1,7 +1,6 @@
 package microos
 
 import (
-	"github.com/hetznercloud/hcloud-go/v2/hcloud"
 	"h3s/internal/cluster"
 	"h3s/internal/config"
 	"h3s/internal/hetzner/microos/image"
@@ -9,6 +8,8 @@ import (
 	"h3s/internal/hetzner/sshkey"
 	"h3s/internal/utils/logger"
 	"sync"
+
+	"github.com/hetznercloud/hcloud-go/v2/hcloud"
 )
 
 func Create(ctx *cluster.Cluster) error {

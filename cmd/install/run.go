@@ -1,10 +1,11 @@
 package install
 
 import (
-	"github.com/spf13/cobra"
 	"h3s/internal/cluster"
 	"h3s/internal/k3s"
 	"h3s/internal/k8s"
+
+	"github.com/spf13/cobra"
 )
 
 // runInstallK3s installs k3s on all servers in the h3s cluster

@@ -49,7 +49,6 @@ func create(
 	}
 
 	res, _, err := ctx.CloudClient.LoadBalancer.Create(ctx.Context, opts)
-
 	if err != nil {
 		l.AddEvent(logger.Failure, err)
 		return nil, err

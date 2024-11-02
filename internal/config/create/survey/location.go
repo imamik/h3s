@@ -1,10 +1,11 @@
 package survey
 
 import (
-	"github.com/charmbracelet/huh"
-	"github.com/hetznercloud/hcloud-go/v2/hcloud"
 	"h3s/internal/config"
 	"log"
+
+	"github.com/charmbracelet/huh"
+	"github.com/hetznercloud/hcloud-go/v2/hcloud"
 )
 
 func getLocation(title string, description string, networkZone hcloud.NetworkZone) config.Location {

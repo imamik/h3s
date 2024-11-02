@@ -1,8 +1,9 @@
 package k3s
 
 import (
-	"github.com/spf13/cobra"
 	"h3s/internal/k3s"
+
+	"github.com/spf13/cobra"
 )
 
 // runGetK3sReleases gets available k3s releases

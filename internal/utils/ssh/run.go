@@ -4,10 +4,11 @@ import (
 	"bufio"
 	"errors"
 	"fmt"
-	"golang.org/x/crypto/ssh"
 	"h3s/internal/utils/logger"
 	"io"
 	"time"
+
+	"golang.org/x/crypto/ssh"
 )
 
 // dialWithRetries dials the SSH server with retries
@@ -33,7 +34,6 @@ func dialWithRetries(ip string, sshConfig *ssh.ClientConfig, retryInterval time.
 }
 
 func run(client *ssh.Client, command string) (string, error) {
-
 	defer func(client *ssh.Client) {
 		err := client.Close()
 		if err != nil {
@@ -53,13 +53,13 @@ func run(client *ssh.Client, command string) (string, error) {
 		}
 	}(session)
 
-	var output = ""
+	output := ""
 	stdoutPipe, err := session.StdoutPipe()
 	if err != nil {
 		return "", fmt.Errorf("unable to create stdout pipe: %w", err)
 	}
 
-	var errorOutput = ""
+	errorOutput := ""
 	stderrPipe, err := session.StderrPipe()
 	if err != nil {
 		return "", fmt.Errorf("unable to create stderr pipe: %w", err)

@@ -1,8 +1,9 @@
 package get
 
 import (
-	"github.com/spf13/cobra"
 	"h3s/cmd/get/k3s"
+
+	"github.com/spf13/cobra"
 )
 
 // Cmd is the main command for getting information from the cluster

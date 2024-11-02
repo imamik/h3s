@@ -85,7 +85,6 @@ func (l *EventLogger) LogLatest() {
 
 // logEvent logs the event with the appropriate color
 func (l *EventLogger) logEvent(e ResourceEvent, group bool) {
-
 	// Build the action string
 	var actionStr string
 	switch v := e.Action.(type) {

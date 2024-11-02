@@ -2,7 +2,6 @@ package gateway
 
 import (
 	"errors"
-	"github.com/hetznercloud/hcloud-go/v2/hcloud"
 	"h3s/internal/cluster"
 	"h3s/internal/config"
 	"h3s/internal/hetzner/microos/image"
@@ -12,6 +11,8 @@ import (
 	"h3s/internal/utils/logger"
 	"h3s/internal/utils/ssh"
 	"net"
+
+	"github.com/hetznercloud/hcloud-go/v2/hcloud"
 )
 
 func Create(ctx *cluster.Cluster) (*hcloud.Server, error) {

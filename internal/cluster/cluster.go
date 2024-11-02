@@ -3,11 +3,12 @@ package cluster
 import (
 	"context"
 	"errors"
-	"github.com/hetznercloud/hcloud-go/v2/hcloud"
 	"h3s/internal/config"
 	"h3s/internal/config/credentials"
 	"h3s/internal/hetzner/dns/api"
 	"strings"
+
+	"github.com/hetznercloud/hcloud-go/v2/hcloud"
 )
 
 type Cluster struct {

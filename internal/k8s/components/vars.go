@@ -2,12 +2,13 @@ package components
 
 import (
 	"fmt"
-	"github.com/hetznercloud/hcloud-go/v2/hcloud"
 	"h3s/internal/config"
 	"h3s/internal/config/credentials"
 	"h3s/internal/utils/encode"
 	"regexp"
 	"strings"
+
+	"github.com/hetznercloud/hcloud-go/v2/hcloud"
 )
 
 const (

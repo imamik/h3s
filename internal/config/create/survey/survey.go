@@ -95,5 +95,4 @@ func Survey(k3sReleases []k3s.Release) (config.Config, error) {
 	}
 
 	return conf, nil
-
 }

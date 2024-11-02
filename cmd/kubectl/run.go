@@ -1,13 +1,14 @@
 package kubectl
 
 import (
-	"github.com/spf13/cobra"
 	"h3s/internal/cluster"
 	"h3s/internal/config/path"
 	"h3s/internal/utils/common"
 	"h3s/internal/utils/execute"
 	"h3s/internal/utils/file"
 	"h3s/internal/utils/kubectl"
+
+	"github.com/spf13/cobra"
 )
 
 // runKubectl proxies kubectl commands either directly with the kubeconfig if available or via SSH to the first control plane server

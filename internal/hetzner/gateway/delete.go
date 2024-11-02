@@ -2,12 +2,13 @@ package gateway
 
 import (
 	"errors"
-	"github.com/hetznercloud/hcloud-go/v2/hcloud"
 	"h3s/internal/cluster"
 	"h3s/internal/hetzner/network"
 	"h3s/internal/utils/ip"
 	"h3s/internal/utils/logger"
 	"net"
+
+	"github.com/hetznercloud/hcloud-go/v2/hcloud"
 )
 
 func Delete(ctx *cluster.Cluster) error {

@@ -2,13 +2,14 @@ package image
 
 import (
 	"fmt"
-	"github.com/hetznercloud/hcloud-go/v2/hcloud"
 	"h3s/internal/cluster"
 	"h3s/internal/hetzner/microos/image/commands"
 	"h3s/internal/utils/logger"
 	"h3s/internal/utils/ping"
 	"h3s/internal/utils/ssh"
 	"time"
+
+	"github.com/hetznercloud/hcloud-go/v2/hcloud"
 )
 
 const waitTime = 5 * time.Second

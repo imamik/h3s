@@ -1,9 +1,10 @@
 package survey
 
 import (
-	"github.com/charmbracelet/huh"
 	"h3s/internal/config"
 	"log"
+
+	"github.com/charmbracelet/huh"
 )
 
 var instanceTypeOptions = []huh.Option[config.CloudInstanceType]{
@@ -53,7 +54,6 @@ func getInstance() config.CloudInstance {
 		Options(instanceTypeOptions...).
 		Value(&instanceType).
 		Run()
-
 	if err != nil {
 		log.Printf("errors selecting instance type: %v\n", err)
 		return instance
@@ -65,12 +65,10 @@ func getInstance() config.CloudInstance {
 		Options(instanceOptions[instanceType]...).
 		Value(&instance).
 		Run()
-
 	if err != nil {
 		log.Printf("errors selecting instance: %v\n", err)
 		return instance
 	}
 
 	return instance
-
 }

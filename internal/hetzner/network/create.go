@@ -2,10 +2,11 @@ package network
 
 import (
 	"errors"
-	"github.com/hetznercloud/hcloud-go/v2/hcloud"
 	"h3s/internal/cluster"
 	"h3s/internal/utils/logger"
 	"net"
+
+	"github.com/hetznercloud/hcloud-go/v2/hcloud"
 )
 
 func Create(ctx *cluster.Cluster) (*hcloud.Network, error) {

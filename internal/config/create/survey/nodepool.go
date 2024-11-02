@@ -2,10 +2,11 @@ package survey
 
 import (
 	"fmt"
-	"github.com/charmbracelet/huh"
-	"github.com/hetznercloud/hcloud-go/v2/hcloud"
 	"h3s/internal/config"
 	"strconv"
+
+	"github.com/charmbracelet/huh"
+	"github.com/hetznercloud/hcloud-go/v2/hcloud"
 )
 
 func getNodePool(networkZone hcloud.NetworkZone) config.NodePool {

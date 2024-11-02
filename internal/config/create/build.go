@@ -8,9 +8,7 @@ import (
 )
 
 func Build(k3sReleases []k3s.Release) {
-
 	conf, err := survey.Survey(k3sReleases)
-
 	if err != nil {
 		fmt.Println(err)
 		return
