@@ -20,20 +20,14 @@ jobs:
         uses: actions/setup-go@v5
         with:
           go-version: 1.22.4
-      - name: Go Module Cache
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/go/pkg/mod
-          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
-      - name: Build Cache
+      - name: Go Cache
         uses: actions/cache@v3
         with:
           path: |
             ~/.cache/go-build
             ~/go/pkg/mod
-          key: ${{ runner.os }}-golang-${{ hashFiles('**/go.sum') }}
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
           restore-keys: |
-            ${{ runner.os }}-golang-
+            ${{ runner.os }}-go-
       - name: Test
         run: go test -race -v -timeout 10m -coverprofile=coverage.txt -covermode=atomic ./...
