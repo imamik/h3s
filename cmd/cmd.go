@@ -2,7 +2,6 @@
 package cmd
 
 import (
-	"github.com/spf13/cobra"
 	"h3s/cmd/create"
 	"h3s/cmd/destroy"
 	"h3s/cmd/get"
@@ -10,9 +9,12 @@ import (
 	"h3s/cmd/kubectl"
 	"h3s/cmd/ssh"
 	"h3s/internal/utils/version"
+
+	"github.com/spf13/cobra"
 )
 
 var (
+	// Version represents the current version of the h3s CLI tool
 	Version = version.New(0, 1, 0).String()
 )
 
