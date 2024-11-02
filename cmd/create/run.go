@@ -29,8 +29,7 @@ func runCreateConfig(cmd *cobra.Command, _ []string) error {
 
 // runCreateCredentials creates h3s cluster credentials
 func runCreateCredentials(_ *cobra.Command, _ []string) error {
-	credentials.Configure()
-	return nil
+	return credentials.Configure()
 }
 
 // runCreateCluster creates a h3s cluster

@@ -54,6 +54,9 @@ func runWithSSH(ctx *cluster.Cluster, args []string) (string, error) {
 func getLocalPathIfExists() (string, bool) {
 	p := string(path.KubeConfigFileName)
 	f := file.New(p)
-	absPath, _ := f.Path()
+	absPath, err := f.Path()
+	if err != nil {
+		return "", false
+	}
 	return absPath, f.Exists()
 }

@@ -2,6 +2,7 @@ package config
 
 import "github.com/hetznercloud/hcloud-go/v2/hcloud"
 
+// GetArchitecture determines the CPU architecture for a given cloud instance, depending on the instance type.
 func GetArchitecture(instance CloudInstance) hcloud.Architecture {
 	if instance[:3] == "cax" {
 		return hcloud.ArchitectureARM
@@ -10,6 +11,8 @@ func GetArchitecture(instance CloudInstance) hcloud.Architecture {
 	}
 }
 
+// GetArchitectures analyzes the configuration and returns which CPU architectures
+// are used across all instance pools (control plane and worker nodes).
 func GetArchitectures(config *Config) Architectures {
 	architectures := Architectures{
 		ARM: GetArchitecture(config.ControlPlane.Pool.Instance) == hcloud.ArchitectureARM,
