@@ -25,12 +25,12 @@ jobs:
         uses: actions/cache@v3
         with:
           path: |
+            ~/.cache/golangci-lint
             ~/.cache/go-build
             ~/go/pkg/mod
-          key: ${{ runner.os }}-go-test-${{ hashFiles('**/go.sum') }}
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
           restore-keys: |
-            ${{ runner.os }}-go-test-
-            ${{ runner.os }}-go-
+            ${{ runner.os }}-go
 
       - name: Test
         run: go test -race -v -timeout 10m -coverprofile=coverage.txt -covermode=atomic ./...

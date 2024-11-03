@@ -28,10 +28,9 @@ jobs:
             ~/.cache/golangci-lint
             ~/.cache/go-build
             ~/go/pkg/mod
-          key: ${{ runner.os }}-go-lint-${{ hashFiles('**/go.sum') }}
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
           restore-keys: |
-            ${{ runner.os }}-go-lint-
-            ${{ runner.os }}-go-
+            ${{ runner.os }}-go
 
       - uses: golangci/golangci-lint-action@v3
         with:
