@@ -27,11 +27,11 @@ type ErrorMessage struct {
 
 // Client for the Hetzner DNS API.
 type Client struct {
-	requestLock sync.Mutex
-	apiToken    string
-	userAgent   string
 	httpClient  *http.Client
 	endPoint    *url.URL
+	apiToken    string
+	userAgent   string
+	requestLock sync.Mutex
 }
 
 // New creates a new API Client using a given api token.

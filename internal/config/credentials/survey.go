@@ -7,30 +7,40 @@ import (
 	"github.com/charmbracelet/huh"
 )
 
-func generateToken(length int) string {
+func generateToken(length int) (string, error) {
 	bytes := make([]byte, length)
-	_, _ = rand.Read(bytes)
-	return hex.EncodeToString(bytes)
+	if _, err := rand.Read(bytes); err != nil {
+		return "", err
+	}
+	return hex.EncodeToString(bytes), nil
 }
 
-func surveyCredentials() ProjectCredentials {
+func surveyCredentials() (ProjectCredentials, error) {
 	var projectCredentials ProjectCredentials
 
-	huh.NewInput().
+	if inputErr := huh.NewInput().
 		Title("Hetzner Cloud Token").
 		Description("The api token to create resources for the given project").
 		Validate(ValidateHCloudToken).
 		Value(&projectCredentials.HCloudToken).
-		Run()
+		Run(); inputErr != nil {
+		return projectCredentials, inputErr
+	}
 
-	huh.NewInput().
+	if inputErr := huh.NewInput().
 		Title("Hetzner DNS Token").
 		Description("The dns token to create dns entries for the given project").
 		Validate(ValidateHetznerDNSToken).
 		Value(&projectCredentials.HetznerDNSToken).
-		Run()
+		Run(); inputErr != nil {
+		return projectCredentials, inputErr
+	}
 
-	projectCredentials.K3sToken = generateToken(32)
+	k3sToken, err := generateToken(32)
+	if err != nil {
+		return projectCredentials, err
+	}
+	projectCredentials.K3sToken = k3sToken
 
-	return projectCredentials
+	return projectCredentials, nil
 }

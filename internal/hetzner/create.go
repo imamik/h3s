@@ -21,17 +21,23 @@ func Create(ctx *cluster.Cluster) {
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		microos.Create(ctx)
+		if err := microos.Create(ctx); err != nil {
+			l.AddEvent(logger.Failure, err)
+		}
 	}()
 	wg.Add(1)
 	go func() {
-		sshkey.Create(ctx)
-		wg.Done()
+		defer wg.Done()
+		if _, err := sshkey.Create(ctx); err != nil {
+			l.AddEvent(logger.Failure, err)
+		}
 	}()
 	wg.Add(1)
 	go func() {
-		network.Create(ctx)
-		wg.Done()
+		defer wg.Done()
+		if _, err := network.Create(ctx); err != nil {
+			l.AddEvent(logger.Failure, err)
+		}
 	}()
 	wg.Wait()
 
@@ -39,18 +45,26 @@ func Create(ctx *cluster.Cluster) {
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		loadbalancers.Create(ctx)
-		dns.Create(ctx)
+		if _, err := loadbalancers.Create(ctx); err != nil {
+			l.AddEvent(logger.Failure, err)
+		}
+		if err := dns.Create(ctx); err != nil {
+			l.AddEvent(logger.Failure, err)
+		}
 	}()
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		pool.CreatePools(ctx)
+		if _, err := pool.CreatePools(ctx); err != nil {
+			l.AddEvent(logger.Failure, err)
+		}
 	}()
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		gateway.Create(ctx)
+		if _, err := gateway.Create(ctx); err != nil {
+			l.AddEvent(logger.Failure, err)
+		}
 	}()
 
 	l.AddEvent(logger.Success)

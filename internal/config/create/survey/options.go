@@ -8,7 +8,7 @@ import (
 )
 
 func releasesToOptions(k3sReleases []k3s.Release) []huh.Option[string] {
-	var options []huh.Option[string]
+	options := make([]huh.Option[string], 0, len(k3sReleases))
 	for _, release := range k3sReleases {
 		releaseString := release.Name
 		for i := len(releaseString); i < 16; i++ {

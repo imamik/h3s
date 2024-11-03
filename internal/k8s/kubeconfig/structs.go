@@ -4,11 +4,11 @@ package kubeconfig
 type KubeConfig struct {
 	APIVersion     string      `yaml:"apiVersion"`
 	Kind           string      `yaml:"kind"`
-	Preferences    Preferences `yaml:"preferences,omitempty"`
+	CurrentContext string      `yaml:"current-context"`
 	Clusters       []Cluster   `yaml:"clusters"`
 	Contexts       []Context   `yaml:"contexts"`
-	CurrentContext string      `yaml:"current-context"`
 	Users          []User      `yaml:"users"`
+	Preferences    Preferences `yaml:"preferences,omitempty"`
 }
 
 // Preferences represents user-specific preferences

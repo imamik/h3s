@@ -4,16 +4,16 @@ import "github.com/hetznercloud/hcloud-go/v2/hcloud"
 
 // NodePool represents a group of nodes with similar characteristics
 type NodePool struct {
+	Instance CloudInstance `yaml:"instance"` // Instance type for the nodes
+	Location Location      `yaml:"location"` // Location of the nodes
 	Name     string        `yaml:"name"`     // Name of the node pool
 	Nodes    int           `yaml:"nodes"`    // Number of nodes in the pool
-	Location Location      `yaml:"location"` // Location of the nodes
-	Instance CloudInstance `yaml:"instance"` // Instance type for the nodes
 }
 
 // ControlPlane represents the configuration for the Kubernetes control plane
 type ControlPlane struct {
-	AsWorkerPool bool     `yaml:"as_worker_pool,omitempty"` // Whether the control plane nodes should also act as worker nodes
 	Pool         NodePool `yaml:"pool"`                     // The node pool configuration for the control plane
+	AsWorkerPool bool     `yaml:"as_worker_pool,omitempty"` // Whether the control plane nodes should also act as worker nodes
 }
 
 // SSHKeyPaths contains the paths to the SSH keys used for authentication
@@ -30,12 +30,12 @@ type CertManager struct {
 
 // Config represents the main configuration structure for the h3s application
 type Config struct {
-	Name         string             `yaml:"name"`                   // Name of the cluster
-	K3sVersion   string             `yaml:"k3s_version"`            // Version of K3s to install
-	SSHKeyPaths  SSHKeyPaths        `yaml:"ssh_key_paths"`          // SSH key paths for authentication
-	NetworkZone  hcloud.NetworkZone `yaml:"network_zone"`           // Network zone for the cluster
-	Domain       string             `yaml:"domain"`                 // Domain name for the cluster
-	CertManager  CertManager        `yaml:"cert_manager"`           // Certificate manager configuration
-	ControlPlane ControlPlane       `yaml:"control_plane"`          // Control plane configuration
-	WorkerPools  []NodePool         `yaml:"worker_pools,omitempty"` // Worker node pool configurations
+	SSHKeyPaths  SSHKeyPaths        `yaml:"ssh_key_paths"`
+	NetworkZone  hcloud.NetworkZone `yaml:"network_zone"`
+	K3sVersion   string             `yaml:"k3s_version"`
+	Name         string             `yaml:"name"`
+	Domain       string             `yaml:"domain"`
+	WorkerPools  []NodePool         `yaml:"worker_pools,omitempty"`
+	CertManager  CertManager        `yaml:"cert_manager"`
+	ControlPlane ControlPlane       `yaml:"control_plane"`
 }

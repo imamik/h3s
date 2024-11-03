@@ -47,9 +47,9 @@ func run(client *ssh.Client, command string) (string, error) {
 	}
 
 	defer func(session *ssh.Session) {
-		err := session.Close()
-		if err != nil && err != io.EOF {
-			fmt.Printf("unable to close session: %v\n", err)
+		closeErr := session.Close()
+		if closeErr != nil && closeErr != io.EOF {
+			fmt.Printf("unable to close session: %v\n", closeErr)
 		}
 	}(session)
 

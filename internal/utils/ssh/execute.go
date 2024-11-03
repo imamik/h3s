@@ -74,9 +74,8 @@ func ExecuteViaProxy(
 		return "", fmt.Errorf("unable to connect to gateway: %w", err)
 	}
 	defer func(proxyConn *ssh.Client) {
-		err := proxyConn.Close()
-		if err != nil {
-			fmt.Printf("unable to close gateway connection: %v\n", err)
+		if closeErr := proxyConn.Close(); closeErr != nil {
+			fmt.Printf("unable to close gateway connection: %v\n", closeErr)
 		}
 	}(proxyConn)
 

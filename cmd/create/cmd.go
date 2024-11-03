@@ -1,4 +1,4 @@
-// Package create provides commands for creating h3s cluster resources
+// Package create provides commands for creating resources - a h3s cluster or necessary configuration & credentials
 package create
 
 import (

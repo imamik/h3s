@@ -8,13 +8,13 @@ import (
 
 // EventLogger is a struct that collects and logs events
 type EventLogger struct {
-	logOnlyLatest bool            // logOnlyLatest determines if only the latest event should be logged
-	logLive       bool            // logLive determines if events should be logged live or stacked until explicitly logged
-	events        []ResourceEvent // events is a list of ResourceEvent
-	resource      LogResource     // resource is the resource of the events
-	action        interface{}     // action is the action of the event
-	id            string          // id is the id of the resource
-	parent        *EventLogger    // parent is the parent event logger
+	action        interface{}
+	parent        *EventLogger
+	resource      LogResource
+	id            string
+	events        []ResourceEvent
+	logOnlyLatest bool
+	logLive       bool
 }
 
 // New creates a new event logger

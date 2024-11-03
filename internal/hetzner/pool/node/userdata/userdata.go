@@ -6,12 +6,12 @@ import (
 
 type CloudInitConfig struct {
 	Hostname          string
-	SSHAuthorizedKeys []string
 	SwapSize          string
+	K3sRegistries     string
+	SSHAuthorizedKeys []string
+	DNSServers        []string
 	SSHPort           int
 	SSHMaxAuthTries   int
-	K3sRegistries     string
-	DNSServers        []string
 }
 
 func GenerateCloudInitConfig(config CloudInitConfig) (string, error) {

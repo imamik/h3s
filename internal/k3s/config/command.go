@@ -8,32 +8,17 @@ import (
 
 // CommandConfig represents the configuration options for the k3s agents and control plane commands (installation & server configuration)
 type CommandConfig struct {
-	// IsMain is true if the node is the main control plane node
-	IsMain bool
-	// IsControlPlane is true if the node is a control plane node
-	IsControlPlane bool
-
-	// K3sToken is the token used for the k3s cluster
-	K3sToken string
-	// Server is the address of the main control plane node
-	Server string
-	// Domain is the domain of the k3s cluster
-	Domain string
-	// TlsSAN is the list of SANs for the TLS certificate
-	TlsSAN []string
-
-	// ControlPlanesAsWorker is true if the control plane nodes should also be worker nodes
+	K3sToken              string
+	Server                string
+	Domain                string
+	NodeName              string
+	NodeIp                string
+	NetworkInterface      string
+	K3sVersion            string
+	TlsSAN                []string
+	IsMain                bool
+	IsControlPlane        bool
 	ControlPlanesAsWorker bool
-
-	// NodeName is the name of the node
-	NodeName string
-	// NodeIp is the IP address of the node
-	NodeIp string
-	// NetworkInterface is the network interface to use for flannel
-	NetworkInterface string
-
-	// K3sVersion is the version of k3s to install
-	K3sVersion string
 }
 
 // CommonConfig represents the common configuration options for k3s agents and control plane nodes

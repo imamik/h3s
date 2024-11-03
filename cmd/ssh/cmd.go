@@ -1,3 +1,4 @@
+// Package ssh provides functionality to proxy ssh commands to the first control plane server in the h3s cluster.
 package ssh
 
 import (

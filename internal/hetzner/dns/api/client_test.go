@@ -243,9 +243,9 @@ func TestClientHandleUnauthorizedRequest(t *testing.T) {
 }
 
 type RequestConfig struct {
-	responseHTTPStatus int
-	responseBodyJSON   []byte
 	requestBodyReader  *io.Reader
+	responseBodyJSON   []byte
+	responseHTTPStatus int
 }
 
 func createTestClient(t testing.TB, config RequestConfig) *Client {

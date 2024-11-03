@@ -8,12 +8,12 @@ import (
 
 // Record represents a record in a specific Zone.
 type Record struct {
+	TTL    *int64 `json:"ttl,omitempty"`
 	ZoneID string `json:"zone_id"`
 	ID     string `json:"id"`
 	Type   string `json:"type"`
 	Name   string `json:"name"`
 	Value  string `json:"value"`
-	TTL    *int64 `json:"ttl,omitempty"`
 }
 
 // HasTTL returns true if a Record has a TTL set and false if TTL is undefined.
@@ -23,20 +23,20 @@ func (r *Record) HasTTL() bool {
 
 // CreateRecordOpts covers all parameters used to create a new DNS record.
 type CreateRecordOpts struct {
+	TTL    *int64 `json:"ttl,omitempty"`
 	ZoneID string `json:"zone_id"`
 	Type   string `json:"type"`
 	Name   string `json:"name"`
 	Value  string `json:"value"`
-	TTL    *int64 `json:"ttl,omitempty"`
 }
 
 // CreateRecordRequest represents all data required to create a new record.
 type CreateRecordRequest struct {
+	TTL    *int64 `json:"ttl,omitempty"`
 	ZoneID string `json:"zone_id"`
 	Type   string `json:"type"`
 	Name   string `json:"name"`
 	Value  string `json:"value"`
-	TTL    *int64 `json:"ttl,omitempty"`
 }
 
 // RecordsResponse represents a response from the API containing a list of records.

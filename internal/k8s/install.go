@@ -69,9 +69,9 @@ exit 1`, description, command)
 func installComponents(clr *cluster.Cluster, gateway, remote *hcloud.Server, vars map[string]interface{}) error {
 	steps := []struct {
 		applyYaml        string
-		waitForCrds      []string
 		waitForNamespace string
 		description      string
+		waitForCrds      []string
 	}{
 		{applyYaml: components.Yaml.HcloudSecrets, description: "Hetzner Cloud Secrets"},
 		{applyYaml: components.Yaml.CCM, description: "Hetzner Cloud Controller Manager"},

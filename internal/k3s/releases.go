@@ -21,14 +21,10 @@ const (
 
 // Release represents a k3s release as returned by the GitHub API
 type Release struct {
-	// Name is the name of the release
-	Name string `json:"name"`
-	// Prerelease is true if the release is a release candidate
-	Prerelease bool `json:"prerelease"`
-	// Draft is true if the release is a draft
-	Draft bool `json:"draft"`
-	// PublishedAt is the time the release was published
 	PublishedAt time.Time `json:"published_at"`
+	Name        string    `json:"name"`
+	Prerelease  bool      `json:"prerelease"`
+	Draft       bool      `json:"draft"`
 }
 
 // getAllReleases fetches all k3s releases from the GitHub API

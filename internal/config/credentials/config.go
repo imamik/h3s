@@ -1,8 +1,11 @@
 package credentials
 
 func Configure() error {
-	projectCredentials := surveyCredentials()
-	err := SaveCredentials(projectCredentials)
+	projectCredentials, err := surveyCredentials()
+	if err != nil {
+		return err
+	}
+	err = SaveCredentials(projectCredentials)
 	if err != nil {
 		return err
 	}

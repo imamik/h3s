@@ -56,6 +56,8 @@ func Context() (*Cluster, error) {
 	}, nil
 }
 
+// GetLabels returns a map of labels for a resource,
+// including project name, origin and any additional labels provided as arguments.
 func (c *Cluster) GetLabels(optionalLabels ...map[string]string) map[string]string {
 	labels := map[string]string{
 		"project": c.Config.Name,
