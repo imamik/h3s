@@ -9,6 +9,7 @@ import (
 	"github.com/hetznercloud/hcloud-go/v2/hcloud"
 )
 
+// Get gets the Hetzner cloud placement group
 func Get(
 	ctx *cluster.Cluster,
 	pool config.NodePool,

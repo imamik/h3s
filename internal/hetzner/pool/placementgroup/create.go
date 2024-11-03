@@ -1,3 +1,4 @@
+// Package placementgroup contains the functionality for managing Hetzner cloud placement groups
 package placementgroup
 
 import (
@@ -48,6 +49,7 @@ func create(
 	return res.PlacementGroup, nil
 }
 
+// Create creates a Hetzner cloud placement group
 func Create(
 	ctx *cluster.Cluster,
 	pool config.NodePool,

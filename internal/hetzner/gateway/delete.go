@@ -11,6 +11,7 @@ import (
 	"github.com/hetznercloud/hcloud-go/v2/hcloud"
 )
 
+// Delete deletes the Hetzner cloud gateway
 func Delete(ctx *cluster.Cluster) error {
 	// Get network
 	network, err := network.Get(ctx)

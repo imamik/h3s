@@ -1,3 +1,4 @@
+// Package template contains the functionality for compiling templates
 package template
 
 import (
@@ -8,6 +9,7 @@ import (
 	"text/template"
 )
 
+// CompileTemplate compiles a template string with the provided variables and returns the compiled template as a string.
 func CompileTemplate(templateStr string, templateVars interface{}) (string, error) {
 	// Define a new template with all functions and template to parse
 	tpl, err := template.

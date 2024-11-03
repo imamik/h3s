@@ -1,3 +1,4 @@
+// Package config contains the functionality for generating the k3s configuration
 package config
 
 import (
@@ -119,6 +120,9 @@ func Command(c CommandConfig) (string, error) {
 	var k3sStartCmd string
 	if c.IsControlPlane {
 		k3sStartCmd, err = K3sStartControlPlane(c.IsMain)
+		if err != nil {
+			return "", err
+		}
 	} else {
 		k3sStartCmd = K3sStartAgent()
 	}

@@ -1,3 +1,4 @@
+// Package k3s contains the functionality for installing k3s
 package k3s
 
 import (
@@ -49,6 +50,7 @@ func getTlsSan(domain string, lb *hcloud.LoadBalancer, controlPlaneNodes []*hclo
 	return tlsSan
 }
 
+// Install installs k3s to the cluster
 func Install(ctx *cluster.Cluster) error {
 	// Get load balancer
 	lb, err := loadbalancers.Get(ctx)

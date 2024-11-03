@@ -1,3 +1,4 @@
+// Package ping contains the functionality for pinging servers
 package ping
 
 import (

@@ -1,3 +1,4 @@
+// Package pool contains the functionality for managing Hetzner cloud pools
 package pool
 
 import (
@@ -15,6 +16,7 @@ import (
 	"github.com/hetznercloud/hcloud-go/v2/hcloud"
 )
 
+// CreatePools creates the control plane and worker pools
 func CreatePools(ctx *cluster.Cluster) ([]*hcloud.Server, error) {
 	l := logger.New(nil, logger.Pool, logger.Create, "All")
 	defer l.LogEvents()
@@ -96,6 +98,7 @@ func CreatePools(ctx *cluster.Cluster) ([]*hcloud.Server, error) {
 	}
 
 	// Check and handle errors
+	//nolint:prealloc // Suppressing pre-allocation suggestion intentionally as we don't know the number of errors
 	var errors []error
 	for err := range errCh {
 		errors = append(errors, err)
@@ -109,6 +112,7 @@ func CreatePools(ctx *cluster.Cluster) ([]*hcloud.Server, error) {
 	return nodes, nil
 }
 
+// CreatePool creates a pool of Hetzner cloud servers
 func CreatePool(
 	ctx *cluster.Cluster,
 	sshKey *hcloud.SSHKey,
@@ -133,7 +137,6 @@ func CreatePool(
 	}
 
 	// Create a channel to collect the nodes & setup a WaitGroup
-	var nodes []*hcloud.Server
 	nodeCh := make(chan *hcloud.Server, pool.Nodes)
 	errCh := make(chan error)
 	var wg sync.WaitGroup
@@ -167,14 +170,15 @@ func CreatePool(
 	close(nodeCh)
 	close(errCh)
 
-	// Collect the nodes from the channel
-	for n := range nodeCh {
-		nodes = append(nodes, n)
-	}
-
 	// Check for errors
 	if err, ok := <-errCh; ok {
 		return nil, err
+	}
+
+	// Collect the nodes from the channel
+	nodes := make([]*hcloud.Server, 0, pool.Nodes)
+	for n := range nodeCh {
+		nodes = append(nodes, n)
 	}
 
 	l.AddEvent(logger.Success)

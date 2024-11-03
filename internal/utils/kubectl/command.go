@@ -1,3 +1,4 @@
+// Package kubectl contains the util functionality for composing kubectl commands
 package kubectl
 
 import (

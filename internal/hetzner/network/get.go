@@ -8,6 +8,7 @@ import (
 	"github.com/hetznercloud/hcloud-go/v2/hcloud"
 )
 
+// Get gets the Hetzner cloud network
 func Get(ctx *cluster.Cluster) (*hcloud.Network, error) {
 	networkName := getName(ctx)
 

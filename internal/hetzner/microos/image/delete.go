@@ -7,6 +7,7 @@ import (
 	"github.com/hetznercloud/hcloud-go/v2/hcloud"
 )
 
+// Delete deletes the Hetzner cloud microOS image
 func Delete(ctx *cluster.Cluster, architecture hcloud.Architecture) error {
 	l := logger.New(nil, logger.Image, logger.Delete, getName(ctx, architecture))
 	defer l.LogEvents()

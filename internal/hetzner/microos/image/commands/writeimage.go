@@ -1,5 +1,6 @@
 package commands
 
+// WriteImage returns the write image script for the microOS image
 func WriteImage() string {
 	return `
 set -ex

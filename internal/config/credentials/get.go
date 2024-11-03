@@ -6,6 +6,7 @@ import (
 	"h3s/internal/utils/file"
 )
 
+// Get returns the ProjectCredentials from the secrets file and validates the tokens.
 func Get() (*ProjectCredentials, error) {
 	p := string(path.SecretsFileName)
 	f := file.New(p)

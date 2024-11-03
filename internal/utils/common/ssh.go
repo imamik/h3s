@@ -1,3 +1,4 @@
+// Package common contains the common utility functionality
 package common
 
 import (
@@ -7,6 +8,7 @@ import (
 	"h3s/internal/utils/ssh"
 )
 
+// SSH executes a command on the first control plane node via the gateway
 func SSH(ctx *cluster.Cluster, cmd string) (string, error) {
 	// Get the gateway
 	gate, err := gateway.Get(ctx)

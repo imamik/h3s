@@ -1,3 +1,4 @@
+// Package network contains the functionality for managing Hetzner cloud networks
 package network
 
 import (
@@ -9,6 +10,7 @@ import (
 	"github.com/hetznercloud/hcloud-go/v2/hcloud"
 )
 
+// Create creates the Hetzner cloud network
 func Create(ctx *cluster.Cluster) (*hcloud.Network, error) {
 	network, err := Get(ctx)
 	if network != nil && err == nil {

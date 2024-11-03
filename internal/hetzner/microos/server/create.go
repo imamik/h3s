@@ -1,3 +1,4 @@
+// Package server contains the functionality for managing Hetzner cloud microOS servers
 package server
 
 import (
@@ -14,9 +15,11 @@ const (
 	ARMInstanceType = config.CAX11
 	// X86InstanceType CX22 is the server type for x86 architecture
 	X86InstanceType = config.CX22
-	LinuxImage      = "ubuntu-24.04"
+	// LinuxImage is the name of the Ubuntu 24.04 image
+	LinuxImage = "ubuntu-24.04"
 )
 
+// Create creates the Hetzner cloud microOS server
 func Create(
 	ctx *cluster.Cluster,
 	architecture hcloud.Architecture,

@@ -1,3 +1,4 @@
+// Package hetzner contains the functionality for creating the Hetzner cloud cluster
 package hetzner
 
 import (
@@ -13,6 +14,7 @@ import (
 	"sync"
 )
 
+// Create creates the Hetzner cloud cluster
 func Create(ctx *cluster.Cluster) {
 	l := logger.New(nil, logger.Cluster, logger.Create, ctx.Config.Name)
 	defer l.LogEvents()

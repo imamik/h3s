@@ -1,5 +1,7 @@
+// Package commands contains various commands for the microOS image
 package commands
 
+// CleanUp returns the cleanup script for the microOS image
 func CleanUp() string {
 	return `
 set -ex

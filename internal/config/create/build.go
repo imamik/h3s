@@ -1,3 +1,4 @@
+// Package create contains the functionality for creating a h3s cluster configuration
 package create
 
 import (
@@ -7,6 +8,7 @@ import (
 	"h3s/internal/utils/file"
 )
 
+// Build surveys the user for the cluster configuration and saves it to h3s.yaml in the current directory.
 func Build(k3sReleases []k3s.Release) {
 	conf, err := survey.Survey(k3sReleases)
 	if err != nil {

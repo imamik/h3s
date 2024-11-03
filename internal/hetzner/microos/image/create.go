@@ -1,3 +1,4 @@
+// Package image contains the functionality for managing Hetzner cloud microOS images
 package image
 
 import (
@@ -7,6 +8,7 @@ import (
 	"github.com/hetznercloud/hcloud-go/v2/hcloud"
 )
 
+// Create creates the Hetzner cloud microOS image
 func Create(
 	ctx *cluster.Cluster,
 	server *hcloud.Server,

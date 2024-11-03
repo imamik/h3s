@@ -1,3 +1,4 @@
+// Package str contains utility functions for strings
 package str
 
 import "strings"

@@ -1,3 +1,4 @@
+// Package main is the entry point of the application - it initializes the command line interface
 package main
 
 import (

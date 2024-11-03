@@ -1,3 +1,4 @@
+// Package components contains the functionality for managing the Kubernetes components & their configuration/variables
 package components
 
 import (

@@ -8,6 +8,8 @@ import (
 
 var ttl int64 = 60
 
+// GetExpectedRecords builds a list of expected records based on the load balancer and zone
+// it assumes that the load balancer has a public IPv4 and IPv6 address
 func GetExpectedRecords(lb *hcloud.LoadBalancer, zone *api.Zone) []api.CreateRecordOpts {
 	ipv4 := ""
 	ipv6 := ""

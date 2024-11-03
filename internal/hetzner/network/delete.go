@@ -5,6 +5,7 @@ import (
 	"h3s/internal/utils/logger"
 )
 
+// Delete removes the Hetzner cloud network
 func Delete(ctx *cluster.Cluster) error {
 	l := logger.New(nil, logger.Network, logger.Delete, getName(ctx))
 	defer l.LogEvents()

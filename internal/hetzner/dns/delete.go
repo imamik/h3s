@@ -7,6 +7,7 @@ import (
 	"sync"
 )
 
+// Delete deletes the DNS records for the cluster
 func Delete(ctx *cluster.Cluster) error {
 	l := logger.New(nil, logger.DNSRecord, logger.Delete, "All records")
 	defer l.LogEvents()

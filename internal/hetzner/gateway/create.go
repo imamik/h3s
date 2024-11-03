@@ -1,3 +1,4 @@
+// Package gateway contains the functionality for creating a Hetzner cloud gateway
 package gateway
 
 import (
@@ -15,6 +16,7 @@ import (
 	"github.com/hetznercloud/hcloud-go/v2/hcloud"
 )
 
+// Create creates the Hetzner cloud gateway
 func Create(ctx *cluster.Cluster) (*hcloud.Server, error) {
 	l := logger.New(nil, logger.Server, logger.Create, "gateway")
 	defer l.LogEvents()
@@ -126,13 +128,13 @@ func createServer(
 		l.AddEvent(logger.Failure, err)
 		return nil, err
 	}
-	if err := ctx.CloudClient.Action.WaitFor(ctx.Context, res.Action); err != nil {
-		l.AddEvent(logger.Failure, err)
-		return nil, err
+	if waitErr := ctx.CloudClient.Action.WaitFor(ctx.Context, res.Action); waitErr != nil {
+		l.AddEvent(logger.Failure, waitErr)
+		return nil, waitErr
 	}
-	if err := ctx.CloudClient.Action.WaitFor(ctx.Context, res.NextActions...); err != nil {
-		l.AddEvent(logger.Failure, err)
-		return nil, err
+	if waitErr := ctx.CloudClient.Action.WaitFor(ctx.Context, res.NextActions...); waitErr != nil {
+		l.AddEvent(logger.Failure, waitErr)
+		return nil, waitErr
 	}
 
 	server, err = Get(ctx)

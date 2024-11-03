@@ -9,6 +9,7 @@ import (
 	"github.com/hetznercloud/hcloud-go/v2/hcloud"
 )
 
+// Get gets a Hetzner cloud server
 func Get(
 	ctx *cluster.Cluster,
 	pool config.NodePool,

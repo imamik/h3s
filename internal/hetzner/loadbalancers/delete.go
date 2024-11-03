@@ -5,6 +5,7 @@ import (
 	"h3s/internal/utils/logger"
 )
 
+// Delete deletes the Hetzner cloud load balancer
 func Delete(ctx *cluster.Cluster) error {
 	l := logger.New(nil, logger.LoadBalancer, logger.Delete, "")
 	defer l.LogEvents()

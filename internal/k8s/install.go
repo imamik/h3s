@@ -1,3 +1,4 @@
+// Package k8s contains the functionality for installing the Kubernetes components
 package k8s
 
 import (
@@ -15,6 +16,7 @@ import (
 	"github.com/hetznercloud/hcloud-go/v2/hcloud"
 )
 
+// Install installs the Kubernetes components to the first control plane node of the cluster
 func Install(clr *cluster.Cluster) error {
 	l := logger.New(nil, logger.Server, logger.Create, "gateway")
 	defer l.LogEvents()

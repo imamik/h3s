@@ -4,6 +4,7 @@ import (
 	"h3s/internal/utils/template"
 )
 
+// CloudInitConfig is the configuration for the cloud-init user data
 type CloudInitConfig struct {
 	Hostname          string
 	SwapSize          string
@@ -14,6 +15,7 @@ type CloudInitConfig struct {
 	SSHMaxAuthTries   int
 }
 
+// GenerateCloudInitConfig generates the cloud-init user data
 func GenerateCloudInitConfig(config CloudInitConfig) (string, error) {
 	writeFilesCommon, err := generateWriteFilesCommon(config)
 	if err != nil {

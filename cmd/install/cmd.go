@@ -1,3 +1,4 @@
+// Package install contains the commands for installing k3s or k8s components on a h3s cluster
 package install
 
 import (

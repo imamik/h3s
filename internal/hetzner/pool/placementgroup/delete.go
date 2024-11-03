@@ -6,6 +6,7 @@ import (
 	"h3s/internal/utils/logger"
 )
 
+// Delete deletes a Hetzner cloud placement group
 func Delete(
 	ctx *cluster.Cluster,
 	pool config.NodePool,

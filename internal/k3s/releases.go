@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io"
 	"net/http"
 	"strings"
 	"time"
@@ -34,14 +33,9 @@ func getAllReleases() ([]Release, error) {
 	if err != nil {
 		return nil, err
 	}
-
-	// Close the response body when the function returns
-	defer func(Body io.ReadCloser) {
-		err := Body.Close()
-		if err != nil {
-			fmt.Println("Error closing response body")
-		}
-	}(res.Body)
+	if err := res.Body.Close(); err != nil { // Check for error on closing the response body
+		return nil, err
+	}
 
 	if res.StatusCode != http.StatusOK {
 		return nil, errors.New("failed to fetch releases")
@@ -91,10 +85,12 @@ func (r Release) Type() string {
 	return stable
 }
 
+// FormattedDate returns the date of the release in the format YYYY-MM-DD
 func (r Release) FormattedDate() string {
 	return r.PublishedAt.Format("2006-01-02")
 }
 
+// PrintReleases prints the releases in a formatted table
 func PrintReleases(releases []Release) {
 	// Calculate column widths
 	maxNameLength := len("Name")

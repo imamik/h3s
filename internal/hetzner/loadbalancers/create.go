@@ -1,3 +1,4 @@
+// Package loadbalancers contains the functionality for creating a Hetzner cloud load balancer
 package loadbalancers
 
 import (
@@ -58,9 +59,9 @@ func create(
 		l.AddEvent(logger.Failure, err)
 		return nil, err
 	}
-	if err := ctx.CloudClient.Action.WaitFor(ctx.Context, res.Action); err != nil {
-		l.AddEvent(logger.Failure, err)
-		return nil, err
+	if waitErr := ctx.CloudClient.Action.WaitFor(ctx.Context, res.Action); waitErr != nil {
+		l.AddEvent(logger.Failure, waitErr)
+		return nil, waitErr
 	}
 
 	balancer, err := Get(ctx)

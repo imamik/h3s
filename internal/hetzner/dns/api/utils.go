@@ -9,7 +9,11 @@ import (
 
 func parseUnprocessableEntityError(resp *http.Response) (*UnprocessableEntityError, error) {
 	body, err := io.ReadAll(resp.Body)
-	defer resp.Body.Close()
+	defer func() {
+		if cerr := resp.Body.Close(); cerr != nil {
+			err = fmt.Errorf("error closing response body: %w", cerr)
+		}
+	}()
 
 	if err != nil {
 		return nil, fmt.Errorf("error reading HTTP response body: %e", err)
@@ -38,7 +42,11 @@ func parseUnauthorizedError(resp *http.Response) (*UnauthorizedError, error) {
 
 func readBody(resp *http.Response) ([]byte, error) {
 	body, err := io.ReadAll(resp.Body)
-	defer resp.Body.Close()
+	defer func() {
+		if cerr := resp.Body.Close(); cerr != nil {
+			err = fmt.Errorf("error closing response body: %w", cerr)
+		}
+	}()
 
 	if err != nil {
 		return nil, fmt.Errorf("error reading HTTP response body: %w", err)

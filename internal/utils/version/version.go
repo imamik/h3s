@@ -1,3 +1,4 @@
+// Package version contains utility functions for semantic versioning
 package version
 
 import "fmt"

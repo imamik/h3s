@@ -55,6 +55,11 @@ func (c *Client) GetRecordByName(ctx context.Context, zoneID string, name string
 	if err != nil {
 		return nil, fmt.Errorf("error getting records in zone %s: %w", zoneID, err)
 	}
+	defer func() {
+		if cerr := resp.Body.Close(); cerr != nil {
+			err = fmt.Errorf("error closing response body: %w", cerr)
+		}
+	}()
 
 	switch resp.StatusCode {
 	case http.StatusOK:
@@ -81,12 +86,17 @@ func (c *Client) GetRecordByName(ctx context.Context, zoneID string, name string
 	}
 }
 
-// GetRecords reads all records in a given zone.
+// GetRecordsByZoneID reads all records in a given zone.
 func (c *Client) GetRecordsByZoneID(ctx context.Context, zoneID string) (*[]Record, error) {
 	resp, err := c.request(ctx, http.MethodGet, "/api/v1/records?zone_id="+zoneID, nil)
 	if err != nil {
 		return nil, fmt.Errorf("error getting records in zone %s: %w", zoneID, err)
 	}
+	defer func() {
+		if cerr := resp.Body.Close(); cerr != nil {
+			err = fmt.Errorf("error closing response body: %w", cerr)
+		}
+	}()
 
 	switch resp.StatusCode {
 	case http.StatusOK:
@@ -109,6 +119,11 @@ func (c *Client) GetRecord(ctx context.Context, recordID string) (*Record, error
 	if err != nil {
 		return nil, fmt.Errorf("error getting record %s: %w", recordID, err)
 	}
+	defer func() {
+		if cerr := resp.Body.Close(); cerr != nil {
+			err = fmt.Errorf("error closing response body: %w", cerr)
+		}
+	}()
 
 	switch resp.StatusCode {
 	case http.StatusNotFound:
@@ -135,6 +150,11 @@ func (c *Client) CreateRecord(ctx context.Context, opts CreateRecordOpts) (*Reco
 	if err != nil {
 		return nil, fmt.Errorf("error creating record in zone %s: %w", opts.ZoneID, err)
 	}
+	defer func() {
+		if cerr := resp.Body.Close(); cerr != nil {
+			err = fmt.Errorf("error closing response body: %w", cerr)
+		}
+	}()
 
 	switch resp.StatusCode {
 	case http.StatusNotFound:
@@ -159,6 +179,11 @@ func (c *Client) DeleteRecord(ctx context.Context, id string) error {
 	if err != nil {
 		return fmt.Errorf("error deleting record %s: %s", id, err)
 	}
+	defer func() {
+		if cerr := resp.Body.Close(); cerr != nil {
+			err = fmt.Errorf("error closing response body: %w", cerr)
+		}
+	}()
 
 	switch resp.StatusCode {
 	case http.StatusOK:
@@ -174,6 +199,11 @@ func (c *Client) UpdateRecord(ctx context.Context, record Record) (*Record, erro
 	if err != nil {
 		return nil, fmt.Errorf("error updating record %s: %s", record.ID, err)
 	}
+	defer func() {
+		if cerr := resp.Body.Close(); cerr != nil {
+			err = fmt.Errorf("error closing response body: %w", cerr)
+		}
+	}()
 
 	switch resp.StatusCode {
 	case http.StatusOK:

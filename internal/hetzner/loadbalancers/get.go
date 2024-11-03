@@ -8,6 +8,7 @@ import (
 	"github.com/hetznercloud/hcloud-go/v2/hcloud"
 )
 
+// Get gets the Hetzner cloud load balancer
 func Get(ctx *cluster.Cluster) (*hcloud.LoadBalancer, error) {
 	balancer := getName(ctx)
 

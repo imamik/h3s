@@ -8,6 +8,7 @@ import (
 	"h3s/internal/utils/logger"
 )
 
+// Get gets the DNS records for the cluster
 func Get(ctx *cluster.Cluster) ([]api.Record, error) {
 	l := logger.New(nil, logger.DNSRecord, logger.Get, "All records")
 	defer l.LogEvents()
@@ -34,6 +35,7 @@ func Get(ctx *cluster.Cluster) ([]api.Record, error) {
 	return utils.FilterFoundRecords(*records), nil
 }
 
+// GetZone gets the DNS zone for the cluster
 func GetZone(ctx *cluster.Cluster) (*api.Zone, error) {
 	l := logger.New(nil, logger.DNSZone, logger.Get, ctx.Config.Domain)
 	defer l.LogEvents()

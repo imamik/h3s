@@ -1,3 +1,4 @@
+// Package sshkey contains the functionality for managing Hetzner cloud SSH keys
 package sshkey
 
 import (
@@ -40,6 +41,7 @@ func create(ctx *cluster.Cluster) (*hcloud.SSHKey, error) {
 	return sshKey, nil
 }
 
+// Create creates a Hetzner cloud SSH key
 func Create(ctx *cluster.Cluster) (*hcloud.SSHKey, error) {
 	sshKey, err := Get(ctx)
 	if sshKey != nil && err == nil {

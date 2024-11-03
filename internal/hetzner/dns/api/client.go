@@ -1,3 +1,4 @@
+// Package api contains the Hetzner DNS API client
 package api
 
 import (
@@ -54,10 +55,12 @@ func New(apiEndpoint string, apiToken string, roundTripper http.RoundTripper) (*
 	return client, nil
 }
 
+// SetUserAgent sets the user agent for the client.
 func (c *Client) SetUserAgent(userAgent string) {
 	c.userAgent = userAgent
 }
 
+// request sends a request to the Hetzner DNS API and returns the response.
 func (c *Client) request(ctx context.Context, method string, path string, bodyJSON any) (*http.Response, error) {
 	uri := c.endPoint.String() + path
 

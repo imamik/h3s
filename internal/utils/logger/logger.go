@@ -1,3 +1,4 @@
+// Package logger contains the functionality for constructing a logger, that can be used to log events in a structured way
 package logger
 
 import (
@@ -77,6 +78,7 @@ func (l *EventLogger) LogEvents() {
 	l.events = []ResourceEvent{}
 }
 
+// LogLatest logs the latest event in the event logger
 func (l *EventLogger) LogLatest() {
 	lastIndex := len(l.events) - 1
 	event := l.events[lastIndex]
@@ -123,9 +125,7 @@ func (l *EventLogger) logEvent(e ResourceEvent, group bool) {
 	)
 
 	// Add the error messages to the log line
-	for _, e := range e.Err {
-		logLine = append(logLine, e)
-	}
+	logLine = append(logLine, e.Err...)
 
 	// Log the line with the appropriate color (green for success, red for failure)
 	switch e.Status {

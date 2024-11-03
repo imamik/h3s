@@ -8,6 +8,7 @@ const (
 	wget           = "wget --timeout=5 --waitretry=5 --tries=5 --retry-connrefused --inet4-only "
 )
 
+// DownloadImage returns the download link for the microOS image
 func DownloadImage(architecture hcloud.Architecture) string {
 	if architecture == hcloud.ArchitectureARM {
 		return wget + microOsArmLink

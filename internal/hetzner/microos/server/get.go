@@ -8,6 +8,7 @@ import (
 	"github.com/hetznercloud/hcloud-go/v2/hcloud"
 )
 
+// Get gets the Hetzner cloud microOS server
 func Get(
 	ctx *cluster.Cluster,
 	architecture hcloud.Architecture,

@@ -14,6 +14,7 @@ import (
 
 const waitTime = 5 * time.Second
 
+// Provision provisions the Hetzner cloud microOS image
 func Provision(
 	ctx *cluster.Cluster,
 	architecture hcloud.Architecture,

@@ -58,6 +58,11 @@ func (c *Client) GetZones(ctx context.Context) ([]Zone, error) {
 	if err != nil {
 		return nil, fmt.Errorf("error getting zones: %w", err)
 	}
+	defer func() {
+		if closeErr := resp.Body.Close(); closeErr != nil {
+			fmt.Println("Error closing response body:", closeErr)
+		}
+	}()
 
 	switch resp.StatusCode {
 	case http.StatusNotFound:
@@ -83,6 +88,11 @@ func (c *Client) GetZone(ctx context.Context, id string) (*Zone, error) {
 	if err != nil {
 		return nil, fmt.Errorf("error getting zone %s: %w", id, err)
 	}
+	defer func() {
+		if closeErr := resp.Body.Close(); closeErr != nil {
+			fmt.Println("Error closing response body:", closeErr)
+		}
+	}()
 
 	switch resp.StatusCode {
 	case http.StatusNotFound:
@@ -107,6 +117,11 @@ func (c *Client) UpdateZone(ctx context.Context, zone Zone) (*Zone, error) {
 	if err != nil {
 		return nil, fmt.Errorf("error updating zone %s: %s", zone.ID, err)
 	}
+	defer func() {
+		if closeErr := resp.Body.Close(); closeErr != nil {
+			fmt.Println("Error closing response body:", closeErr)
+		}
+	}()
 
 	switch resp.StatusCode {
 	case http.StatusOK:
@@ -129,6 +144,11 @@ func (c *Client) DeleteZone(ctx context.Context, id string) error {
 	if err != nil {
 		return fmt.Errorf("error deleting zone %s: %s", id, err)
 	}
+	defer func() {
+		if closeErr := resp.Body.Close(); closeErr != nil {
+			fmt.Println("Error closing response body:", closeErr)
+		}
+	}()
 
 	switch resp.StatusCode {
 	case http.StatusOK:
@@ -144,6 +164,11 @@ func (c *Client) GetZoneByName(ctx context.Context, name string) (*Zone, error) 
 	if err != nil {
 		return nil, fmt.Errorf("error getting zones: %w", err)
 	}
+	defer func() {
+		if closeErr := resp.Body.Close(); closeErr != nil {
+			fmt.Println("Error closing response body:", closeErr)
+		}
+	}()
 
 	switch resp.StatusCode {
 	case http.StatusNotFound:
@@ -178,6 +203,11 @@ func (c *Client) CreateZone(ctx context.Context, opts CreateZoneOpts) (*Zone, er
 	if err != nil {
 		return nil, fmt.Errorf("error getting zones: %w", err)
 	}
+	defer func() {
+		if closeErr := resp.Body.Close(); closeErr != nil {
+			fmt.Println("Error closing response body:", closeErr)
+		}
+	}()
 
 	switch resp.StatusCode {
 	case http.StatusOK:

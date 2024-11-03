@@ -1,3 +1,4 @@
+// Package dns contains the functionality for creating DNS records for a Hetzner cloud cluster
 package dns
 
 import (
@@ -8,6 +9,7 @@ import (
 	"sync"
 )
 
+// Create creates the DNS records for the cluster
 func Create(ctx *cluster.Cluster) error {
 	l := logger.New(nil, logger.DNSRecord, logger.Create, "All Records")
 	defer l.LogEvents()

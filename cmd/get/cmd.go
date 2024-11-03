@@ -1,3 +1,4 @@
+// Package get contains the commands for getting information from the cluster e.g. kubeconfig, token, etc.
 package get
 
 import (

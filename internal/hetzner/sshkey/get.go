@@ -8,6 +8,7 @@ import (
 	"github.com/hetznercloud/hcloud-go/v2/hcloud"
 )
 
+// Get retrieves a Hetzner cloud SSH key
 func Get(ctx *cluster.Cluster) (*hcloud.SSHKey, error) {
 	sshKeyName := getName(ctx)
 

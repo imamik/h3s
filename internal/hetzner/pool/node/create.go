@@ -1,3 +1,4 @@
+// Package node contains the functionality for managing Hetzner cloud servers
 package node
 
 import (
@@ -11,6 +12,7 @@ import (
 	"github.com/hetznercloud/hcloud-go/v2/hcloud"
 )
 
+// Create creates a Hetzner cloud server
 func Create(
 	ctx *cluster.Cluster,
 	sshKey *hcloud.SSHKey,
@@ -62,6 +64,10 @@ func create(
 			sshKey.PublicKey,
 		},
 	})
+	if err != nil {
+		l.AddEvent(logger.Failure, err)
+		return nil, err
+	}
 
 	res, _, err := ctx.CloudClient.Server.Create(ctx.Context, hcloud.ServerCreateOpts{
 		Name:           name,

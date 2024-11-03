@@ -1,3 +1,4 @@
+// Package k3s contains the commands for getting k3s releases
 package k3s
 
 import (

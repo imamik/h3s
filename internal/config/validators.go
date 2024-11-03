@@ -6,8 +6,10 @@ import (
 	"strconv"
 )
 
+// NameRegex is a regex for validating names in lower-kebap-case
 var NameRegex = regexp.MustCompile(`^[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$`)
 
+// ValidateName validates a name in lower-kebap-case, checks length and format
 func ValidateName(s string) error {
 	if len(s) < 4 {
 		return errors.New("name must be at least 4 characters long")
@@ -21,6 +23,7 @@ func ValidateName(s string) error {
 	return nil
 }
 
+// IsNumberString checks if a string is a number
 func IsNumberString(s string) error {
 	_, err := strconv.Atoi(s)
 	if err != nil {
@@ -29,6 +32,7 @@ func IsNumberString(s string) error {
 	return nil
 }
 
+// IsUnevenNumberString checks if a string is a number and is uneven
 func IsUnevenNumberString(s string) error {
 	i, err := strconv.Atoi(s)
 	if err != nil {

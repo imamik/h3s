@@ -1,3 +1,5 @@
+// Package userdata contains the functionality for generating the user data for Hetzner cloud servers,
+// which is used to configure the servers during boot
 package userdata
 
 import "h3s/internal/utils/template"

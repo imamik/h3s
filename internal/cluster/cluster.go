@@ -1,3 +1,4 @@
+// Package cluster provides a helper struct and its context initialization for the h3s clusters configuration, credentials, and clients.
 package cluster
 
 import (
@@ -11,6 +12,7 @@ import (
 	"github.com/hetznercloud/hcloud-go/v2/hcloud"
 )
 
+// Cluster is a helper struct representing the h3s clusters configuration, credentials, and clients.
 type Cluster struct {
 	Config      *config.Config
 	Credentials *credentials.ProjectCredentials
@@ -71,7 +73,8 @@ func (c *Cluster) GetLabels(optionalLabels ...map[string]string) map[string]stri
 	return labels
 }
 
+// GetName returns a name for a resource, including the project name, origin and any additional names provided as arguments.
 func (c *Cluster) GetName(names ...string) string {
-	names = append([]string{c.Config.Name, "k3s"}, names...)
+	names = append([]string{c.Config.Name, "h3s"}, names...)
 	return strings.Join(names, "-")
 }

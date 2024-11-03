@@ -9,13 +9,19 @@ import (
 	"sync"
 )
 
+// Delete removes the control plane and worker pools from the cluster.
 func Delete(ctx *cluster.Cluster) error {
+	l := logger.New(nil, logger.Pool, logger.Delete, ctx.GetName(ctx.Config.ControlPlane.Pool.Name))
+	defer l.LogEvents()
+
 	var wg sync.WaitGroup
 
 	// Delete control plane pool
 	wg.Add(1)
 	go func() {
-		deletePool(ctx, ctx.Config.ControlPlane.Pool)
+		if err := deletePool(ctx, ctx.Config.ControlPlane.Pool); err != nil {
+			l.AddEvent(logger.Failure, err)
+		}
 		wg.Done()
 	}()
 
@@ -23,7 +29,9 @@ func Delete(ctx *cluster.Cluster) error {
 	for _, pool := range ctx.Config.WorkerPools {
 		wg.Add(1)
 		go func(pool config.NodePool) {
-			deletePool(ctx, pool)
+			if err := deletePool(ctx, pool); err != nil {
+				l.AddEvent(logger.Failure, err)
+			}
 			wg.Done()
 		}(pool)
 	}
@@ -42,7 +50,9 @@ func deletePool(ctx *cluster.Cluster, pool config.NodePool) error {
 		wg.Add(1)
 		go func(i int) {
 			defer wg.Done()
-			node.Delete(ctx, pool, i)
+			if err := node.Delete(ctx, pool, i); err != nil {
+				l.AddEvent(logger.Failure, err)
+			}
 		}(i)
 	}
 	wg.Wait()

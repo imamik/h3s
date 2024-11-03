@@ -1,3 +1,4 @@
+// Package survey contains the survey for creating a h3s cluster
 package survey
 
 import (
@@ -9,6 +10,7 @@ import (
 	"github.com/hetznercloud/hcloud-go/v2/hcloud"
 )
 
+// Survey surveys the user for the cluster configuration and returns it.
 func Survey(k3sReleases []k3s.Release) (config.Config, error) {
 	var conf config.Config
 

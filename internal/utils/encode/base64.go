@@ -1,3 +1,4 @@
+// Package encode contains the functionality for en- & decoding strings
 package encode
 
 import "encoding/base64"

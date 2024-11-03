@@ -1,3 +1,4 @@
+// Package file contains the functionality for managing files
 package file
 
 // SetBytes sets the data of the File

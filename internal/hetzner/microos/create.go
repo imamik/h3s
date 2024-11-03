@@ -1,3 +1,4 @@
+// Package microos contains the functionality for managing Hetzner cloud microOS images
 package microos
 
 import (
@@ -12,6 +13,7 @@ import (
 	"github.com/hetznercloud/hcloud-go/v2/hcloud"
 )
 
+// Create creates the Hetzner cloud microOS image
 func Create(ctx *cluster.Cluster) error {
 	sshKey, err := sshkey.Get(ctx)
 	if err != nil {
@@ -25,7 +27,9 @@ func Create(ctx *cluster.Cluster) error {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
-			create(ctx, sshKey, hcloud.ArchitectureARM)
+			if _, err := create(ctx, sshKey, hcloud.ArchitectureARM); err != nil {
+				logger.New(nil, logger.Image, logger.Create, "ARM").AddEvent(logger.Failure, err)
+			}
 		}()
 	}
 
@@ -33,7 +37,9 @@ func Create(ctx *cluster.Cluster) error {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
-			create(ctx, sshKey, hcloud.ArchitectureX86)
+			if _, err := create(ctx, sshKey, hcloud.ArchitectureX86); err != nil {
+				logger.New(nil, logger.Image, logger.Create, "X86").AddEvent(logger.Failure, err)
+			}
 		}()
 	}
 
@@ -57,7 +63,11 @@ func create(
 	}
 
 	// Cleanup on success AND failure
-	defer server.Delete(ctx, architecture)
+	defer func() {
+		if deleteErr := server.Delete(ctx, architecture); deleteErr != nil {
+			l.AddEvent(logger.Failure, deleteErr) // Log the error if deletion fails
+		}
+	}()
 
 	// Create server that will be used to create the image
 	s, err := server.Create(ctx, architecture, sshKey, ctx.Config.ControlPlane.Pool.Location)

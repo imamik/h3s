@@ -28,30 +28,46 @@ func getConfig(privateSshKeyPath string) (*ssh.ClientConfig, error) {
 
 	// SSH client configuration
 	return &ssh.ClientConfig{
-		User:            user,
-		Auth:            []ssh.AuthMethod{ssh.PublicKeys(signer)},
-		HostKeyCallback: ssh.InsecureIgnoreHostKey(),
+		User: user,
+		Auth: []ssh.AuthMethod{ssh.PublicKeys(signer)},
+		// #nosec G106
+		HostKeyCallback: ssh.InsecureIgnoreHostKey(), // ignore host key verification
 	}, nil
 }
 
 // removeKnownHostsEntry removes the known_hosts entry for the given IP
 func removeKnownHostsEntry(ip string) error {
-	knownHostsFile := os.Getenv("HOME") + "/.ssh/known_hosts"
-	tempFile := os.Getenv("HOME") + "/.ssh/temp_known_hosts"
+	homeDir, err := os.UserHomeDir() // Safely get the home directory
+	if err != nil {
+		return err
+	}
+	knownHostsFile := homeDir + "/.ssh/known_hosts"
+	tempFile := homeDir + "/.ssh/temp_known_hosts"
 
 	// Open original known_hosts file
+	// #nosec G304
 	in, err := os.Open(knownHostsFile)
 	if err != nil {
 		return err
 	}
-	defer in.Close()
+	defer func() {
+		if closeErr := in.Close(); closeErr != nil {
+			// Handle the error from closing the file
+			err = closeErr
+		}
+	}()
 
 	// Create a temporary file
+	// #nosec G304
 	out, err := os.Create(tempFile)
 	if err != nil {
 		return err
 	}
-	defer out.Close()
+	defer func() {
+		if closeErr := out.Close(); closeErr != nil {
+			err = closeErr
+		}
+	}()
 
 	// Create a scanner to read the known_hosts file line by line
 	scanner := bufio.NewScanner(in)

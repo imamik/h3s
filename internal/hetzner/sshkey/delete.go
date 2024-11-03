@@ -5,6 +5,7 @@ import (
 	"h3s/internal/utils/logger"
 )
 
+// Delete deletes a Hetzner cloud SSH key
 func Delete(ctx *cluster.Cluster) error {
 	l := logger.New(nil, logger.SSHKey, logger.Delete, getName(ctx))
 	defer l.LogEvents()

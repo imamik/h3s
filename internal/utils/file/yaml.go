@@ -4,6 +4,7 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
+// SetYaml sets the file content to the YAML representation of the given interface
 func (f *File) SetYaml(yml interface{}) *File {
 	data, err := yaml.Marshal(yml)
 	f.SetBytes(data)
@@ -13,6 +14,7 @@ func (f *File) SetYaml(yml interface{}) *File {
 	return f
 }
 
+// UnmarshalYamlTo unmarshals the file content to the given interface
 func (f *File) UnmarshalYamlTo(out interface{}) error {
 	err := f.Error()
 	if err != nil {

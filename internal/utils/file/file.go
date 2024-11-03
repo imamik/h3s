@@ -77,9 +77,9 @@ func (f *File) Save() (int, error) {
 	}
 
 	defer func(file *os.File) {
-		err := file.Close()
-		if err != nil {
-			f.errors = append(f.errors, err)
+		closeErr := file.Close()
+		if closeErr != nil {
+			f.errors = append(f.errors, closeErr)
 		}
 	}(createdFile)
 

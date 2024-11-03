@@ -1,3 +1,4 @@
+// Package server contains the functionality for managing Hetzner cloud servers
 package server
 
 import (
@@ -12,6 +13,7 @@ import (
 	"github.com/hetznercloud/hcloud-go/v2/hcloud"
 )
 
+// AllServers is a collection of all servers in the cluster, sorted by role (ControlPlane, Worker, Gateway, Other)
 type AllServers struct {
 	ControlPlane []*hcloud.Server
 	Worker       []*hcloud.Server
@@ -34,7 +36,7 @@ func getAll(ctx *cluster.Cluster) ([]*hcloud.Server, error) {
 		l.AddEvent(logger.Failure, err)
 		return nil, err
 	}
-	if servers == nil || len(servers) == 0 {
+	if len(servers) == 0 {
 		err = errors.New("no servers found")
 		l.AddEvent(logger.Failure, err)
 		return nil, err

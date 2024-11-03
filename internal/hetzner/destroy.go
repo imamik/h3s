@@ -28,6 +28,7 @@ func deleteResource(
 	}()
 }
 
+// Destroy deletes the Hetzner cloud cluster
 func Destroy(ctx *cluster.Cluster) error {
 	l := logger.New(nil, logger.Cluster, logger.Delete, ctx.Config.Name)
 	defer l.LogEvents()

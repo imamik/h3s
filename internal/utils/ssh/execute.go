@@ -1,3 +1,4 @@
+// Package ssh contains the functionality for executing SSH commands
 package ssh
 
 import (

@@ -1,3 +1,4 @@
+// Package kubeconfig contains the functionality for retrieving the kubeconfig from the cluster
 package kubeconfig
 
 import (

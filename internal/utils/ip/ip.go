@@ -1,3 +1,4 @@
+// Package ip contains the utility functionality for working with IP addresses, especially for Hetzner cloud servers
 package ip
 
 import (

@@ -7,6 +7,7 @@ import (
 	"github.com/hetznercloud/hcloud-go/v2/hcloud"
 )
 
+// Get gets the Hetzner cloud gateway
 func Get(ctx *cluster.Cluster) (*hcloud.Server, error) {
 	name := getName(ctx)
 

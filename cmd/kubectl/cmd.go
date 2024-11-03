@@ -1,3 +1,5 @@
+// Package kubectl provides the command for running kubectl commands e.g. kubectl get nodes, kubectl get pods, etc.
+// it proxies the kubectl command either directly with the kubeconfig if available or via SSH to the first control plane server
 package kubectl
 
 import (

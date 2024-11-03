@@ -5,6 +5,7 @@ import (
 	"strings"
 )
 
+// Packages returns the packages script for the microOS image
 func Packages() string {
 	neededPackages := strings.Join([]string{
 		"restorecond",

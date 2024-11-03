@@ -1,3 +1,4 @@
+// Package destroy provides the command for destroying resources e.g. hetzner cloud resources, k8s components etc.
 package destroy
 
 import (

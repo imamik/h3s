@@ -7,6 +7,7 @@ import (
 	"github.com/hetznercloud/hcloud-go/v2/hcloud"
 )
 
+// Delete deletes a Hetzner cloud microOS server
 func Delete(
 	ctx *cluster.Cluster,
 	architecture hcloud.Architecture,
