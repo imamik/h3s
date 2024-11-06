@@ -1,6 +1,6 @@
 package dependencies
 
 // Get returns the default implementation of CommandDependencies
-func Get() CommandDependencies {
+var Get = func() CommandDependencies {
 	return &DefaultDependencies{}
 }
