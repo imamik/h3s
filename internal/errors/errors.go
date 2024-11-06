@@ -15,13 +15,15 @@ const (
 	ErrorTypeKubectl ErrorType = "KubectlError" // ErrorTypeKubectl is an error type for kubectl errors
 	ErrorTypeHetzner ErrorType = "HetznerError" // ErrorTypeHetzner is an error type for Hetzner Cloud errors
 	ErrorTypeK3s     ErrorType = "K3sError"     // ErrorTypeK3s is an error type for k3s errors
+	ErrorTypeSSH     ErrorType = "SSHError"     // ErrorTypeSSH is an error type for ssh errors
+	ErrorTypeSystem  ErrorType = "SystemError"  // ErrorTypeSystem is an error type for system errors
 )
 
 // Error is a custom error type for the h3s project
 type Error struct {
-	Type    ErrorType
 	Message string
 	Err     error
+	Type    ErrorType
 }
 
 // Error returns the string representation of the error

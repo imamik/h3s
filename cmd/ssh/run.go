@@ -2,6 +2,7 @@ package ssh
 
 import (
 	"h3s/internal/cluster"
+	"h3s/internal/errors"
 	"h3s/internal/utils/common"
 	"strings"
 
@@ -12,13 +13,13 @@ import (
 func runSsh(cmd *cobra.Command, args []string) error {
 	ctx, err := cluster.Context()
 	if err != nil {
-		return err
+		return errors.Wrap(errors.ErrorTypeCluster, "failed to load cluster context", err)
 	}
 
 	command := strings.Join(args, " ")
 	res, err := common.SSH(ctx, command)
 	if err != nil {
-		return err
+		return errors.Wrap(errors.ErrorTypeSSH, "failed to execute ssh command", err)
 	}
 
 	cmd.Println(res)

@@ -30,7 +30,10 @@ func runCreateConfig(cmd *cobra.Command, _ []string) error {
 
 // runCreateCredentials creates h3s cluster credentials
 func runCreateCredentials(_ *cobra.Command, _ []string) error {
-	return credentials.Configure()
+	if err := credentials.Configure(); err != nil {
+		return errors.Wrap(errors.ErrorTypeConfig, "failed to configure credentials", err)
+	}
+	return nil
 }
 
 // runCreateCluster creates a h3s cluster
@@ -38,7 +41,7 @@ func runCreateCluster(_ *cobra.Command, _ []string) error {
 	// Load the cluster context
 	clr, err := cluster.Context()
 	if err != nil {
-		return err
+		return errors.Wrap(errors.ErrorTypeCluster, "failed to load cluster context", err)
 	}
 
 	// Create the cluster resources

@@ -3,6 +3,7 @@ package kubectl
 import (
 	"h3s/internal/cluster"
 	"h3s/internal/config/path"
+	"h3s/internal/errors"
 	"h3s/internal/utils/common"
 	"h3s/internal/utils/execute"
 	"h3s/internal/utils/file"
@@ -15,7 +16,7 @@ import (
 func runKubectl(cmd *cobra.Command, args []string) error {
 	ctx, err := cluster.Context()
 	if err != nil {
-		return err
+		return errors.Wrap(errors.ErrorTypeCluster, "failed to load cluster context", err)
 	}
 
 	// if a kubeconfig file exists, run kubectl commands with it, otherwise run them via SSH
@@ -28,7 +29,7 @@ func runKubectl(cmd *cobra.Command, args []string) error {
 	}
 
 	if err != nil {
-		return err
+		return errors.Wrap(errors.ErrorTypeKubectl, "failed to execute kubectl command", err)
 	}
 
 	cmd.Println(res)
@@ -38,7 +39,7 @@ func runKubectl(cmd *cobra.Command, args []string) error {
 func runWithKubeConfig(kubeConfigPath string, args []string) (string, error) {
 	cmd, err := kubectl.New(args...).AddKubeConfigPath(kubeConfigPath).String()
 	if err != nil {
-		return "", err
+		return "", errors.Wrap(errors.ErrorTypeKubectl, "failed to build kubectl command", err)
 	}
 	return execute.Local(cmd)
 }
@@ -46,7 +47,7 @@ func runWithKubeConfig(kubeConfigPath string, args []string) (string, error) {
 func runWithSSH(ctx *cluster.Cluster, args []string) (string, error) {
 	cmd, err := kubectl.New(args...).EmbedFileContent().String()
 	if err != nil {
-		return "", err
+		return "", errors.Wrap(errors.ErrorTypeKubectl, "failed to build kubectl command", err)
 	}
 	return common.SSH(ctx, cmd)
 }

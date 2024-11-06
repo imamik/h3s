@@ -2,8 +2,6 @@
 package get
 
 import (
-	"h3s/cmd/get/k3s"
-
 	"github.com/spf13/cobra"
 )
 
@@ -33,6 +31,5 @@ func init() {
 	Cmd.AddCommand(
 		getTokenCmd,
 		getKubeConfigCmd,
-		k3s.Cmd,
 	)
 }
