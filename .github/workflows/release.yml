@@ -28,7 +28,7 @@ jobs:
 
   test:
     name: test
-    needs: lint  # This ensures lint job runs first
+    needs: lint
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -39,5 +39,29 @@ jobs:
         with:
           go-version-file: 'go.mod'
 
-      - name: Test
-        run: go test -race -v -timeout 10m -coverprofile=coverage.txt -covermode=atomic ./... 
+      - name: Set up gotestfmt
+        uses: GoTestTools/gotestfmt-action@v2
+        with:
+          version: v2.0.0
+
+      - name: Test with coverage
+        run: |
+          set -euo pipefail
+          go test -json -race -v -timeout 10m -coverprofile=coverage.txt -covermode=atomic ./... 2>&1 | tee /tmp/gotest.log | gotestfmt
+
+      - name: Upload test log
+        uses: actions/upload-artifact@v2
+        if: always()
+        with:
+          name: test-log
+          path: /tmp/gotest.log
+          if-no-files-found: error
+
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          file: ./coverage.txt
+          flags: unittests
+          fail_ci_if_error: true
+          verbose: true
+          token: ${{ secrets.CODECOV_TOKEN }}
