@@ -5,11 +5,9 @@ import (
 	"fmt"
 	"h3s/internal/cluster"
 	"h3s/internal/config"
-	"h3s/internal/hetzner/microos/image"
-	"h3s/internal/hetzner/network"
+	"h3s/internal/hetzner/microos"
 	"h3s/internal/hetzner/pool/node"
 	"h3s/internal/hetzner/pool/placementgroup"
-	"h3s/internal/hetzner/sshkey"
 	"h3s/internal/utils/logger"
 	"sync"
 
@@ -17,23 +15,14 @@ import (
 )
 
 // CreatePools creates the control plane and worker pools
-func CreatePools(ctx *cluster.Cluster) ([]*hcloud.Server, error) {
+func CreatePools(
+	ctx *cluster.Cluster,
+	sshKey *hcloud.SSHKey,
+	net *hcloud.Network,
+	images *microos.ImageInArchitecture,
+) ([]*hcloud.Server, error) {
 	l := logger.New(nil, logger.Pool, logger.Create, "All")
 	defer l.LogEvents()
-
-	// Get ssh key & network
-	sshKey, err := sshkey.Get(ctx)
-	if err != nil {
-		l.AddEvent(logger.Failure, err)
-		return nil, err
-	}
-
-	// Get network
-	net, err := network.Get(ctx)
-	if err != nil {
-		l.AddEvent(logger.Failure, err)
-		return nil, err
-	}
 
 	// Create a channel to collect the nodes & setup a WaitGroup
 	nodeCh := make(chan []*hcloud.Server)
@@ -52,6 +41,7 @@ func CreatePools(ctx *cluster.Cluster) ([]*hcloud.Server, error) {
 			ctx.Config.ControlPlane.Pool,
 			true,
 			ctx.Config.ControlPlane.AsWorkerPool,
+			images,
 		)
 		if err != nil {
 			logr.AddEvent(logger.Failure, err)
@@ -74,6 +64,7 @@ func CreatePools(ctx *cluster.Cluster) ([]*hcloud.Server, error) {
 				pool,
 				false,
 				true,
+				images,
 			)
 			if err != nil {
 				logr.AddEvent(logger.Failure, err)
@@ -120,14 +111,14 @@ func CreatePool(
 	pool config.NodePool,
 	isControlPlane bool,
 	isWorker bool,
+	images *microos.ImageInArchitecture,
 ) ([]*hcloud.Server, error) {
 	l := logger.New(nil, logger.Pool, logger.Create, ctx.GetName(pool.Name))
 	defer l.LogEvents()
 
-	img, err := image.Get(ctx, config.GetArchitecture(pool.Instance))
-	if err != nil {
-		l.AddEvent(logger.Failure, err)
-		return nil, err
+	img := images.ARM
+	if config.GetArchitecture(pool.Instance) == hcloud.ArchitectureX86 {
+		img = images.X86
 	}
 
 	placementGroup, err := placementgroup.Create(ctx, pool, isControlPlane, isWorker)

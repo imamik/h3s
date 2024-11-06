@@ -4,21 +4,16 @@ package loadbalancers
 import (
 	"errors"
 	"h3s/internal/cluster"
-	"h3s/internal/hetzner/network"
 	"h3s/internal/utils/logger"
 
 	"github.com/hetznercloud/hcloud-go/v2/hcloud"
 )
 
 // Create sets up a new load balancer in the Hetzner Cloud for the cluster
-func Create(ctx *cluster.Cluster) (*hcloud.LoadBalancer, error) {
+func Create(ctx *cluster.Cluster, net *hcloud.Network) (*hcloud.LoadBalancer, error) {
 	balancer, err := Get(ctx)
 	if balancer != nil && err == nil {
 		return balancer, nil
-	}
-	net, err := network.Get(ctx)
-	if err != nil {
-		return nil, err
 	}
 	return create(ctx, net)
 }

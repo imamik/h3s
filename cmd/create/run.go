@@ -4,6 +4,7 @@ import (
 	"h3s/internal/cluster"
 	"h3s/internal/config/create"
 	"h3s/internal/config/credentials"
+	"h3s/internal/errors"
 	"h3s/internal/hetzner"
 	"h3s/internal/k3s"
 	"h3s/internal/k8s"
@@ -16,13 +17,13 @@ import (
 func runCreateConfig(cmd *cobra.Command, _ []string) error {
 	// Load the latest 5 stable k3s releases
 	k3sReleases, err := k3s.GetFilteredReleases(false, true, 5)
-	// If there was an error, print it and return
 	if err != nil {
-		return err
+		return errors.Wrap(errors.ErrorTypeK3s, "failed to get k3s releases", err)
 	}
 
-	// Build the configuration
-	create.Build(k3sReleases)
+	if err := create.Build(k3sReleases); err != nil {
+		return errors.Wrap(errors.ErrorTypeConfig, "failed to build configuration", err)
+	}
 
 	return nil
 }
@@ -41,21 +42,23 @@ func runCreateCluster(_ *cobra.Command, _ []string) error {
 	}
 
 	// Create the cluster resources
-	hetzner.Create(clr)
+	if err := hetzner.Create(clr); err != nil {
+		return errors.Wrap(errors.ErrorTypeHetzner, "failed to create hetzner resources", err)
+	}
 
 	// Install k3s on the cluster
 	if err := k3s.Install(clr); err != nil {
-		return err
+		return errors.Wrap(errors.ErrorTypeK3s, "failed to install k3s", err)
 	}
 
 	// Install additional software on the cluster (traefik, cert-manager, csi etc.)
 	if err := k8s.Install(clr); err != nil {
-		return err
+		return errors.Wrap(errors.ErrorTypeK3s, "failed to install kubernetes components", err)
 	}
 
 	// Download the kubeconfig file
 	if err := kubeconfig.Download(clr); err != nil {
-		return err
+		return errors.Wrap(errors.ErrorTypeK3s, "failed to download kubeconfig file", err)
 	}
 
 	return nil

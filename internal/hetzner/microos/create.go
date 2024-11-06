@@ -6,7 +6,6 @@ import (
 	"h3s/internal/config"
 	"h3s/internal/hetzner/microos/image"
 	"h3s/internal/hetzner/microos/server"
-	"h3s/internal/hetzner/sshkey"
 	"h3s/internal/utils/logger"
 	"sync"
 
@@ -14,12 +13,9 @@ import (
 )
 
 // Create creates the Hetzner cloud microOS image
-func Create(ctx *cluster.Cluster) error {
-	sshKey, err := sshkey.Get(ctx)
-	if err != nil {
-		return err
-	}
+func Create(ctx *cluster.Cluster, sshKey *hcloud.SSHKey) (*ImageInArchitecture, error) {
 	architectures := config.GetArchitectures(ctx.Config)
+	images := &ImageInArchitecture{}
 
 	var wg sync.WaitGroup
 
@@ -27,8 +23,10 @@ func Create(ctx *cluster.Cluster) error {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
-			if _, err := create(ctx, sshKey, hcloud.ArchitectureARM); err != nil {
+			if img, err := create(ctx, sshKey, hcloud.ArchitectureARM); err != nil {
 				logger.New(nil, logger.Image, logger.Create, "ARM").AddEvent(logger.Failure, err)
+			} else {
+				images.ARM = img
 			}
 		}()
 	}
@@ -37,14 +35,16 @@ func Create(ctx *cluster.Cluster) error {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
-			if _, err := create(ctx, sshKey, hcloud.ArchitectureX86); err != nil {
+			if img, err := create(ctx, sshKey, hcloud.ArchitectureX86); err != nil {
 				logger.New(nil, logger.Image, logger.Create, "X86").AddEvent(logger.Failure, err)
+			} else {
+				images.X86 = img
 			}
 		}()
 	}
 
 	wg.Wait()
-	return nil
+	return images, nil
 }
 
 func create(

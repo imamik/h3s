@@ -11,63 +11,52 @@ import (
 	"h3s/internal/hetzner/pool"
 	"h3s/internal/hetzner/sshkey"
 	"h3s/internal/utils/logger"
-	"sync"
 )
 
 // Create creates the Hetzner cloud cluster
-func Create(ctx *cluster.Cluster) {
+func Create(ctx *cluster.Cluster) error {
 	l := logger.New(nil, logger.Cluster, logger.Create, ctx.Config.Name)
 	defer l.LogEvents()
 
-	var wg sync.WaitGroup
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		if err := microos.Create(ctx); err != nil {
-			l.AddEvent(logger.Failure, err)
-		}
-	}()
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		if _, err := sshkey.Create(ctx); err != nil {
-			l.AddEvent(logger.Failure, err)
-		}
-	}()
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		if _, err := network.Create(ctx); err != nil {
-			l.AddEvent(logger.Failure, err)
-		}
-	}()
-	wg.Wait()
+	sshKey, err := sshkey.Create(ctx)
+	if err != nil {
+		l.AddEvent(logger.Failure, err)
+		return err
+	}
 
-	wg = sync.WaitGroup{}
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		if _, err := loadbalancers.Create(ctx); err != nil {
-			l.AddEvent(logger.Failure, err)
-		}
-		if err := dns.Create(ctx); err != nil {
-			l.AddEvent(logger.Failure, err)
-		}
-	}()
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		if _, err := pool.CreatePools(ctx); err != nil {
-			l.AddEvent(logger.Failure, err)
-		}
-	}()
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		if _, err := gateway.Create(ctx); err != nil {
-			l.AddEvent(logger.Failure, err)
-		}
-	}()
+	images, err := microos.Create(ctx, sshKey)
+	if err != nil {
+		l.AddEvent(logger.Failure, err)
+		return err
+	}
+
+	net, err := network.Create(ctx)
+	if err != nil {
+		l.AddEvent(logger.Failure, err)
+		return err
+	}
+
+	lb, err := loadbalancers.Create(ctx, net)
+	if err != nil {
+		l.AddEvent(logger.Failure, err)
+		return err
+	}
+
+	if _, err := dns.Create(ctx, lb); err != nil {
+		l.AddEvent(logger.Failure, err)
+		return err
+	}
+
+	if _, err := pool.CreatePools(ctx, sshKey, net, images); err != nil {
+		l.AddEvent(logger.Failure, err)
+		return err
+	}
+
+	if _, err := gateway.Create(ctx, sshKey, net, images); err != nil {
+		l.AddEvent(logger.Failure, err)
+		return err
+	}
 
 	l.AddEvent(logger.Success)
+	return nil
 }

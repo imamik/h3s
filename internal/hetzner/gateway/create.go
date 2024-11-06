@@ -5,9 +5,7 @@ import (
 	"errors"
 	"h3s/internal/cluster"
 	"h3s/internal/config"
-	"h3s/internal/hetzner/microos/image"
-	"h3s/internal/hetzner/network"
-	"h3s/internal/hetzner/sshkey"
+	"h3s/internal/hetzner/microos"
 	"h3s/internal/utils/ip"
 	"h3s/internal/utils/logger"
 	"h3s/internal/utils/ssh"
@@ -17,30 +15,12 @@ import (
 )
 
 // Create creates the Hetzner cloud gateway
-func Create(ctx *cluster.Cluster) (*hcloud.Server, error) {
+func Create(ctx *cluster.Cluster, sshKey *hcloud.SSHKey, n *hcloud.Network, images *microos.ImageInArchitecture) (*hcloud.Server, error) {
 	l := logger.New(nil, logger.Server, logger.Create, "gateway")
 	defer l.LogEvents()
 
-	n, err := network.Get(ctx)
-	if err != nil {
-		l.AddEvent(logger.Failure, err)
-		return nil, err
-	}
-
-	// Get ssh key
-	sshKey, err := sshkey.Get(ctx)
-	if err != nil {
-		l.AddEvent(logger.Failure, err)
-		return nil, err
-	}
-
 	// Get image for architecture
-	img, err := image.Get(ctx, hcloud.ArchitectureARM)
-	if err != nil {
-		l.AddEvent(logger.Failure, err)
-		return nil, err
-	}
-	gateway, err := createServer(ctx, sshKey, n, img)
+	gateway, err := createServer(ctx, sshKey, n, images.ARM)
 	if err != nil {
 		l.AddEvent(logger.Failure, err)
 		return nil, err
