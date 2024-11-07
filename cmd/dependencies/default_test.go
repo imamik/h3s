@@ -28,3 +28,21 @@ func TestDefaultDependencies_GetKubeconfigPath(t *testing.T) {
 	assert.False(t, exists)
 	assert.True(t, strings.HasSuffix(path, "h3s-kubeconfig.yaml"))
 }
+
+func TestDefaultDependencies_GetKubeconfigPath_InvalidPath(t *testing.T) {
+	deps := &DefaultDependencies{}
+
+	// Test with invalid path
+	path, exists := deps.GetKubeconfigPath()
+	assert.False(t, exists)
+	assert.True(t, strings.HasSuffix(path, "h3s-kubeconfig.yaml"))
+}
+
+func TestDefaultDependencies_ExecuteLocalCommand_Error(t *testing.T) {
+	deps := &DefaultDependencies{}
+
+	// Test with invalid command
+	output, err := deps.ExecuteLocalCommand("invalid-command")
+	assert.Error(t, err)
+	assert.True(t, strings.Index(output, "invalid-command: command not found") > 0)
+}
