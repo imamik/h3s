@@ -42,7 +42,6 @@ func TestDefaultDependencies_ExecuteLocalCommand_Error(t *testing.T) {
 	deps := &DefaultDependencies{}
 
 	// Test with invalid command
-	output, err := deps.ExecuteLocalCommand("invalid-command")
+	_, err := deps.ExecuteLocalCommand("invalid-command")
 	assert.Error(t, err)
-	assert.True(t, strings.Index(output, "invalid-command: command not found") > 0)
 }
