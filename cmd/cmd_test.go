@@ -6,11 +6,14 @@ import (
 	"strings"
 	"testing"
 
+	"h3s/internal/version"
+
 	"github.com/stretchr/testify/assert"
 )
 
 // TestSubcommandsSetup tests that all subcommands are correctly set up
 func TestSubcommandsSetup(t *testing.T) {
+	Initialize(version.BuildInfo{})
 	expectedSubcommands := []string{
 		"create",
 		"destroy",
@@ -29,6 +32,7 @@ func TestSubcommandsSetup(t *testing.T) {
 
 // TestInvalidSubcommand tests that an error is returned when an invalid subcommand is provided
 func TestInvalidSubcommand(t *testing.T) {
+	Initialize(version.BuildInfo{})
 	buf := new(bytes.Buffer)
 	Cmd.SetOut(buf)
 	Cmd.SetErr(buf)
@@ -41,6 +45,7 @@ func TestInvalidSubcommand(t *testing.T) {
 
 // TestPrintWelcome tests that the welcome message is printed when the root command is called without any subcommands
 func TestPrintWelcome(t *testing.T) {
+	Initialize(version.BuildInfo{})
 	buf := new(bytes.Buffer)
 	Cmd.SetOut(buf)
 	Cmd.SetArgs([]string{})
@@ -55,6 +60,7 @@ func TestPrintWelcome(t *testing.T) {
 
 // TestVersionShortFlag tests that the version is printed if the version flag is provided
 func TestVersionShortFlag(t *testing.T) {
+	Initialize(version.BuildInfo{Version: "dev"})
 	buf := new(bytes.Buffer)
 	Cmd.SetOut(buf)
 	Cmd.SetArgs([]string{"-v"})
@@ -68,6 +74,7 @@ func TestVersionShortFlag(t *testing.T) {
 
 // TestVersionLongFlag tests that the version is printed if the version flag is provided
 func TestVersionLongFlag(t *testing.T) {
+	Initialize(version.BuildInfo{Version: "dev"})
 	buf := new(bytes.Buffer)
 	Cmd.SetOut(buf)
 	Cmd.SetArgs([]string{"--version"})
@@ -81,6 +88,12 @@ func TestVersionLongFlag(t *testing.T) {
 
 // TestVersionOutput tests that the version output includes all necessary information
 func TestVersionOutput(t *testing.T) {
+	Initialize(version.BuildInfo{
+		Version:   "dev",
+		Commit:    "test-commit",
+		GoVersion: "go1.21",
+	})
+
 	var buf bytes.Buffer
 	Cmd.SetOut(&buf)
 	Cmd.SetArgs([]string{"--version"})
@@ -92,8 +105,8 @@ func TestVersionOutput(t *testing.T) {
 	output := buf.String()
 	expected := []string{
 		"h3s version dev",
-		"Commit:",
-		"Go version:",
+		"Commit: test-commit",
+		"Go version: go1.21",
 	}
 
 	for _, s := range expected {
