@@ -3,10 +3,9 @@ package cmd
 import (
 	"bytes"
 	"fmt"
+	"h3s/internal/version"
 	"strings"
 	"testing"
-
-	"h3s/internal/version"
 
 	"github.com/stretchr/testify/assert"
 )
