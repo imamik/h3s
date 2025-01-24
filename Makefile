@@ -38,6 +38,10 @@ test: ## Run tests
 lint: ## Run linter
 	golangci-lint run --timeout 5m
 
+.PHONY: lint\:fix
+lint\:fix: ## Run linter with auto-fix enabled
+	golangci-lint run --timeout 5m --fix
+
 .PHONY: clean
 clean: ## Clean build artifacts
 	$(GOCLEAN)
