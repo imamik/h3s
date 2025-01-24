@@ -1,0 +1,22 @@
+apiVersion: helm.cattle.io/v1
+kind: HelmChart
+metadata:
+  name: cert-manager
+  namespace: kube-system
+spec:
+  chart: cert-manager
+  version: "{{ .CertManagerVersion }}"
+  repo: https://charts.jetstack.io
+  targetNamespace: "{{ .CertManagerNamespace }}"
+  createNamespace: true
+  valuesContent: |-
+    crds:
+      enabled: true
+    webhook:
+      enabled: true
+    cainjector:
+      enabled: true
+    startupapicheck:
+      enabled: true
+    ingressShim:
+      enabled: true

@@ -1,0 +1,56 @@
+linters-settings:
+  govet:
+    enable: # List of enabled analyzers
+      - shadow # Replaces check-shadowing for variable shadowing checks
+  gofumpt:
+    extra-rules: true # Applies extra formatting rules for consistency
+  gocyclo:
+    min-complexity: 10 # Enforces code complexity threshold at 10
+
+linters:
+  disable-all: false # Must be false to avoid contradicting the enabled linters below
+  enable:
+    - gofumpt # Enforce strict code formatting
+    - govet # Perform static analysis to catch common mistakes
+    - staticcheck # Comprehensive static analysis
+    - revive # Configurable, fast linter
+    - errcheck # Check for unchecked errors
+    - gosec # Security checks for Go code
+    - gosimple # Simplifies Go code where possible
+    - gocyclo # Measures cyclomatic complexity
+    - goconst # Identifies repeated constants
+    - dupl # Detects duplicated code
+    - ineffassign # Finds ineffectual assignments
+    - typecheck # Ensures types are correctly used
+    - unused # Flags unused variables, functions, etc.
+    - unparam # Highlights unused function parameters
+    - gocritic # Suggests code improvements
+    - bodyclose # Checks for unclosed HTTP response bodies
+    - prealloc # Advises on preallocating slice space
+    - misspell # Identifies common spelling errors
+
+run:
+  timeout: "5m" # Specifies a 5-minute timeout for linting
+  issues-exit-code: 1 # Exits with code 1 if issues are found
+
+output:
+  formats: # Maintain compatibility with newer versions
+    - format: colored-line-number
+  print-issued-lines: true # Prints lines where issues occur
+  print-linter-name: true # Displays the linter name in the output
+  sort-results: true # Sorts the reported issues
+
+issues:
+  exclude-dirs:
+    - vendor/ # Skips vendor directory to reduce noise
+    - third_party/ # Skips external dependencies folder
+    - testdata/ # Skips test data resources
+  exclude-files:
+    - ".*_generated\\.go$" # Skips auto-generated files
+  new: false # Shows all issues, not just new ones
+  fix: false # Disables auto-fixing of issues
+  uniq-by-line: false # Allows duplicates on the same line if relevant
+
+severity:
+  default-severity: error # Treats all issues with error-level severity
+  case-sensitive: false # Ignores case when matching severity

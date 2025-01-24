@@ -1,0 +1,49 @@
+builds:
+  - env:
+      - CGO_ENABLED=0
+    mod_timestamp: "{{ .CommitTimestamp }}"
+    goos:
+      - linux
+      - darwin
+      - windows
+      - freebsd
+    goarch:
+      - amd64
+      - arm64
+      - arm
+      - 386
+    goarm:
+      - "6"
+      - "7"
+    flags:
+      - -trimpath
+    ldflags:
+      - -s -w
+      - -X h3s/internal/version.Version={{ .Version }}
+      - -X h3s/internal/version.Commit={{ .Commit }}
+      - -X 'h3s/internal/version.GoVersion={{ .Env.GOVERSION }}'
+    tags:
+      - netgo
+      - osusergo
+
+archives:
+  - format: tar.gz
+    name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+
+checksum:
+  name_template: "checksums.txt"
+
+snapshot:
+  name_template: "{{ .Tag }}-next"
+
+changelog:
+  skip: true
+
+release:
+  github:
+    owner: imamik
+    name: h3s
+  draft: false
+  prerelease: false
+  extra_files:
+    - glob: LICENSE.txt
