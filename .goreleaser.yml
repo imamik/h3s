@@ -13,7 +13,6 @@ builds:
       - arm
       - 386
     goarm:
-      - "6"
       - "7"
     flags:
       - -trimpath
