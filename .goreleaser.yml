@@ -26,8 +26,6 @@ builds:
     builder: go
     gobinary: "go"
     no_unique_dist_dir: true
-    hooks:
-      post: ["go tool link -v"]
 
 archives:
   - format: tar.gz
