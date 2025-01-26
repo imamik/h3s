@@ -1,9 +1,12 @@
-name: MainIntegration
+name: CI
+
 on:
-  push:
-    branches:
-      - main
-  pull_request:
+  workflow_call:
+    inputs:
+      fetch-depth:
+        required: false
+        type: number
+        default: 1
 
 permissions:
   contents: read
@@ -15,7 +18,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 1
+          fetch-depth: ${{ inputs.fetch-depth }}
           
       - uses: actions/setup-go@v5
         with:
@@ -33,7 +36,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 1
+          fetch-depth: ${{ inputs.fetch-depth }}
           
       - uses: actions/setup-go@v5
         with:
@@ -64,4 +67,4 @@ jobs:
           flags: unittests
           fail_ci_if_error: true
           verbose: true
-          token: ${{ secrets.CODECOV_TOKEN }}
+          token: ${{ secrets.CODECOV_TOKEN }} 
