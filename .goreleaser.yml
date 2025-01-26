@@ -14,6 +14,7 @@ builds:
         goarch: arm64
     flags:
       - -trimpath
+      - -v
     ldflags:
       - -s -w
       - -X h3s/internal/version.Version={{ .Version }}
@@ -27,9 +28,6 @@ builds:
     no_unique_dist_dir: true
     hooks:
       post: ["go tool link -v"]
-    build_flags:
-      - -v
-    parallelism: 1
 
 archives:
   - format: tar.gz
