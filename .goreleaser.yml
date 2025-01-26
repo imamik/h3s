@@ -25,7 +25,6 @@ builds:
     builder: go
     gobinary: "go"
     no_unique_dist_dir: true
-    mod_timestamp: "{{ .CommitTimestamp }}"
     hooks:
       post: ["go tool link -v"]
     build_flags:
