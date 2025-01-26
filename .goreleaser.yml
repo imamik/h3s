@@ -22,6 +22,15 @@ builds:
     tags:
       - netgo
       - osusergo
+    builder: go
+    gobinary: "go"
+    no_unique_dist_dir: true
+    mod_timestamp: "{{ .CommitTimestamp }}"
+    hooks:
+      post: ["go tool link -v"]
+    build_flags:
+      - -v
+    parallelism: 1
 
 archives:
   - format: tar.gz

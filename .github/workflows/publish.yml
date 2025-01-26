@@ -35,7 +35,8 @@ jobs:
         with:
           distribution: goreleaser
           version: v1.24.0
-          args: release --clean
+          args: release --clean -f .goreleaser.yml --debug
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GOVERSION: go$(go version | cut -d' ' -f3) 
+          GOVERSION: go$(go version | cut -d' ' -f3)
+          GORELEASER_DEBUG: 1 
