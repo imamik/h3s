@@ -1,9 +1,17 @@
+version: 2
+
+before:
+  hooks:
+    - go mod tidy
+    - go generate ./...
+    - go test -v ./...
+
 builds:
-  - env:
-      - CGO_ENABLED=1
-      - GOAMD64=v3
-      - XX_CC_PREFER_STATIC_LINKER=1
-    mod_timestamp: "{{ .CommitTimestamp }}"
+  - id: h3s
+    binary: h3s
+    dir: .
+    env:
+      - CGO_ENABLED=0
     goos:
       - linux
       - darwin
@@ -11,9 +19,9 @@ builds:
     goarch:
       - amd64
       - arm64
-    flags:
-      - -trimpath
-      - -v
+    ignore:
+      - goos: windows
+        goarch: arm64
     ldflags:
       - -s -w
       - -X h3s/internal/version.Version={{ .Version }}
@@ -22,29 +30,16 @@ builds:
     tags:
       - netgo
       - osusergo
-    builder: docker
-    docker:
-      image: crazymax/goreleaser-xx:latest
-      volumes:
-        - /tmp/build:/tmp/build
-    gobinary: "go"
-    no_unique_dist_dir: true
 
 archives:
-  - format: tar.gz
-    name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+  - name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+    format: tar.gz
     format_overrides:
       - goos: windows
         format: zip
 
 checksum:
   name_template: "checksums.txt"
-
-snapshot:
-  name_template: "{{ .Tag }}-next"
-
-changelog:
-  skip: true
 
 release:
   github:
