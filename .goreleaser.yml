@@ -1,6 +1,7 @@
 builds:
   - env:
       - CGO_ENABLED=0
+      - GOAMD64=v1
     mod_timestamp: "{{ .CommitTimestamp }}"
     goos:
       - linux
