@@ -3,15 +3,19 @@
 # Exit on error
 set -e
 
-# Add all changes
-git add .
+# Check if there are any changes
+if [[ -n $(git status --porcelain) ]]; then
+    # There are changes, proceed with commit
+    # Add all changes
+    git add .
 
-# Get commit message from user
-echo "Enter commit message:"
-read commit_msg
+    # Get commit message from user
+    echo "Enter commit message:"
+    read commit_msg
 
-# Commit changes
-git commit -m "$commit_msg"
+    # Commit changes
+    git commit -m "$commit_msg"
+fi
 
 # Get the latest tag
 latest_tag=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
@@ -30,6 +34,6 @@ git tag "$new_tag"
 git push origin main --tags
 
 echo "Successfully:"
-echo "- Committed changes with message: $commit_msg"
+[[ -n $(git status --porcelain) ]] && echo "- Committed changes with message: $commit_msg"
 echo "- Created new tag: $new_tag"
 echo "- Pushed changes and tags to remote" 
