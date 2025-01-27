@@ -31,11 +31,12 @@ jobs:
           cache: true
 
       - name: Run GoReleaser
-        uses: goreleaser/goreleaser-action@v5
+        uses: docker/bake-action@v4
         with:
-          distribution: goreleaser
-          version: v1.24.0
-          args: release --clean -f .goreleaser.yml --debug
+          targets: release
+          files: |
+            docker-bake.hcl
+            .goreleaser.yml
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GOVERSION: go$(go version | cut -d' ' -f3)
