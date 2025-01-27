@@ -24,9 +24,9 @@ jobs:
           cache: true
 
       - name: Run GoReleaser
-        uses: goreleaser/goreleaser-action@v6
+        uses: goreleaser/goreleaser-action@v5
         with:
-          version: v1.24.0
+          version: v1.25.0
           args: release --clean
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
