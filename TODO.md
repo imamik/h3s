@@ -1,3 +1,5 @@
+copy build process from https://github.com/janosmiko/hetzner-k3s
+
 # Quick Wins & High Impact Features
 
 ## Quick Fixes (Priority Order)
