@@ -4,6 +4,7 @@ go 1.22.4
 
 require (
 	github.com/charmbracelet/huh v0.6.0
+	github.com/go-playground/validator/v10 v10.26.0
 	github.com/hashicorp/terraform-plugin-log v0.9.0
 	github.com/hetznercloud/hcloud-go/v2 v2.16.0
 	github.com/spf13/cobra v1.8.1
@@ -16,7 +17,7 @@ require (
 	github.com/atotto/clipboard v0.1.4 // indirect
 	github.com/aymanbagabas/go-osc52/v2 v2.0.1 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
-	github.com/catppuccin/go v0.2.0 // indirect
+	github.com/catppuccin/go v0.3.0 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/charmbracelet/bubbles v0.20.0 // indirect
 	github.com/charmbracelet/bubbletea v1.2.0 // indirect
@@ -31,7 +32,6 @@ require (
 	github.com/gabriel-vasile/mimetype v1.4.8 // indirect
 	github.com/go-playground/locales v0.14.1 // indirect
 	github.com/go-playground/universal-translator v0.18.1 // indirect
-	github.com/go-playground/validator/v10 v10.26.0 // indirect
 	github.com/hashicorp/go-hclog v1.6.3 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/klauspost/compress v1.17.11 // indirect
