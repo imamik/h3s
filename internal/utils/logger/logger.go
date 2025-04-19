@@ -196,12 +196,17 @@ func (l *EventLogger) logEvent(e ResourceEvent, group bool) {
 
 // extractRequiredField extracts a required field from LogFields with type assertion
 func extractRequiredField[T any](data LogFields, key string) (T, bool) {
-	value, ok := data[key].(T)
+	value, ok := data[key]
+	if !ok || value == nil {
+		log.Printf("Error: %s field is missing or nil", key)
+		return *new(T), false
+	}
+	cast, ok := value.(T)
 	if !ok {
 		log.Printf("Error: %s field is not of expected type", key)
 		return *new(T), false
 	}
-	return value, true
+	return cast, true
 }
 
 // formatBasicMessage formats the basic message with required fields

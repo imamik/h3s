@@ -21,6 +21,20 @@ func CreatePools(
 	net *hcloud.Network,
 	images *microos.ImageInArchitecture,
 ) ([]*hcloud.Server, error) {
+	// Defensive: nil checks for required arguments
+	if ctx == nil {
+		return nil, fmt.Errorf("CreatePools: ctx is nil")
+	}
+	if sshKey == nil {
+		return nil, fmt.Errorf("CreatePools: sshKey is nil")
+	}
+	if net == nil {
+		return nil, fmt.Errorf("CreatePools: net is nil")
+	}
+	if images == nil {
+		return nil, fmt.Errorf("CreatePools: images is nil")
+	}
+
 	l := logger.New(nil, logger.Pool, logger.Create, "All")
 	defer l.LogEvents()
 
@@ -115,6 +129,17 @@ func CreatePool(
 ) ([]*hcloud.Server, error) {
 	l := logger.New(nil, logger.Pool, logger.Create, ctx.GetName(pool.Name))
 	defer l.LogEvents()
+
+	// Defensive: nil checks for ctx, images, and pool.Instance
+	if ctx == nil {
+		return nil, fmt.Errorf("CreatePool: ctx is nil")
+	}
+	if images == nil {
+		return nil, fmt.Errorf("CreatePool: images is nil")
+	}
+	if pool.Instance == "" {
+		return nil, fmt.Errorf("CreatePool: pool.Instance is empty")
+	}
 
 	img := images.ARM
 	if config.GetArchitecture(pool.Instance) == hcloud.ArchitectureX86 {

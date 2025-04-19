@@ -114,3 +114,51 @@ func TestVersionOutput(t *testing.T) {
 		}
 	}
 }
+
+// TestHelpCommand tests that help output is shown for 'help' and '--help'
+func TestHelpCommand(t *testing.T) {
+	Initialize(version.BuildInfo{})
+	buf := new(bytes.Buffer)
+	Cmd.SetOut(buf)
+	Cmd.SetArgs([]string{"help"})
+	err := Cmd.Execute()
+	assert.NoError(t, err)
+	output := buf.String()
+	assert.Contains(t, output, "Usage:")
+	assert.Contains(t, output, "Available Commands:")
+
+	// Test --help flag
+	buf.Reset()
+	Cmd.SetOut(buf)
+	Cmd.SetArgs([]string{"--help"})
+	err = Cmd.Execute()
+	assert.NoError(t, err)
+	output = buf.String()
+	assert.Contains(t, output, "Usage:")
+	assert.Contains(t, output, "Available Commands:")
+}
+
+// TestUnknownFlag tests that an unknown flag returns an error and writes to stderr
+func TestUnknownFlag(t *testing.T) {
+	Initialize(version.BuildInfo{})
+	outBuf := new(bytes.Buffer)
+	errBuf := new(bytes.Buffer)
+	Cmd.SetOut(outBuf)
+	Cmd.SetErr(errBuf)
+	Cmd.SetArgs([]string{"--notaflag"})
+	err := Cmd.Execute()
+	assert.Error(t, err)
+	errOutput := errBuf.String() + outBuf.String()
+	assert.Contains(t, errOutput, "unknown flag: --notaflag")
+}
+
+// TestUnknownSubcommandAndFlagExitCode checks that exit code is non-zero for unknown command/flag
+func TestUnknownSubcommandAndFlagExitCode(t *testing.T) {
+	Initialize(version.BuildInfo{})
+	Cmd.SetArgs([]string{"unknowncmd"})
+	err := Cmd.Execute()
+	assert.Error(t, err)
+	Cmd.SetArgs([]string{"--notaflag"})
+	err = Cmd.Execute()
+	assert.Error(t, err)
+}

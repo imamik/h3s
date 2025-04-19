@@ -39,7 +39,11 @@ func Survey(k3sReleases []k3s.Release) (config.Config, error) {
 	}
 
 	conf.ControlPlane.Pool.Name = "control-plane"
-	conf.ControlPlane.Pool.Location = getLocation("Control Plane Location", "Location of the control plane node", conf.NetworkZone)
+	location, err := getLocation("Control Plane Location", "Location of the control plane node", conf.NetworkZone)
+	if err != nil {
+		return conf, err
+	}
+	conf.ControlPlane.Pool.Location = location
 	conf.ControlPlane.Pool.Instance = getInstance()
 
 	if err := surveyControlPlaneNodes(&conf); err != nil {

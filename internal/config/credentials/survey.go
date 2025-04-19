@@ -42,5 +42,6 @@ func surveyCredentials() (ProjectCredentials, error) {
 	}
 	projectCredentials.K3sToken = k3sToken
 
+	// DO NOT LOG projectCredentials directly. Use projectCredentials.Redacted() if logging is needed.
 	return projectCredentials, nil
 }

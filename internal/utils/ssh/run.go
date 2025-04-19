@@ -2,7 +2,6 @@ package ssh
 
 import (
 	"bufio"
-	"errors"
 	"fmt"
 	"h3s/internal/utils/logger"
 	"io"
@@ -24,13 +23,13 @@ func dialWithRetries(ip string, sshConfig *ssh.ClientConfig, retryInterval time.
 		}
 		retryBackoff := time.Duration(i+1) * retryInterval
 		l.AddEvent(logger.Failure, err)
-		l.AddEvent(logger.Failure, fmt.Errorf("retrying in %s", ip))
+		l.AddEvent(logger.Failure, fmt.Errorf("retrying SSH dial in %s: %w", ip, err))
 		time.Sleep(retryBackoff)
 	}
 
-	err := fmt.Sprintf("Failed to dial %s after %d retries", ip, maxRetries)
-	l.AddEvent(logger.Failure, err)
-	return nil, errors.New(err)
+	errMsg := fmt.Sprintf("Failed to dial %s after %d retries", ip, maxRetries)
+	l.AddEvent(logger.Failure, fmt.Errorf(errMsg))
+	return nil, fmt.Errorf("%s", errMsg)
 }
 
 func run(client *ssh.Client, command string) (string, error) {

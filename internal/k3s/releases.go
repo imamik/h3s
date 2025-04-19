@@ -2,7 +2,6 @@ package k3s
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"net/http"
 	"strings"
@@ -38,7 +37,7 @@ func getAllReleases() ([]Release, error) {
 	}
 
 	if res.StatusCode != http.StatusOK {
-		return nil, errors.New("failed to fetch releases")
+		return nil, fmt.Errorf("failed to fetch releases: status %d", res.StatusCode)
 	}
 
 	// Decode the response body into a slice of Release structs
@@ -99,7 +98,7 @@ func (r Release) FormattedDate() string {
 func PrintReleases(releases []Release) {
 	// Calculate column widths
 	maxNameLength := len("Name")
-	maxTypeLength := max(len("Type"), len(rc), len(stable)) + 5
+	maxTypeLength := max(len("Type"), max(len(rc), len(stable))) + 5
 	for _, r := range releases {
 		if len(r.Name) > maxNameLength {
 			maxNameLength = len(r.Name) + 5
@@ -114,4 +113,11 @@ func PrintReleases(releases []Release) {
 	for _, v := range releases {
 		fmt.Printf("%-*s %-*s %-10s\n", maxNameLength, v.Name, maxTypeLength, v.Type(), v.FormattedDate())
 	}
+}
+
+func max(a, b int) int {
+	if a > b {
+		return a
+	}
+	return b
 }

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"h3s/internal/config/path"
 	"h3s/internal/utils/file"
+	"h3s/internal/validation"
 )
 
 // Get returns the ProjectCredentials from the secrets file and validates the tokens.
@@ -19,6 +20,13 @@ func Get() (*ProjectCredentials, error) {
 	if err != nil || credentials == nil {
 		return nil, err
 	}
+
+	// Validate credentials struct
+	if err := validation.ValidateStruct(credentials); err != nil {
+		return nil, err
+	}
+
+	// DO NOT LOG credentials directly. Use credentials.Redacted() if logging is needed.
 
 	err = ValidateHCloudToken(credentials.HCloudToken)
 	if err != nil {

@@ -1,7 +1,6 @@
 package file
 
 import (
-	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -69,7 +68,7 @@ func (f *File) Exists() bool {
 // Save writes the data of the File to the filesystem (creates the file if it does not exist)
 func (f *File) Save() (int, error) {
 	if f.data == nil {
-		return 0, errors.New("no data to save")
+		return 0, fmt.Errorf("file.Save: no data to save for file %s", f.path)
 	}
 	createdFile, err := os.Create(f.path)
 	if err != nil {

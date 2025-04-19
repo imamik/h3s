@@ -1,6 +1,12 @@
 name: CI
 
 on:
+  push:
+    branches:
+      - '**'
+  pull_request:
+    branches:
+      - '**'
   workflow_call:
     inputs:
       fetch-depth:
@@ -23,6 +29,9 @@ jobs:
       - uses: actions/setup-go@v5
         with:
           go-version-file: 'go.mod'
+
+      - name: Run go vet
+        run: go vet ./...
 
       - uses: golangci/golangci-lint-action@v6
         with:
@@ -68,3 +77,6 @@ jobs:
           fail_ci_if_error: true
           verbose: true
           token: ${{ secrets.CODECOV_TOKEN }} 
+
+      - name: Enforce coverage threshold
+        run: make coverage-threshold

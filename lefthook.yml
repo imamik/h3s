@@ -1,0 +1,64 @@
+# Pre-commit hooks run before each commit
+pre-commit:
+  parallel: true
+  # Skip pre-commit hooks for the cloud package due to known issues
+  exclude: "internal/utils/cloud/*"
+  commands:
+    # Format Go code
+    go-fmt:
+      glob: "*.go"
+      run: go fmt ./...
+
+    # Run unit tests (fast)
+    go-test-unit:
+      glob: "*.go"
+      run: ./scripts/hooks/run_unit_tests.sh
+
+    # Run linting
+    golangci-lint:
+      glob: "*.go"
+      run: ./scripts/hooks/run_golangci_lint.sh
+
+    # Scan for secrets
+    gitleaks:
+      run: |
+        if ! command -v gitleaks >/dev/null 2>&1; then
+          echo "gitleaks not installed. Please install it for secret scanning (https://github.com/gitleaks/gitleaks)." >&2
+          echo "Run: go install github.com/gitleaks/gitleaks/v8@latest"
+          exit 0  # Don't fail if not installed
+        fi
+        gitleaks protect --staged --no-git -v
+
+    # Check for ineffective assignments
+    ineffassign:
+      glob: "*.go"
+      run: |
+        if ! command -v ineffassign >/dev/null 2>&1; then
+          echo "ineffassign not installed. Run: go install github.com/gordonklaus/ineffassign@latest" >&2
+          exit 0  # Don't fail if not installed
+        fi
+        ineffassign ./...
+
+# Commit message hooks validate commit message format
+commit-msg:
+  commands:
+    validate-conventional-commit:
+      run: |
+        if ! grep -Eq '^(feat|fix|docs|style|refactor|test|chore|ci|build|perf)\([a-zA-Z0-9_-]+\): .+' "$1"; then
+          echo "Error: Commit message must follow Conventional Commits format." >&2
+          echo "Format: type(scope): description" >&2
+          echo "Example: feat(api): add new endpoint for user creation" >&2
+          echo "Valid types: feat, fix, docs, style, refactor, test, chore, ci, build, perf" >&2
+          exit 1
+        fi
+
+# Push hooks run before pushing to remote
+push:
+  commands:
+    # Run all tests including integration tests
+    run-all-tests:
+      run: go test ./...
+
+    # Check test coverage
+    check-coverage:
+      run: ./scripts/hooks/check_coverage.sh

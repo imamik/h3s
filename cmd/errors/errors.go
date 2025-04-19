@@ -2,6 +2,7 @@
 package errors
 
 import (
+	"errors"
 	"fmt"
 	"runtime"
 	"strings"
@@ -55,6 +56,7 @@ type Error struct {
 	Severity  Severity
 	Stack     []StackTrace
 	Retryable bool
+	Code      string // Error code for more specific error identification
 }
 
 // Error returns the string representation of the error
@@ -115,6 +117,7 @@ func New(errType ErrorType, message string) *Error {
 		Context:   make(map[string]interface{}),
 		Severity:  SeverityError,
 		Retryable: false,
+		Timestamp: time.Now(),
 	}
 }
 
@@ -128,7 +131,32 @@ func Wrap(errType ErrorType, message string, err error) *Error {
 		Context:   make(map[string]interface{}),
 		Severity:  SeverityError,
 		Retryable: false,
+		Timestamp: time.Now(),
 	}
+}
+
+// WithCode adds an error code to an error
+func (e *Error) WithCode(code string) *Error {
+	e.Code = code
+	return e
+}
+
+// IsErrorType checks if an error is of a specific ErrorType
+func IsErrorType(err error, errType ErrorType) bool {
+	var e *Error
+	if errors.As(err, &e) {
+		return e.Type == errType
+	}
+	return false
+}
+
+// GetErrorContext extracts context from an error if it's a custom Error
+func GetErrorContext(err error) map[string]interface{} {
+	var e *Error
+	if errors.As(err, &e) {
+		return e.Context
+	}
+	return nil
 }
 
 // WithContext adds context to an error

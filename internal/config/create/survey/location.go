@@ -1,14 +1,14 @@
 package survey
 
 import (
+	"fmt"
 	"h3s/internal/config"
-	"log"
 
 	"github.com/charmbracelet/huh"
 	"github.com/hetznercloud/hcloud-go/v2/hcloud"
 )
 
-func getLocation(title, description string, networkZone hcloud.NetworkZone) config.Location {
+func getLocation(title, description string, networkZone hcloud.NetworkZone) (config.Location, error) {
 	switch networkZone {
 	case hcloud.NetworkZoneEUCentral:
 		var location config.Location
@@ -23,16 +23,14 @@ func getLocation(title, description string, networkZone hcloud.NetworkZone) conf
 			Value(&location).
 			Run()
 		if err != nil {
-			log.Fatal(err)
-			return ""
+			return "", fmt.Errorf("failed to select location: %w", err)
 		}
-		return location
+		return location, nil
 	case hcloud.NetworkZoneUSEast:
-		return config.Ashburn
+		return config.Ashburn, nil
 	case hcloud.NetworkZoneUSWest:
-		return config.Hillsboro
+		return config.Hillsboro, nil
 	default:
-		log.Fatal("Invalid network zone")
-		return ""
+		return "", fmt.Errorf("invalid network zone")
 	}
 }

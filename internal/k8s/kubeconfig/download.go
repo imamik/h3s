@@ -2,7 +2,7 @@
 package kubeconfig
 
 import (
-	"errors"
+	"fmt"
 	"h3s/internal/cluster"
 	"h3s/internal/config/path"
 	"h3s/internal/hetzner/gateway"
@@ -36,7 +36,7 @@ func Download(ctx *cluster.Cluster) error {
 		return err
 	}
 	if kubeConfig == nil {
-		return errors.New("kubeconfig is nil")
+		return fmt.Errorf("failed to get kubeconfig: kubeconfig is nil")
 	}
 
 	// Save the kubeconfig

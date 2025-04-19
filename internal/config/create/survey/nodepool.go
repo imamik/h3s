@@ -40,11 +40,14 @@ func getNodePool(networkZone hcloud.NetworkZone) (config.NodePool, error) {
 	}
 	nodePool.Nodes = nodePoolNodes
 
-	nodePool.Location = getLocation(
+	nodePool.Location, err = getLocation(
 		"Location",
 		fmt.Sprintf("Number of nodes in the '%s' pool ", nodePool.Name),
 		networkZone,
 	)
+	if err != nil {
+		return config.NodePool{}, err
+	}
 
 	nodePool.Instance = getInstance()
 

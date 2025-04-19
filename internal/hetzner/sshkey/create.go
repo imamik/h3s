@@ -2,50 +2,54 @@
 package sshkey
 
 import (
-	"errors"
 	"h3s/internal/cluster"
 	"h3s/internal/utils/file"
 	"h3s/internal/utils/logger"
+	"h3s/internal/utils/resource"
 
 	"github.com/hetznercloud/hcloud-go/v2/hcloud"
 )
 
-func create(ctx *cluster.Cluster) (*hcloud.SSHKey, error) {
-	publicKey, err := file.New(ctx.Config.SSHKeyPaths.PublicKeyPath).Load().GetString()
+// createSSHKey creates a new SSH key in Hetzner Cloud
+func createSSHKey(ctx *cluster.Cluster) (*hcloud.SSHKey, error) {
+	if err := validateContext(ctx); err != nil {
+		return nil, err
+	}
 
-	l := logger.New(nil, logger.SSHKey, logger.Create, getName(ctx))
-	defer l.LogEvents()
+	publicKey, err := file.New(ctx.Config.SSHKeyPaths.PublicKeyPath).Load().GetString()
 	if err != nil {
-		l.AddEvent(logger.Failure, err)
 		return nil, err
 	}
 
 	sshKeyName := getName(ctx)
+	manager := resource.NewManager[*hcloud.SSHKey](ctx, logger.SSHKey, sshKeyName)
 
-	sshKey, _, err := ctx.CloudClient.SSHKey.Create(ctx.Context, hcloud.SSHKeyCreateOpts{
-		Name:      sshKeyName,
-		PublicKey: publicKey,
-		Labels:    ctx.GetLabels(),
+	return manager.Create(func() (*hcloud.SSHKey, error) {
+		sshKey, _, err := ctx.CloudClient.SSHKey.Create(ctx.Context, hcloud.SSHKeyCreateOpts{
+			Name:      sshKeyName,
+			PublicKey: publicKey,
+			Labels:    ctx.GetLabels(),
+		})
+		return sshKey, err
 	})
-	if err != nil {
-		l.AddEvent(logger.Failure, err)
-		return nil, err
-	}
-	if sshKey == nil {
-		err = errors.New("sshKey is nil")
-		l.AddEvent(logger.Failure, err)
-		return nil, err
-	}
-
-	l.AddEvent(logger.Success)
-	return sshKey, nil
 }
 
-// Create creates a Hetzner cloud SSH key
+// Create creates a Hetzner cloud SSH key or returns an existing one
 func Create(ctx *cluster.Cluster) (*hcloud.SSHKey, error) {
-	sshKey, err := Get(ctx)
-	if sshKey != nil && err == nil {
-		return sshKey, nil
+	if err := validateContext(ctx); err != nil {
+		return nil, err
 	}
-	return create(ctx)
+
+	sshKeyName := getName(ctx)
+	manager := resource.NewManager[*hcloud.SSHKey](ctx, logger.SSHKey, sshKeyName)
+
+	return manager.GetOrCreate(
+		func() (*hcloud.SSHKey, error) {
+			sshKey, _, err := ctx.CloudClient.SSHKey.GetByName(ctx.Context, sshKeyName)
+			return sshKey, err
+		},
+		func() (*hcloud.SSHKey, error) {
+			return createSSHKey(ctx)
+		},
+	)
 }

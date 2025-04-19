@@ -4,7 +4,6 @@ package ssh
 import (
 	"fmt"
 	"h3s/internal/utils/ip"
-	"log"
 	"strings"
 	"time"
 
@@ -14,6 +13,9 @@ import (
 
 // ExecuteWithSSH executes a command on a remote server using SSH
 func ExecuteWithSSH(privateSSHKeyPath string, remote *hcloud.Server, command string) (string, error) {
+	if remote == nil {
+		return "", fmt.Errorf("remote server is nil")
+	}
 	remoteIP := ip.FirstAvailable(remote)
 	if err := removeKnownHostsEntry(remoteIP); err != nil {
 		return "", err
@@ -28,7 +30,7 @@ func ExecuteWithSSH(privateSSHKeyPath string, remote *hcloud.Server, command str
 	// Connect to the remote server
 	client, err := dialWithRetries(remoteIP, sshConfig, 5*time.Second, 5)
 	if err != nil {
-		log.Fatalf("Failed to dial: %s", err)
+		return "", fmt.Errorf("failed to dial: %w", err)
 	}
 
 	// Run the command

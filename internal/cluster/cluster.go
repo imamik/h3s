@@ -7,6 +7,7 @@ import (
 	"h3s/internal/config"
 	"h3s/internal/config/credentials"
 	"h3s/internal/hetzner/dns/api"
+	"os"
 	"strings"
 
 	"github.com/hetznercloud/hcloud-go/v2/hcloud"
@@ -39,8 +40,17 @@ func Context() (*Cluster, error) {
 	}
 
 	// Create a client using the project credentials
-	options := hcloud.WithToken(projectCredentials.HCloudToken)
-	client := hcloud.NewClient(options)
+	token := projectCredentials.HCloudToken
+	endpoint := os.Getenv("H3S_HETZNER_ENDPOINT")
+	var client *hcloud.Client
+	if endpoint != "" {
+		client = hcloud.NewClient(
+			hcloud.WithToken(token),
+			hcloud.WithEndpoint(endpoint),
+		)
+	} else {
+		client = hcloud.NewClient(hcloud.WithToken(token))
+	}
 
 	// Create a DNS client
 	dnsClient, err := api.New("https://dns.hetzner.com", projectCredentials.HetznerDNSToken, nil)
