@@ -50,7 +50,7 @@ func writeTempConfig(content string) (string, func()) {
 }
 
 func TestContext_Success(t *testing.T) {
-	credentialsPath, _ := filepath.Abs("internal/cluster/testdata/valid-credentials.yaml")
+	credentialsPath, _ := filepath.Abs("testdata/valid-credentials.yaml")
 	os.Setenv("H3S_CREDENTIALS", credentialsPath)
 	_, cleanup := writeTempConfig(testConfigYAML)
 	defer cleanup()
@@ -91,7 +91,7 @@ func TestContext_MissingCredentials(t *testing.T) {
 }
 
 func TestContext_Idempotency(t *testing.T) {
-	credentialsPath, _ := filepath.Abs("internal/cluster/testdata/valid-credentials.yaml")
+	credentialsPath, _ := filepath.Abs("testdata/valid-credentials.yaml")
 	os.Setenv("H3S_CREDENTIALS", credentialsPath)
 	_, cleanup := writeTempConfig(testConfigYAML)
 	defer cleanup()
@@ -104,7 +104,7 @@ func TestContext_Idempotency(t *testing.T) {
 }
 
 func TestContext_LargeCluster(t *testing.T) {
-	credentialsPath, _ := filepath.Abs("internal/cluster/testdata/valid-credentials.yaml")
+	credentialsPath, _ := filepath.Abs("testdata/valid-credentials.yaml")
 	os.Setenv("H3S_CREDENTIALS", credentialsPath)
 	configYAML := `
 ssh_key_paths:
@@ -145,7 +145,7 @@ func generateLargeWorkerPools(n int) string {
 
 // TestContext_ResourceExhaustion simulates too many nodes (resource exhaustion).
 func TestContext_ResourceExhaustion(t *testing.T) {
-	credentialsPath, _ := filepath.Abs("internal/cluster/testdata/valid-credentials.yaml")
+	credentialsPath, _ := filepath.Abs("testdata/valid-credentials.yaml")
 	os.Setenv("H3S_CREDENTIALS", credentialsPath)
 	configYAML := `
 ssh_key_paths:
@@ -181,42 +181,20 @@ control_plane:
 }
 
 func TestContext_Recovery(t *testing.T) {
-	credentialsPath, _ := filepath.Abs("internal/cluster/testdata/valid-credentials.yaml")
-	os.Setenv("H3S_CREDENTIALS", credentialsPath)
+	// Start with non-existent paths
 	os.Setenv("H3S_CONFIG", "/nonexistent/file.yaml")
 	os.Setenv("H3S_CREDENTIALS", "/nonexistent/creds.yaml")
 	_, err := Context()
 	if err == nil {
 		t.Error("expected error for missing config/creds, got nil")
 	}
-	// Now fix config and credentials
-	configYAML := `
-ssh_key_paths:
-  private_key_path: /tmp/id_rsa
-  public_key_path: /tmp/id_rsa.pub
-network_zone: nbg1
-k3s_version: v1.28.0
-name: testcluster
-domain: example.com
-cert_manager:
-  email: test@example.com
-  production: false
-worker_pools:
-  - instance: cx31
-    location: nbg1
-    name: workerpool1
-    nodes: 1
-control_plane:
-  pool:
-    instance: cx31
-    location: nbg1
-    name: cp01
-    nodes: 1
-  as_worker_pool: false
-`
-	configPath, cleanup := writeTempConfig(configYAML)
+	configPath, cleanup := writeTempConfig(testConfigYAML)
 	defer cleanup()
 	os.Setenv("H3S_CONFIG", configPath)
+	// Correctly resolve and set the valid credentials path *after* fixing the config
+	credentialsPath, _ := filepath.Abs("testdata/valid-credentials.yaml")
+	os.Setenv("H3S_CREDENTIALS", credentialsPath)
+
 	_, err = Context()
 	if err != nil {
 		t.Errorf("expected recovery after fixing config/creds, got error: %v", err)
