@@ -10,6 +10,7 @@ import (
 
 // runCLI runs the CLI command and returns output and error
 func runCLI(args ...string) (string, error) {
+	//nolint:gosec // G204: Subprocess launched with variable args, assumed safe in test context
 	cmd := exec.Command("go", append([]string{"run", "../.."}, args...)...)
 	output, err := cmd.CombinedOutput()
 	return string(output), err
@@ -17,6 +18,7 @@ func runCLI(args ...string) (string, error) {
 
 // runCLIWithEnv runs the CLI command with environment variables and returns output and error
 func runCLIWithEnv(env []string, args ...string) (string, error) {
+	//nolint:gosec // G204: Subprocess launched with variable args, assumed safe in test context
 	cmd := exec.Command("go", append([]string{"run", "../.."}, args...)...)
 	cmd.Env = append(os.Environ(), env...)
 	output, err := cmd.CombinedOutput()
@@ -34,6 +36,7 @@ func TestHelpCommand(t *testing.T) {
 }
 
 // TestAdvancedClusterWorkflows tests cluster creation and deletion
+//nolint:gocyclo // Complexity acceptable for integration test setup
 func TestAdvancedClusterWorkflows(t *testing.T) {
 	if os.Getenv("H3S_ENABLE_REAL_INTEGRATION") != "1" {
 		t.Skip("Skipping real Hetzner integration test (set H3S_ENABLE_REAL_INTEGRATION=1 to enable)")
@@ -76,6 +79,7 @@ control_plane:
 	}
 	secrets := []byte("hcloud_token: " + hcloudToken + "\nhetzner_dns_token: " + dnsToken + "\nk3s_token: " + k3sToken + "\n")
 	// Using a constant for the secrets filename
+	//nolint:gosec // G101: Potential hardcoded credentials (filename constant in test)
 	const secretsFileName = "h3s-secrets.yaml"
 	secretsPath := secretsFileName
 	if err := os.WriteFile(secretsPath, secrets, 0600); err != nil {
@@ -94,6 +98,8 @@ control_plane:
 	}
 }
 
+// TestClusterWorkflow_WithMockHetzner covers basic cluster creation, update, and deletion using a mock Hetzner API.
+//nolint:gocyclo // Complexity acceptable for integration test setup
 func TestClusterWorkflow_WithMockHetzner(t *testing.T) {
 	if os.Getenv("H3S_USE_MOCK_HETZNER") != "1" {
 		t.Skip("Skipping mock Hetzner integration test (set H3S_USE_MOCK_HETZNER=1 to enable)")
@@ -142,7 +148,9 @@ hetzner_api_endpoint: "` + mockServer.Server.URL + `"
 	}
 	secrets := []byte("hcloud_token: " + hcloudToken + "\nhetzner_dns_token: " + dnsToken + "\nk3s_token: " + k3sToken + "\n")
 	// Using the same constant as above
-	secretsPath := "h3s-secrets.yaml"
+	//nolint:gosec // G101: Potential hardcoded credentials (filename constant in test)
+	const secretsFileName = "h3s-secrets.yaml"
+	secretsPath := secretsFileName
 	if err := os.WriteFile(secretsPath, secrets, 0600); err != nil {
 		t.Fatalf("failed to write secrets: %v", err)
 	}
@@ -192,6 +200,7 @@ hetzner_api_endpoint: "` + mockServerError.Server.URL + `"
 		t.Fatalf("failed to write error config: %v", writeErr)
 	}
 	defer os.Remove(configErrorPath)
+	//nolint:gosec // G101: Potential hardcoded credentials (filename constant in test)
 	secretsErrorPath := "h3s-secrets-err.yaml"
 	if writeErr := os.WriteFile(secretsErrorPath, secrets, 0600); writeErr != nil {
 		t.Fatalf("failed to write error secrets: %v", writeErr)

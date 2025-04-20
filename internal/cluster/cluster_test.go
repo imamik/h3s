@@ -73,10 +73,19 @@ func TestContext_MissingCredentials(t *testing.T) {
 	_, cleanup := writeTempConfig(testConfigYAML)
 	defer cleanup()
 	// Temporarily rename secrets file if it exists
+	tmpDir, err := os.MkdirTemp("", "test-context-missing-credentials")
+	if err != nil {
+		t.Fatalf("Failed to create temp dir: %v", err)
+	}
+	defer os.RemoveAll(tmpDir)
+	// Create necessary files
+	configPath := filepath.Join(tmpDir, "h3s.yaml")
+	_ = configPath // Assign to blank identifier to silence unused warning
+	//nolint:gosec // G101: Potential hardcoded credentials (filename constant in test)
 	const secretsFilename = "h3s-secrets.yaml" // Using a constant for the filename
-	secretsPath := secretsFilename
-	bakPath := secretsFilename + ".bak"
-	if err := os.Rename(secretsPath, bakPath); err != nil {
+	secretsPath := filepath.Join(tmpDir, secretsFilename)
+	bakPath := secretsPath + ".bak"
+	if err = os.Rename(secretsPath, bakPath); err != nil {
 		// If the file doesn't exist, that's fine
 		if !os.IsNotExist(err) {
 			t.Fatalf("Failed to rename secrets file: %v", err)
@@ -84,15 +93,15 @@ func TestContext_MissingCredentials(t *testing.T) {
 	}
 	defer func() {
 		// Only try to rename back if the backup exists
-		if _, err := os.Stat(bakPath); err == nil {
-			if err := os.Rename(bakPath, secretsPath); err != nil {
+		if _, err = os.Stat(bakPath); err == nil {
+			if err = os.Rename(bakPath, secretsPath); err != nil {
 				t.Logf("Warning: Failed to restore secrets file: %v", err)
 			}
 		}
 	}()
 	credentialsPath, _ := filepath.Abs("internal/cluster/testdata/nonexistent-creds.yaml")
 	os.Setenv("H3S_CREDENTIALS", credentialsPath)
-	_, err := Context()
+	_, err = Context()
 	if err == nil {
 		t.Error("expected error for missing credentials, got nil")
 	}

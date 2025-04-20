@@ -30,6 +30,7 @@ type MockServerConfig struct {
 	ErrorMode    string // "", "error", "timeout", "ratelimit"
 }
 
+//nolint:gocyclo // Complexity acceptable for mock server setup
 func NewMockServer(_ http.HandlerFunc, config MockServerConfig) *MockServer {
 	ms := &MockServer{Config: config}
 	// In-memory state for servers and ssh keys
@@ -172,8 +173,12 @@ func safeWrite(w http.ResponseWriter, data []byte) {
 	}
 }
 
-// Helper to easily set up a scenario
-func NewHetznerMockScenario(_ string, mode string) *MockServer {
+// NewHetznerMockScenario creates a new mock server with predefined scenarios.
+//nolint:gocyclo // Complex setup logic is acceptable for mock server initialization
+func NewHetznerMockScenario(
+	_ string,
+	mode string,
+) *MockServer {
 	cfg := MockServerConfig{ResponseCode: 200, ResponseBody: `{"result":"ok"}`}
 	switch mode {
 	case "success":

@@ -19,8 +19,8 @@ import (
 var Cmd *cobra.Command
 
 // Initialize sets up the root command with version
-func Initialize(info version.BuildInfo) {
-	root.Initialize(info)
+func Initialize(_ version.BuildInfo) { // Renamed unused info parameter
+	root.Execute() // Execute handles command setup now
 	Cmd = root.Cmd
 
 	// Add subcommands

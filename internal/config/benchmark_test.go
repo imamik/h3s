@@ -1,12 +1,11 @@
 package config
 
 import (
+	"h3s/internal/utils/file"
+	"h3s/internal/validation"
 	"os"
 	"path/filepath"
 	"testing"
-
-	"h3s/internal/utils/file"
-	"h3s/internal/validation"
 )
 
 // BenchmarkConfigLoad benchmarks the loading and parsing of configuration files

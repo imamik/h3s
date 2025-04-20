@@ -15,6 +15,8 @@ import (
 )
 
 // CreatePools creates the control plane and worker pools
+// based on the provided configuration and Hetzner client.
+//nolint:gocyclo // Complexity acceptable for resource creation logic
 func CreatePools(
 	ctx *cluster.Cluster,
 	sshKey *hcloud.SSHKey,

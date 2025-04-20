@@ -74,10 +74,14 @@ func (m *Manager[T]) Delete(deleter func() error) error {
 	return nil
 }
 
-// GetOrCreate gets a resource if it exists, or creates it if it doesn't
-func (m *Manager[T]) GetOrCreate(getter func() (T, error), creator func() (T, error)) (T, error) {
-	resource, err := m.Get(getter)
+// GetOrCreate attempts to retrieve a resource using the getter function.
+// If the getter returns an error indicating the resource is not found, it attempts to create it using the creator function.
+func (m *Manager[T]) GetOrCreate(
+	getter func() (T, error),
+	creator func() (T, error),
+) (T, error) {
 	var zero T
+	resource, err := getter()
 	if err == nil {
 		return resource, nil
 	}

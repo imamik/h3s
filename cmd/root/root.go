@@ -3,10 +3,11 @@ package root
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/spf13/cobra"
 
-	"h3s/internal/version"
+	cmdversion "h3s/cmd/version"
 )
 
 // Cmd is the root command for the h3s CLI
@@ -18,20 +19,20 @@ func runRoot(cmd *cobra.Command, _ []string) {
 	cmd.Println("Use --help for more information about available commands")
 }
 
-// Initialize sets up the root command with version
-func Initialize(info version.BuildInfo) {
+// Execute adds all child commands to the root command and sets flags appropriately.
+func Execute() {
 	Cmd = &cobra.Command{
-		Use: "h3s",
-		Version: fmt.Sprintf("%s\nCommit: %s\nGo version: %s",
-			info.Version,
-			info.Commit,
-			info.GoVersion,
-		),
+		Use:   "h3s",
 		Short: "A CLI to setup k3s Kubernetes resources on Hetzner Cloud",
-		Long:  "h3s (Hetzner Highly-Available-k3s Clusters) is a command-line interface for setting up and managing k3s Kubernetes resources on Hetzner Cloud. It provides various subcommands for managing clusters, configurations, and resources.",
-		Run:   runRoot,
+		Long: `h3s simplifies the creation, management, and deletion of K3s clusters
+hosted on Hetzner Cloud infrastructure.`,
+		Run: runRoot,
 	}
 
-	// Add version flags
-	Cmd.Flags().BoolP("version", "v", false, "Print version information")
+	Cmd.AddCommand(cmdversion.Cmd)
+
+	if err := Cmd.Execute(); err != nil {
+		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
+		os.Exit(1)
+	}
 }

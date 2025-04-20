@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+
 	"h3s/internal/hetzner/mockhetzner"
 )
 

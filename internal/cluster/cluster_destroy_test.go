@@ -34,11 +34,13 @@ control_plane:
   as_worker_pool: false
 `
 
-// writeTempConfig creates a temporary config file and returns its path and a cleanup function
-// The path is not used in the tests but is returned for potential future use
-func writeTempConfig(content string) (string, func()) {
-	tempfile, _ := os.CreateTemp("", "h3s-config-*.yaml")
-	_, err := tempfile.Write([]byte(content))
+// writeTempConfig creates a temporary config file and returns a cleanup function
+func writeTempConfig(content string) func() {
+	tempfile, err := os.CreateTemp("", "h3s-config-*.yaml")
+	if err != nil {
+		panic(err)
+	}
+	_, err = tempfile.Write([]byte(content))
 	if err != nil {
 		panic(err)
 	}
@@ -46,16 +48,16 @@ func writeTempConfig(content string) (string, func()) {
 	os.Setenv("H3S_CONFIG", tempfile.Name())
 	cleanup := func() {
 		os.Unsetenv("H3S_CONFIG")
-		os.Remove(tempfile.Name())
+		_ = os.Remove(tempfile.Name()) // Assign error to _
 	}
-	return tempfile.Name(), cleanup
+	return cleanup
 }
 
 func TestDestroy_HappyPath(t *testing.T) {
 	if os.Getenv("H3S_ENABLE_REAL_INTEGRATION") != "1" {
 		t.Skip("Skipping real Hetzner integration test (set H3S_ENABLE_REAL_INTEGRATION=1 to enable)")
 	}
-	_, cleanup := writeTempConfig(testConfigYAML)
+	cleanup := writeTempConfig(testConfigYAML)
 	defer cleanup()
 	credentialsPath, _ := filepath.Abs("internal/cluster/testdata/valid-credentials.yaml")
 	os.Setenv("H3S_CREDENTIALS", credentialsPath)
@@ -85,7 +87,7 @@ func TestDestroy_MissingCredentials(t *testing.T) {
 	if os.Getenv("H3S_ENABLE_REAL_INTEGRATION") != "1" {
 		t.Skip("Skipping real Hetzner integration test (set H3S_ENABLE_REAL_INTEGRATION=1 to enable)")
 	}
-	_, cleanup := writeTempConfig(testConfigYAML)
+	cleanup := writeTempConfig(testConfigYAML)
 	defer cleanup()
 	credentialsPath, _ := filepath.Abs("internal/cluster/testdata/nonexistent-creds.yaml")
 	os.Setenv("H3S_CREDENTIALS", credentialsPath)
@@ -99,7 +101,7 @@ func TestDestroy_PartialDeletion(t *testing.T) {
 	if os.Getenv("H3S_ENABLE_REAL_INTEGRATION") != "1" {
 		t.Skip("Skipping real Hetzner integration test (set H3S_ENABLE_REAL_INTEGRATION=1 to enable)")
 	}
-	_, cleanup := writeTempConfig(testConfigYAML)
+	cleanup := writeTempConfig(testConfigYAML)
 	defer cleanup()
 	credentialsPath, _ := filepath.Abs("internal/cluster/testdata/valid-credentials.yaml")
 	os.Setenv("H3S_CREDENTIALS", credentialsPath)

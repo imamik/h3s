@@ -4,12 +4,10 @@ import (
 	"bytes"
 	"fmt"
 	deps "h3s/cmd/dependencies"
-	"h3s/cmd/root"
 	"h3s/internal/cluster"
 	"h3s/internal/config"
 	"h3s/internal/k3s"
 	"h3s/internal/utils/cli"
-	"h3s/internal/version"
 	"testing"
 
 	"github.com/spf13/cobra"
@@ -283,8 +281,4 @@ func TestCreateCommand_OutputFormatting(t *testing.T) {
 	assert.Error(t, err)
 	output = buf.String()
 	assert.Contains(t, output, "unknown command \"notacommand\"")
-}
-
-func InitializeCreateCmd() {
-	root.Initialize(version.BuildInfo{})
 }

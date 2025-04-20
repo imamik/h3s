@@ -124,13 +124,6 @@ hetzner_api_endpoint: "` + mockServerURL + `"
 	return configPath, os.WriteFile(configPath, config, 0600)
 }
 
-// Test token constants
-const (
-	testHCloudToken = "p1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcde" // 64 chars
-	testDNSToken    = "1234567890abcdef1234567890abcdef"                                 // 32 chars
-	testK3sToken    = "k3s1234567890abcdef1234567890abcdef"                              // dummy, can be any string
-)
-
 // createTestCredentials creates a test credentials file
 func createTestCredentials(dir string) (string, error) {
 	credsPath := filepath.Join(dir, "h3s-secrets.yaml")
@@ -142,6 +135,13 @@ func createTestCredentials(dir string) (string, error) {
 
 	return credsPath, os.WriteFile(credsPath, creds, 0600)
 }
+
+// Test token constants
+const (
+	testHCloudToken = "p1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcde" // 64 chars
+	testDNSToken    = "1234567890abcdef1234567890abcdef"                                 // 32 chars
+	testK3sToken    = "k3s1234567890abcdef1234567890abcdef"                              // dummy, can be any string
+)
 
 // findProjectRoot finds the root directory of the project
 func findProjectRoot() string {
@@ -326,7 +326,7 @@ func testConfigCommands(t *testing.T, env *e2eTestEnv) {
 
 // Cluster operation tests
 
-// testClusterOperations tests individual cluster operations with mocked API
+//nolint:gocyclo // Complexity acceptable for end-to-end test setup
 func testClusterOperations(t *testing.T, env *e2eTestEnv) {
 	// Create config and credentials files for testing
 	configPath, err := createTestConfig(env.tempDir, env.mockServer.Server.URL, env.privateKeyPath, env.publicKeyPath)
@@ -491,7 +491,7 @@ func testCompleteWorkflow(t *testing.T, env *e2eTestEnv) {
 
 // Error recovery tests
 
-// testErrorRecovery tests recovery from error conditions
+//nolint:gocyclo // Complexity acceptable for error recovery test setup
 func testErrorRecovery(t *testing.T, env *e2eTestEnv) {
 	// Create a clean directory for this test
 	recoveryDir, err := os.MkdirTemp(env.tempDir, "recovery-*")
