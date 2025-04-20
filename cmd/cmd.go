@@ -20,7 +20,12 @@ import (
 var Cmd *cobra.Command
 
 // Initialize sets up the root command with version
-func Initialize(_ version.BuildInfo) {
+func Initialize(info version.BuildInfo) {
+	// Set global version variables for test injection
+	version.Version = info.Version
+	version.Commit = info.Commit
+	version.GoVersion = info.GoVersion
+
 	root.Execute() // Execute handles command setup now
 	Cmd = root.Cmd
 

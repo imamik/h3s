@@ -9,7 +9,7 @@ import (
 
 // Get returns the ProjectCredentials from the secrets file and validates the tokens.
 func Get() (*ProjectCredentials, error) {
-	p := string(path.SecretsFileName)
+	p := string(path.SecretsFileName())
 	f := file.New(p)
 	if !f.Exists() {
 		return nil, fmt.Errorf("credentials file not found")
@@ -19,6 +19,11 @@ func Get() (*ProjectCredentials, error) {
 	err := f.Load().UnmarshalYamlTo(&credentials)
 	if err != nil || credentials == nil {
 		return nil, err
+	}
+
+	// If the file exists but is empty, treat as missing credentials
+	if credentials.HCloudToken == "" && credentials.HetznerDNSToken == "" && credentials.K3sToken == "" {
+		return nil, fmt.Errorf("credentials file is empty or missing required fields")
 	}
 
 	// Validate credentials struct

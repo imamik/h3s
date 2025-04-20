@@ -50,10 +50,10 @@ func writeTempConfig(content string) (string, func()) {
 }
 
 func TestContext_Success(t *testing.T) {
-	_, cleanup := writeTempConfig(testConfigYAML)
-	defer cleanup()
 	credentialsPath, _ := filepath.Abs("internal/cluster/testdata/valid-credentials.yaml")
 	os.Setenv("H3S_CREDENTIALS", credentialsPath)
+	_, cleanup := writeTempConfig(testConfigYAML)
+	defer cleanup()
 	_, err := Context()
 	if err != nil {
 		t.Errorf("expected success, got error: %v", err)
@@ -81,25 +81,8 @@ func TestContext_MissingCredentials(t *testing.T) {
 	// Create necessary files
 	configPath := filepath.Join(tmpDir, "h3s.yaml")
 	_ = configPath // Assign to blank identifier to silence unused warning
-	//nolint:gosec // G101: Potential hardcoded credentials (filename constant in test)
-	const secretsFilename = "h3s-secrets.yaml" // Using a constant for the filename
-	secretsPath := filepath.Join(tmpDir, secretsFilename)
-	bakPath := secretsPath + ".bak"
-	if err = os.Rename(secretsPath, bakPath); err != nil {
-		// If the file doesn't exist, that's fine
-		if !os.IsNotExist(err) {
-			t.Fatalf("Failed to rename secrets file: %v", err)
-		}
-	}
-	defer func() {
-		// Only try to rename back if the backup exists
-		if _, err = os.Stat(bakPath); err == nil {
-			if err = os.Rename(bakPath, secretsPath); err != nil {
-				t.Logf("Warning: Failed to restore secrets file: %v", err)
-			}
-		}
-	}()
-	credentialsPath, _ := filepath.Abs("internal/cluster/testdata/nonexistent-creds.yaml")
+	// Set credentials path to a truly non-existent file
+	credentialsPath := filepath.Join(tmpDir, "definitely-does-not-exist.yaml")
 	os.Setenv("H3S_CREDENTIALS", credentialsPath)
 	_, err = Context()
 	if err == nil {
@@ -108,10 +91,10 @@ func TestContext_MissingCredentials(t *testing.T) {
 }
 
 func TestContext_Idempotency(t *testing.T) {
-	_, cleanup := writeTempConfig(testConfigYAML)
-	defer cleanup()
 	credentialsPath, _ := filepath.Abs("internal/cluster/testdata/valid-credentials.yaml")
 	os.Setenv("H3S_CREDENTIALS", credentialsPath)
+	_, cleanup := writeTempConfig(testConfigYAML)
+	defer cleanup()
 	for i := 0; i < 5; i++ {
 		_, err := Context()
 		if err != nil {
@@ -121,6 +104,8 @@ func TestContext_Idempotency(t *testing.T) {
 }
 
 func TestContext_LargeCluster(t *testing.T) {
+	credentialsPath, _ := filepath.Abs("internal/cluster/testdata/valid-credentials.yaml")
+	os.Setenv("H3S_CREDENTIALS", credentialsPath)
 	configYAML := `
 ssh_key_paths:
   private_key_path: /tmp/id_rsa
@@ -144,8 +129,6 @@ control_plane:
 `
 	_, cleanup := writeTempConfig(configYAML)
 	defer cleanup()
-	credentialsPath, _ := filepath.Abs("internal/cluster/testdata/valid-credentials.yaml")
-	os.Setenv("H3S_CREDENTIALS", credentialsPath)
 	_, err := Context()
 	if err != nil {
 		t.Errorf("large cluster config failed: %v", err)
@@ -162,6 +145,8 @@ func generateLargeWorkerPools(n int) string {
 
 // TestContext_ResourceExhaustion simulates too many nodes (resource exhaustion).
 func TestContext_ResourceExhaustion(t *testing.T) {
+	credentialsPath, _ := filepath.Abs("internal/cluster/testdata/valid-credentials.yaml")
+	os.Setenv("H3S_CREDENTIALS", credentialsPath)
 	configYAML := `
 ssh_key_paths:
   private_key_path: /tmp/id_rsa
@@ -188,8 +173,6 @@ control_plane:
 `
 	_, cleanup := writeTempConfig(configYAML)
 	defer cleanup()
-	credentialsPath, _ := filepath.Abs("internal/cluster/testdata/valid-credentials.yaml")
-	os.Setenv("H3S_CREDENTIALS", credentialsPath)
 	_, err := Context()
 	// Note: resource exhaustion is not enforced by the current implementation, so we expect success.
 	if err != nil {
@@ -198,6 +181,8 @@ control_plane:
 }
 
 func TestContext_Recovery(t *testing.T) {
+	credentialsPath, _ := filepath.Abs("internal/cluster/testdata/valid-credentials.yaml")
+	os.Setenv("H3S_CREDENTIALS", credentialsPath)
 	os.Setenv("H3S_CONFIG", "/nonexistent/file.yaml")
 	os.Setenv("H3S_CREDENTIALS", "/nonexistent/creds.yaml")
 	_, err := Context()
@@ -232,8 +217,6 @@ control_plane:
 	configPath, cleanup := writeTempConfig(configYAML)
 	defer cleanup()
 	os.Setenv("H3S_CONFIG", configPath)
-	credentialsPath, _ := filepath.Abs("internal/cluster/testdata/valid-credentials.yaml")
-	os.Setenv("H3S_CREDENTIALS", credentialsPath)
 	_, err = Context()
 	if err != nil {
 		t.Errorf("expected recovery after fixing config/creds, got error: %v", err)
