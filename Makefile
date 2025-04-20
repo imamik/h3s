@@ -86,33 +86,34 @@ fix_fieldalignment: ## Fix struct field alignment
 
 .PHONY: coverage
 coverage: ## Generate code coverage report (set UPLOAD=1 to upload to Codecov)
-	$(GOTEST) -v -coverprofile=coverage.out ./...
-	@echo "Generated coverage.out"
+	$(GOTEST) -v -coverprofile=coverage.txt ./...
+	@echo "Generated coverage.txt"
 ifneq ($(UPLOAD),)
 	@echo "Uploading coverage report to Codecov..."
-	bash <(curl -s https://codecov.io/bash) -f coverage.out
+	bash <(curl -s https://codecov.io/bash) -f coverage.txt
 endif
 
 .PHONY: coverage-html
 coverage-html: ## Generate HTML code coverage report
-	$(GOTEST) -coverprofile=coverage.out ./...
-	$(GOCMD) tool cover -html=coverage.out -o coverage.html
-	@echo "Open coverage.html in your browser to view the report."
+	$(GOTEST) -coverprofile=coverage.txt ./...
+	$(GOCMD) tool cover -html=coverage.txt -o coverage.html
+
+.PHONY: coverage-summary
+coverage-summary: ## Print concise coverage summary to console
+	$(GOCMD) tool cover -func=coverage.txt | grep -E '^[^ ]+\s+[0-9.]+%' || echo 'No coverage.txt found. Run make coverage first.'
 
 .PHONY: coverage-threshold
 coverage-threshold: ## Fail if coverage is below 30.0%
-	$(GOTEST) -coverprofile=coverage.out ./...
-	@total=$$(go tool cover -func=coverage.out | grep total: | awk '{print $$3}' | sed 's/%//'); \
-	if [ "$$(echo "$$total < 30.0" | bc -l)" -eq 1 ]; then \
+	@if [ ! -f coverage.txt ]; then \
+		$(GOTEST) -coverprofile=coverage.txt ./...; \
+	fi
+	@total=$$(go tool cover -func=coverage.txt | awk '/^total:/ {sub("%","",$$3); print $$3}'); \
+	if [ $$(echo "$$total < 30.0" | awk '{print ($1 < 30.0)}') -eq 1 ]; then \
 		echo "Code coverage ($$total%) is below threshold (30%)"; \
 		exit 1; \
 	else \
 		echo "Code coverage ($$total%) meets threshold."; \
 	fi
-
-.PHONY: coverage-summary
-coverage-summary: ## Print concise coverage summary to console
-	$(GOCMD) tool cover -func=coverage.out | grep -E '^[^ ]+\s+[0-9.]+%' || echo 'No coverage.out found. Run make coverage first.'
 
 .PHONY: dev
 dev: ## Setup development environment (installs pre-commit hooks and tools)
