@@ -174,6 +174,7 @@ func safeWrite(w http.ResponseWriter, data []byte) {
 }
 
 // NewHetznerMockScenario creates a new mock server with predefined scenarios.
+//
 //nolint:gocyclo // Complex setup logic is acceptable for mock server initialization
 func NewHetznerMockScenario(
 	_ string,

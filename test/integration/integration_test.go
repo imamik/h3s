@@ -36,6 +36,7 @@ func TestHelpCommand(t *testing.T) {
 }
 
 // TestAdvancedClusterWorkflows tests cluster creation and deletion
+//
 //nolint:gocyclo // Complexity acceptable for integration test setup
 func TestAdvancedClusterWorkflows(t *testing.T) {
 	if os.Getenv("H3S_ENABLE_REAL_INTEGRATION") != "1" {
@@ -99,6 +100,7 @@ control_plane:
 }
 
 // TestClusterWorkflow_WithMockHetzner covers basic cluster creation, update, and deletion using a mock Hetzner API.
+//
 //nolint:gocyclo // Complexity acceptable for integration test setup
 func TestClusterWorkflow_WithMockHetzner(t *testing.T) {
 	if os.Getenv("H3S_USE_MOCK_HETZNER") != "1" {
