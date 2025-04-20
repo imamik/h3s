@@ -1,13 +1,12 @@
 package network
 
 import (
+	"h3s/internal/hetzner/mockhetzner"
 	"net/http"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/assert"
-
-	"h3s/internal/hetzner/mockhetzner"
 )
 
 func TestNetworkAPI_Success(t *testing.T) {

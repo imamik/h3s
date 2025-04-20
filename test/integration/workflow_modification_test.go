@@ -12,7 +12,7 @@ func TestWorkflowModification(t *testing.T) {
 	}
 	// Write initial config
 	config := []byte("cluster:\n  name: test-cluster\n  region: us-west\n  value: original\n")
-	if err := os.WriteFile("h3s.yaml", config, 0600); err != nil {
+	if err := os.WriteFile("h3s.yaml", config, 0o600); err != nil {
 		t.Fatalf("failed to write config: %v", err)
 	}
 	defer os.Remove("h3s.yaml")
@@ -32,7 +32,7 @@ func TestWorkflowModification(t *testing.T) {
 	}
 	// Modify config
 	modConfig := []byte("cluster:\n  name: test-cluster\n  region: us-west\n  value: modified\n")
-	if writeErr := os.WriteFile("h3s.yaml", modConfig, 0600); writeErr != nil {
+	if writeErr := os.WriteFile("h3s.yaml", modConfig, 0o600); writeErr != nil {
 		t.Fatalf("failed to write modified config: %v", writeErr)
 	}
 	cmd = exec.Command("go", "run", "../../main.go", "create", "cluster")
@@ -65,7 +65,7 @@ func TestWorkflowDeletion(t *testing.T) {
 func TestWorkflowErrorRecovery(t *testing.T) {
 	// Write invalid config
 	badConfig := []byte("invalid: yaml\n")
-	if writeErr := os.WriteFile("h3s.yaml", badConfig, 0600); writeErr != nil {
+	if writeErr := os.WriteFile("h3s.yaml", badConfig, 0o600); writeErr != nil {
 		t.Fatalf("failed to write invalid config: %v", writeErr)
 	}
 	defer os.Remove("h3s.yaml")

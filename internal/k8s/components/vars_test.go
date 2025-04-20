@@ -1,11 +1,12 @@
 package components
 
 import (
-	"github.com/hetznercloud/hcloud-go/v2/hcloud"
 	"h3s/internal/config"
 	"h3s/internal/config/credentials"
 	"net"
 	"testing"
+
+	"github.com/hetznercloud/hcloud-go/v2/hcloud"
 )
 
 func TestVars_ResourceLimits_NotPresent(t *testing.T) {

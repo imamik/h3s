@@ -2,8 +2,9 @@
 package create
 
 import (
-	"github.com/spf13/cobra"
 	"h3s/internal/utils/cli"
+
+	"github.com/spf13/cobra"
 )
 
 // Command configurations

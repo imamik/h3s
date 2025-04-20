@@ -2,7 +2,6 @@
 package cmd
 
 import (
-	"github.com/spf13/cobra"
 	"h3s/cmd/create"
 	"h3s/cmd/destroy"
 	"h3s/cmd/get"
@@ -12,6 +11,8 @@ import (
 	"h3s/cmd/ssh"
 	"h3s/internal/version"
 
+	"github.com/spf13/cobra"
+
 	versioncmd "h3s/cmd/version"
 )
 
@@ -19,7 +20,7 @@ import (
 var Cmd *cobra.Command
 
 // Initialize sets up the root command with version
-func Initialize(_ version.BuildInfo) { // Renamed unused info parameter
+func Initialize(_ version.BuildInfo) {
 	root.Execute() // Execute handles command setup now
 	Cmd = root.Cmd
 

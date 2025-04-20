@@ -76,7 +76,7 @@ func TestPermissionDenied(t *testing.T) {
 	assert.NoError(t, err)
 
 	// Change permissions to read-only
-	err = os.Chmod(filename, 0400)
+	err = os.Chmod(filename, 0o400)
 	assert.NoError(t, err)
 
 	// Attempt to overwrite read-only file
@@ -85,7 +85,7 @@ func TestPermissionDenied(t *testing.T) {
 	assert.Error(t, err)
 
 	// Restore permissions to allow deletion
-	err = os.Chmod(filename, 0600)
+	err = os.Chmod(filename, 0o600)
 	assert.NoError(t, err)
 	_ = f.Delete()
 }

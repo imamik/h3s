@@ -242,7 +242,6 @@ func TestCreateCommand_FlagParsing(t *testing.T) {
 	assert.Error(t, err)
 	assert.Contains(t, buf.String()+err.Error(), "unknown command \"extraarg\"")
 	buf.Reset()
-
 }
 
 func TestCreateCommand_MissingRequiredArgs(t *testing.T) {

@@ -61,7 +61,7 @@ func TestConfigValidationIntegration(t *testing.T) {
 // Returns the full path to the created file.
 func createConfigFile(t *testing.T, dir, filename, content string) string {
 	path := filepath.Join(dir, filename)
-	err := os.WriteFile(path, []byte(content), 0600)
+	err := os.WriteFile(path, []byte(content), 0o600)
 	if err != nil {
 		t.Fatalf("Failed to create config file: %v", err)
 	}
@@ -257,7 +257,6 @@ func testValidConfig(t *testing.T, tempDir string) {
 
 	// Run the CLI command to load and validate the config
 	out, err := runCLI("version")
-
 	// Check that the command succeeded
 	if err != nil {
 		t.Errorf("Expected command to succeed with valid config, got error: %v\nOutput: %s", err, out)
@@ -284,7 +283,6 @@ func testMinimalConfig(t *testing.T, tempDir string) {
 
 	// Run the CLI command to load and validate the config
 	out, err := runCLI("version")
-
 	// Check that the command succeeded
 	if err != nil {
 		t.Errorf("Expected command to succeed with minimal config, got error: %v\nOutput: %s", err, out)
@@ -317,7 +315,6 @@ func testConfigWithEnvVars(t *testing.T, tempDir string) {
 
 	// Run the CLI command to load and validate the config
 	out, err := runCLI("version")
-
 	// Check that the command succeeded
 	if err != nil {
 		t.Errorf("Expected command to succeed with config and env vars, got error: %v\nOutput: %s", err, out)
@@ -344,7 +341,6 @@ func testMultipleWorkerPools(t *testing.T, tempDir string) {
 
 	// Run the CLI command to load and validate the config
 	out, err := runCLI("version")
-
 	// Check that the command succeeded
 	if err != nil {
 		t.Errorf("Expected command to succeed with multiple worker pools, got error: %v\nOutput: %s", err, out)
@@ -462,12 +458,12 @@ func testPermissionIssues(t *testing.T, tempDir string) {
 	configPath := createConfigFile(t, tempDir, "no-perm-config.yaml", validConfigYAML())
 
 	// Change permissions to make it unreadable
-	err := os.Chmod(configPath, 0000)
+	err := os.Chmod(configPath, 0o000)
 	if err != nil {
 		t.Fatalf("Failed to change file permissions: %v", err)
 	}
 	defer func() {
-		if chmodErr := os.Chmod(configPath, 0600); chmodErr != nil {
+		if chmodErr := os.Chmod(configPath, 0o600); chmodErr != nil {
 			t.Logf("Warning: failed to restore file permissions: %v", chmodErr)
 		}
 	}() // Restore permissions for cleanup

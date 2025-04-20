@@ -3,12 +3,11 @@ package integration
 
 import (
 	"bytes"
+	"h3s/internal/hetzner/mockhetzner"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"testing"
-
-	"h3s/internal/hetzner/mockhetzner"
 )
 
 // TestE2EWorkflows is the main test function for end-to-end CLI workflow tests.
@@ -83,10 +82,10 @@ func createTestSSHKeys(dir string) (privateKeyPath, publicKeyPath string, err er
 	privateKey := "-----BEGIN OPENSSH PRIVATE KEY-----\nb3BlbnNzaC1rZXktdjEAAAAABG5vbmUAAAAEbm9uZQAAAAAAAAABAAAAMwAAAAtzc2gtZW\nQyNTUxOQAAACDFIzSM+Yg/xFbZGX7KwJVBK0GQgwQT+xVgWsK1KvYZMAAAAJgUKTd9FCk3\nfQAAAAtzc2gtZWQyNTUxOQAAACDFIzSM+Yg/xFbZGX7KwJVBK0GQgwQT+xVgWsK1KvYZMA\nAAAECTVAYb8PxOIgKZNxTkZwTTQYrMnQxK9CjWbGG8jFGJxsUjNIz5iD/EVtkZfsrAlUEr\nQZCDBBP7FWBawrUq9hkwAAAAEHRlc3RAZXhhbXBsZS5jb20BAgMEBQ==\n-----END OPENSSH PRIVATE KEY-----"
 	publicKey := "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMUjNIz5iD/EVtkZfsrAlUErQZCDBBP7FWBawrUq9hkw test@example.com"
 
-	if err := os.WriteFile(privateKeyPath, []byte(privateKey), 0600); err != nil {
+	if err := os.WriteFile(privateKeyPath, []byte(privateKey), 0o600); err != nil {
 		return "", "", err
 	}
-	if err := os.WriteFile(publicKeyPath, []byte(publicKey), 0600); err != nil {
+	if err := os.WriteFile(publicKeyPath, []byte(publicKey), 0o600); err != nil {
 		return "", "", err
 	}
 
@@ -94,7 +93,7 @@ func createTestSSHKeys(dir string) (privateKeyPath, publicKeyPath string, err er
 }
 
 // createTestConfig creates a test configuration file
-func createTestConfig(dir string, mockServerURL string, privateKeyPath, publicKeyPath string) (string, error) {
+func createTestConfig(dir, mockServerURL, privateKeyPath, publicKeyPath string) (string, error) {
 	configPath := filepath.Join(dir, "h3s.yaml")
 	config := []byte(`ssh_key_paths:
   private_key_path: ` + privateKeyPath + `
@@ -121,7 +120,7 @@ control_plane:
 hetzner_api_endpoint: "` + mockServerURL + `"
 `)
 
-	return configPath, os.WriteFile(configPath, config, 0600)
+	return configPath, os.WriteFile(configPath, config, 0o600)
 }
 
 // createTestCredentials creates a test credentials file
@@ -133,7 +132,7 @@ func createTestCredentials(dir string) (string, error) {
 
 	creds := []byte("hcloud_token: " + hcloudToken + "\nhetzner_dns_token: " + dnsToken + "\nk3s_token: " + k3sToken + "\n")
 
-	return credsPath, os.WriteFile(credsPath, creds, 0600)
+	return credsPath, os.WriteFile(credsPath, creds, 0o600)
 }
 
 // Test token constants
@@ -506,7 +505,7 @@ func testErrorRecovery(t *testing.T, env *e2eTestEnv) {
 		invalidConfigPath := filepath.Join(recoveryDir, "invalid-config.yaml")
 		invalidConfig := []byte(`invalid: yaml: content
 this is not valid yaml`)
-		if err := os.WriteFile(invalidConfigPath, invalidConfig, 0600); err != nil {
+		if err := os.WriteFile(invalidConfigPath, invalidConfig, 0o600); err != nil {
 			t.Fatalf("Failed to create invalid config file: %v", err)
 		}
 
@@ -541,7 +540,6 @@ this is not valid yaml`)
 			"H3S_HETZNER_ENDPOINT=" + env.mockServer.Server.URL,
 		}
 		out, err = runCLIWithEnvAndDir(recoveryDir, envVars, "create", "cluster")
-
 		// Should succeed
 		if err != nil {
 			t.Errorf("Expected success after fixing config, got error: %v\nOutput: %s", err, out)
@@ -586,7 +584,6 @@ this is not valid yaml`)
 			"H3S_HETZNER_ENDPOINT=" + env.mockServer.Server.URL,
 		}
 		out, err = runCLIWithEnvAndDir(recoveryDir, envVars, "create", "cluster")
-
 		// Should succeed
 		if err != nil {
 			t.Errorf("Expected success after fixing API endpoint, got error: %v\nOutput: %s", err, out)
@@ -603,7 +600,7 @@ this is not valid yaml`)
 	t.Run("ConfigModification", func(t *testing.T) {
 		// Create a subdirectory for this test
 		configModDir := filepath.Join(recoveryDir, "config-mod")
-		if err := os.MkdirAll(configModDir, 0755); err != nil {
+		if err := os.MkdirAll(configModDir, 0o755); err != nil {
 			t.Fatalf("Failed to create config modification test directory: %v", err)
 		}
 
@@ -647,7 +644,7 @@ worker_pools:
 `
 
 		// Write the modified config back
-		if writeErr := os.WriteFile(configPath, []byte(modifiedConfig), 0600); writeErr != nil {
+		if writeErr := os.WriteFile(configPath, []byte(modifiedConfig), 0o600); writeErr != nil {
 			t.Fatalf("Failed to write modified config: %v", writeErr)
 		}
 

@@ -1,11 +1,10 @@
 package integration
 
 import (
+	"h3s/internal/hetzner/mockhetzner"
 	"os"
 	"os/exec"
 	"testing"
-
-	"h3s/internal/hetzner/mockhetzner"
 )
 
 // runCLI runs the CLI command and returns output and error
@@ -67,7 +66,7 @@ control_plane:
   as_worker_pool: false
 `)
 	configPath := "h3s.yaml"
-	if err := os.WriteFile(configPath, config, 0600); err != nil {
+	if err := os.WriteFile(configPath, config, 0o600); err != nil {
 		t.Fatalf("failed to write config: %v", err)
 	}
 	defer os.Remove(configPath)
@@ -83,7 +82,7 @@ control_plane:
 	//nolint:gosec // G101: Potential hardcoded credentials (filename constant in test)
 	const secretsFileName = "h3s-secrets.yaml"
 	secretsPath := secretsFileName
-	if err := os.WriteFile(secretsPath, secrets, 0600); err != nil {
+	if err := os.WriteFile(secretsPath, secrets, 0o600); err != nil {
 		t.Fatalf("failed to write secrets: %v", err)
 	}
 	defer os.Remove(secretsPath)
@@ -137,7 +136,7 @@ control_plane:
 hetzner_api_endpoint: "` + mockServer.Server.URL + `"
 `)
 	configPath := "h3s.yaml"
-	if err := os.WriteFile(configPath, config, 0600); err != nil {
+	if err := os.WriteFile(configPath, config, 0o600); err != nil {
 		t.Fatalf("failed to write config: %v", err)
 	}
 	defer os.Remove(configPath)
@@ -153,7 +152,7 @@ hetzner_api_endpoint: "` + mockServer.Server.URL + `"
 	//nolint:gosec // G101: Potential hardcoded credentials (filename constant in test)
 	const secretsFileName = "h3s-secrets.yaml"
 	secretsPath := secretsFileName
-	if err := os.WriteFile(secretsPath, secrets, 0600); err != nil {
+	if err := os.WriteFile(secretsPath, secrets, 0o600); err != nil {
 		t.Fatalf("failed to write secrets: %v", err)
 	}
 	defer os.Remove(secretsPath)
@@ -198,13 +197,13 @@ control_plane:
 hetzner_api_endpoint: "` + mockServerError.Server.URL + `"
 `)
 	configErrorPath := "h3s-err.yaml"
-	if writeErr := os.WriteFile(configErrorPath, configError, 0600); writeErr != nil {
+	if writeErr := os.WriteFile(configErrorPath, configError, 0o600); writeErr != nil {
 		t.Fatalf("failed to write error config: %v", writeErr)
 	}
 	defer os.Remove(configErrorPath)
 	//nolint:gosec // G101: Potential hardcoded credentials (filename constant in test)
 	secretsErrorPath := "h3s-secrets-err.yaml"
-	if writeErr := os.WriteFile(secretsErrorPath, secrets, 0600); writeErr != nil {
+	if writeErr := os.WriteFile(secretsErrorPath, secrets, 0o600); writeErr != nil {
 		t.Fatalf("failed to write error secrets: %v", writeErr)
 	}
 	defer os.Remove(secretsErrorPath)

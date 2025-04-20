@@ -1,10 +1,11 @@
 package pool
 
 import (
-	"github.com/hetznercloud/hcloud-go/v2/hcloud"
 	"h3s/internal/cluster"
 	"h3s/internal/config"
 	"testing"
+
+	"github.com/hetznercloud/hcloud-go/v2/hcloud"
 )
 
 // Minimal stub for cluster.Cluster with safe fields for CreatePools

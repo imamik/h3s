@@ -1,8 +1,9 @@
 package components
 
 import (
-	"gopkg.in/yaml.v3"
 	"testing"
+
+	"gopkg.in/yaml.v3"
 )
 
 func TestManifestGeneration_Valid(t *testing.T) {

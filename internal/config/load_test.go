@@ -106,11 +106,11 @@ func TestLoadConfig_PermissionDenied(t *testing.T) {
 	tempfile.Close()
 	if _, err = os.Stat(tempfile.Name()); err == nil { // Check if file exists
 		// Change permissions to be unreadable
-		if chmodErr := os.Chmod(tempfile.Name(), 0000); chmodErr != nil {
+		if chmodErr := os.Chmod(tempfile.Name(), 0o000); chmodErr != nil {
 			t.Logf("Warning: Could not change file permissions to 0000: %v", chmodErr)
 		} else {
 			defer func() { // Ensure permissions are restored
-				if restoreErr := os.Chmod(tempfile.Name(), 0600); restoreErr != nil {
+				if restoreErr := os.Chmod(tempfile.Name(), 0o600); restoreErr != nil {
 					t.Logf("Warning: failed to restore file permissions: %v", restoreErr)
 				}
 			}()
