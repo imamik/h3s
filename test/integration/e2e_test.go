@@ -86,7 +86,7 @@ func createTestSSHKeys(dir string) (privateKeyPath, publicKeyPath string, err er
 	if err := os.WriteFile(privateKeyPath, []byte(privateKey), 0600); err != nil {
 		return "", "", err
 	}
-	if err := os.WriteFile(publicKeyPath, []byte(publicKey), 0644); err != nil {
+	if err := os.WriteFile(publicKeyPath, []byte(publicKey), 0600); err != nil {
 		return "", "", err
 	}
 
@@ -121,19 +121,26 @@ control_plane:
 hetzner_api_endpoint: "` + mockServerURL + `"
 `)
 
-	return configPath, os.WriteFile(configPath, config, 0644)
+	return configPath, os.WriteFile(configPath, config, 0600)
 }
+
+// Test token constants
+const (
+	testHCloudToken = "p1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcde" // 64 chars
+	testDNSToken    = "1234567890abcdef1234567890abcdef"                                    // 32 chars
+	testK3sToken    = "k3s1234567890abcdef1234567890abcdef"                                 // dummy, can be any string
+)
 
 // createTestCredentials creates a test credentials file
 func createTestCredentials(dir string) (string, error) {
 	credsPath := filepath.Join(dir, "h3s-secrets.yaml")
-	hcloudToken := "p1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcde" // 64 chars
-	dnsToken := "1234567890abcdef1234567890abcdef"                                    // 32 chars
-	k3sToken := "k3s1234567890abcdef1234567890abcdef"                                 // dummy, can be any string
+	hcloudToken := testHCloudToken
+	dnsToken := testDNSToken
+	k3sToken := testK3sToken
 
 	creds := []byte("hcloud_token: " + hcloudToken + "\nhetzner_dns_token: " + dnsToken + "\nk3s_token: " + k3sToken + "\n")
 
-	return credsPath, os.WriteFile(credsPath, creds, 0644)
+	return credsPath, os.WriteFile(credsPath, creds, 0600)
 }
 
 // findProjectRoot finds the root directory of the project
@@ -192,18 +199,18 @@ func runCLIWithEnvAndDir(dir string, env []string, args ...string) (string, erro
 	}
 
 	// Change to test directory
-	if err := os.Chdir(dir); err != nil {
-		return "", err
+	if chErr := os.Chdir(dir); chErr != nil {
+		return "", chErr
 	}
 
 	// Find the h3s binary
 	// First, try the project root directory
 	projectRoot := findProjectRoot()
 	binaryPath := filepath.Join(projectRoot, "h3s")
-	if _, err := os.Stat(binaryPath); os.IsNotExist(err) {
+	if _, statErr := os.Stat(binaryPath); os.IsNotExist(statErr) {
 		// If not found, try the current directory
 		binaryPath = filepath.Join(currentDir, "h3s")
-		if _, err := os.Stat(binaryPath); os.IsNotExist(err) {
+		if _, statErr := os.Stat(binaryPath); os.IsNotExist(statErr) {
 			// If still not found, use the command name and hope it's in PATH
 			binaryPath = "h3s"
 		}
@@ -228,7 +235,7 @@ func runCLIWithEnvAndDir(dir string, env []string, args ...string) (string, erro
 // Basic command tests
 
 // testBasicCommands tests basic CLI commands that don't require configuration
-func testBasicCommands(t *testing.T, env *e2eTestEnv) {
+func testBasicCommands(t *testing.T, _ *e2eTestEnv) {
 	// Test version command
 	t.Run("VersionCommand", func(t *testing.T) {
 		out, err := runCLI("version")
@@ -499,7 +506,7 @@ func testErrorRecovery(t *testing.T, env *e2eTestEnv) {
 		invalidConfigPath := filepath.Join(recoveryDir, "invalid-config.yaml")
 		invalidConfig := []byte(`invalid: yaml: content
 this is not valid yaml`)
-		if err := os.WriteFile(invalidConfigPath, invalidConfig, 0644); err != nil {
+		if err := os.WriteFile(invalidConfigPath, invalidConfig, 0600); err != nil {
 			t.Fatalf("Failed to create invalid config file: %v", err)
 		}
 
@@ -640,8 +647,8 @@ worker_pools:
 `
 
 		// Write the modified config back
-		if err := os.WriteFile(configPath, []byte(modifiedConfig), 0644); err != nil {
-			t.Fatalf("Failed to write modified config: %v", err)
+		if writeErr := os.WriteFile(configPath, []byte(modifiedConfig), 0600); writeErr != nil {
+			t.Fatalf("Failed to write modified config: %v", writeErr)
 		}
 
 		// Update the cluster with the modified config

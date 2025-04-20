@@ -84,7 +84,7 @@ func DefaultMockDependencies() *dependencies.MockDependencies {
 		MockGetClusterContext: func() (*cluster.Cluster, error) {
 			return mockCluster, nil
 		},
-		MockGetK3sReleases: func(stable, latest bool, limit int) ([]k3s.Release, error) {
+		MockGetK3sReleases: func(_, _ bool, _ int) ([]k3s.Release, error) {
 			return []k3s.Release{
 				{
 					Name:        "v1.28.2+k3s1",
@@ -94,13 +94,13 @@ func DefaultMockDependencies() *dependencies.MockDependencies {
 				},
 			}, nil
 		},
-		MockInstallK3s: func(ctx *cluster.Cluster) error {
+		MockInstallK3s: func(_ *cluster.Cluster) error {
 			return nil
 		},
-		MockInstallK8sComponents: func(ctx *cluster.Cluster) error {
+		MockInstallK8sComponents: func(_ *cluster.Cluster) error {
 			return nil
 		},
-		MockExecuteSSHCommand: func(ctx *cluster.Cluster, command string) (string, error) {
+		MockExecuteSSHCommand: func(_ *cluster.Cluster, command string) (string, error) {
 			return "mock ssh output: " + command, nil
 		},
 		MockExecuteLocalCommand: func(command string) (string, error) {

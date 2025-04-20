@@ -39,7 +39,7 @@ func TestSSH_Help(t *testing.T) {
 
 func TestSSH_Success(t *testing.T) {
 	// Create a mock command that simulates the behavior of the real command
-	cmd := newMockSSHCmd(func(cmd *cobra.Command, args []string) error {
+	cmd := newMockSSHCmd(func(cmd *cobra.Command, _ []string) error {
 		cmd.Println("mock ssh output: ls -la")
 		return nil
 	})
@@ -55,7 +55,7 @@ func TestSSH_Success(t *testing.T) {
 
 func TestSSH_WithComplexCommand(t *testing.T) {
 	// Create a mock command that simulates the behavior of the real command
-	cmd := newMockSSHCmd(func(cmd *cobra.Command, args []string) error {
+	cmd := newMockSSHCmd(func(cmd *cobra.Command, _ []string) error {
 		cmd.Println("mock ssh output: find /var/log -name *.log | grep system")
 		return nil
 	})
@@ -72,7 +72,7 @@ func TestSSH_WithComplexCommand(t *testing.T) {
 
 func TestSSH_Error(t *testing.T) {
 	// Create a mock command that simulates the behavior of the real command with an error
-	cmd := newMockSSHCmd(func(cmd *cobra.Command, args []string) error {
+	cmd := newMockSSHCmd(func(_ *cobra.Command, _ []string) error {
 		return errors.New("failed to execute ssh command: mock ssh connection failure")
 	})
 
@@ -87,7 +87,7 @@ func TestSSH_Error(t *testing.T) {
 
 func TestSSH_ClusterContextError(t *testing.T) {
 	// Create a mock command that simulates the behavior of the real command with a cluster context error
-	cmd := newMockSSHCmd(func(cmd *cobra.Command, args []string) error {
+	cmd := newMockSSHCmd(func(_ *cobra.Command, _ []string) error {
 		return errors.New("failed to load cluster context: mock cluster context error")
 	})
 

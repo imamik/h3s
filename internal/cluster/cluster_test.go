@@ -8,20 +8,8 @@ import (
 	"testing"
 )
 
-func writeTempConfig(content string) (string, func()) {
-	tempfile, _ := os.CreateTemp("", "h3s-config-*.yaml")
-	tempfile.Write([]byte(content))
-	tempfile.Close()
-	os.Setenv("H3S_CONFIG", tempfile.Name())
-	cleanup := func() {
-		os.Unsetenv("H3S_CONFIG")
-		os.Remove(tempfile.Name())
-	}
-	return tempfile.Name(), cleanup
-}
-
-func TestContext_Success(t *testing.T) {
-	configYAML := `
+// testConfigYAML is a common test configuration used across tests
+const testConfigYAML = `
 ssh_key_paths:
   private_key_path: /tmp/id_rsa
   public_key_path: /tmp/id_rsa.pub
@@ -45,7 +33,24 @@ control_plane:
     nodes: 1
   as_worker_pool: false
 `
-	_, cleanup := writeTempConfig(configYAML)
+
+func writeTempConfig(content string) (string, func()) {
+	tempfile, _ := os.CreateTemp("", "h3s-config-*.yaml")
+	_, err := tempfile.Write([]byte(content))
+	if err != nil {
+		panic(err)
+	}
+	tempfile.Close()
+	os.Setenv("H3S_CONFIG", tempfile.Name())
+	cleanup := func() {
+		os.Unsetenv("H3S_CONFIG")
+		os.Remove(tempfile.Name())
+	}
+	return tempfile.Name(), cleanup
+}
+
+func TestContext_Success(t *testing.T) {
+	_, cleanup := writeTempConfig(testConfigYAML)
 	defer cleanup()
 	credentialsPath, _ := filepath.Abs("internal/cluster/testdata/valid-credentials.yaml")
 	os.Setenv("H3S_CREDENTIALS", credentialsPath)
@@ -65,37 +70,26 @@ func TestContext_MissingConfig(t *testing.T) {
 }
 
 func TestContext_MissingCredentials(t *testing.T) {
-	configYAML := `
-ssh_key_paths:
-  private_key_path: /tmp/id_rsa
-  public_key_path: /tmp/id_rsa.pub
-network_zone: nbg1
-k3s_version: v1.28.0
-name: testcluster
-domain: example.com
-cert_manager:
-  email: test@example.com
-  production: false
-worker_pools:
-  - instance: cx31
-    location: nbg1
-    name: workerpool1
-    nodes: 1
-control_plane:
-  pool:
-    instance: cx31
-    location: nbg1
-    name: cp01
-    nodes: 1
-  as_worker_pool: false
-`
-	_, cleanup := writeTempConfig(configYAML)
+	_, cleanup := writeTempConfig(testConfigYAML)
 	defer cleanup()
-	// Temporarily rename h3s-secrets.yaml if it exists
-	secretsPath := "h3s-secrets.yaml"
-	bakPath := "h3s-secrets.yaml.bak"
-	_ = os.Rename(secretsPath, bakPath)
-	defer os.Rename(bakPath, secretsPath)
+	// Temporarily rename secrets file if it exists
+	const secretsFilename = "h3s-secrets.yaml" // Using a constant for the filename
+	secretsPath := secretsFilename
+	bakPath := secretsFilename + ".bak"
+	if err := os.Rename(secretsPath, bakPath); err != nil {
+		// If the file doesn't exist, that's fine
+		if !os.IsNotExist(err) {
+			t.Fatalf("Failed to rename secrets file: %v", err)
+		}
+	}
+	defer func() {
+		// Only try to rename back if the backup exists
+		if _, err := os.Stat(bakPath); err == nil {
+			if err := os.Rename(bakPath, secretsPath); err != nil {
+				t.Logf("Warning: Failed to restore secrets file: %v", err)
+			}
+		}
+	}()
 	credentialsPath, _ := filepath.Abs("internal/cluster/testdata/nonexistent-creds.yaml")
 	os.Setenv("H3S_CREDENTIALS", credentialsPath)
 	_, err := Context()
@@ -105,31 +99,7 @@ control_plane:
 }
 
 func TestContext_Idempotency(t *testing.T) {
-	configYAML := `
-ssh_key_paths:
-  private_key_path: /tmp/id_rsa
-  public_key_path: /tmp/id_rsa.pub
-network_zone: nbg1
-k3s_version: v1.28.0
-name: testcluster
-domain: example.com
-cert_manager:
-  email: test@example.com
-  production: false
-worker_pools:
-  - instance: cx31
-    location: nbg1
-    name: workerpool1
-    nodes: 1
-control_plane:
-  pool:
-    instance: cx31
-    location: nbg1
-    name: cp01
-    nodes: 1
-  as_worker_pool: false
-`
-	_, cleanup := writeTempConfig(configYAML)
+	_, cleanup := writeTempConfig(testConfigYAML)
 	defer cleanup()
 	credentialsPath, _ := filepath.Abs("internal/cluster/testdata/valid-credentials.yaml")
 	os.Setenv("H3S_CREDENTIALS", credentialsPath)

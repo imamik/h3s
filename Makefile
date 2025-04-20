@@ -42,6 +42,14 @@ lint: ## Run linter
 lint\:fix: ## Run linter with auto-fix enabled
 	golangci-lint run --timeout 5m --fix
 
+.PHONY: lint\:ci
+lint\:ci: ## Run linter with the same configuration as CI
+	./scripts/hooks/run_golangci_lint_full.sh
+
+.PHONY: lint\:fix-all
+lint\:fix-all: ## Fix all linting issues in the codebase
+	golangci-lint run --timeout 5m --fix ./...
+
 .PHONY: clean
 clean: ## Clean build artifacts
 	$(GOCLEAN)

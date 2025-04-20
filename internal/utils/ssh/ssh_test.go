@@ -1,8 +1,9 @@
 package ssh
 
 import (
-	"github.com/hetznercloud/hcloud-go/v2/hcloud"
 	"testing"
+
+	"github.com/hetznercloud/hcloud-go/v2/hcloud"
 )
 
 func TestExecuteWithSSH_Errors(t *testing.T) {

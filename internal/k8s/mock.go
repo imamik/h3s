@@ -11,21 +11,21 @@ type MockClient struct {
 	ShouldFail bool
 }
 
-func (m *MockClient) ApplyManifest(ctx context.Context, manifest string) error {
+func (m *MockClient) ApplyManifest(_ context.Context, _ string) error {
 	if m.ShouldFail {
 		return errors.New("mock k8s apply failed")
 	}
 	return nil
 }
 
-func (m *MockClient) CreateResource(ctx context.Context, kind, name string) error {
+func (m *MockClient) CreateResource(_ context.Context, _, _ string) error {
 	if m.ShouldFail {
 		return errors.New("mock k8s create failed")
 	}
 	return nil
 }
 
-func (m *MockClient) DeleteResource(ctx context.Context, kind, name string) error {
+func (m *MockClient) DeleteResource(_ context.Context, _, _ string) error {
 	if m.ShouldFail {
 		return errors.New("mock k8s delete failed")
 	}

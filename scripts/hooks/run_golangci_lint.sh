@@ -24,7 +24,7 @@ for pkg in $PACKAGES; do
     fi
 
     echo "Linting package: $pkg"
-    golangci-lint run ./$pkg/... || {
+    golangci-lint run --timeout=5m ./$pkg/... || {
         # If the package is internal/utils/cloud, ignore the error
         if [[ "$pkg" == "internal/utils/cloud" ]]; then
             echo "Ignoring linting failure in $pkg (known issues)"

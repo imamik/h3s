@@ -30,7 +30,7 @@ func newDestroyCmdWithMock(run runFunc) *cobra.Command {
 }
 
 func TestDestroyCommand_FlagParsing(t *testing.T) {
-	mockRun := func(cmd *cobra.Command, args []string) error { return nil }
+	mockRun := func(_ *cobra.Command, _ []string) error { return nil }
 	buf := new(bytes.Buffer)
 	destroyCmd := newDestroyCmdWithMock(mockRun)
 	destroyCmd.SetOut(buf)
@@ -65,7 +65,7 @@ func TestDestroyCommand_FlagParsing(t *testing.T) {
 
 func TestDestroyCommand_ErrorHandling(t *testing.T) {
 	errMsg := "mock destroy error"
-	mockRun := func(cmd *cobra.Command, args []string) error { return errors.New(errMsg) }
+	mockRun := func(_ *cobra.Command, _ []string) error { return errors.New(errMsg) }
 	buf := new(bytes.Buffer)
 	destroyCmd := newDestroyCmdWithMock(mockRun)
 	destroyCmd.SetOut(buf)
@@ -77,7 +77,7 @@ func TestDestroyCommand_ErrorHandling(t *testing.T) {
 }
 
 func TestDestroyCommand_OutputFormatting(t *testing.T) {
-	mockRun := func(cmd *cobra.Command, args []string) error { return nil }
+	mockRun := func(_ *cobra.Command, _ []string) error { return nil }
 	buf := new(bytes.Buffer)
 	destroyCmd := newDestroyCmdWithMock(mockRun)
 	destroyCmd.SetOut(buf)

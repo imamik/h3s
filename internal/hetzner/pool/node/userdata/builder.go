@@ -147,6 +147,6 @@ func generateSwap(config CloudInitConfig) (string, error) {
 - ["sh", "-c", "echo '/var/swapfile swap swap defaults 0 0' >> /etc/fstab"]`, config)
 }
 
-func generateGrowPart(config CloudInitConfig) (string, error) {
+func generateGrowPart(_ CloudInitConfig) (string, error) {
 	return `devices: ["/var"]`, nil
 }

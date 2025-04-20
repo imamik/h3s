@@ -1,5 +1,8 @@
 package credentials
 
+// redactedText is the text used to replace sensitive information
+const redactedText = "[REDACTED]"
+
 // ProjectCredentials is a struct representing the project credentials.
 type ProjectCredentials struct {
 	HCloudToken     string `yaml:"hcloud_token"`      // Hetzner cloud token
@@ -20,5 +23,5 @@ func redactString(s string) string {
 	if s == "" {
 		return ""
 	}
-	return "[REDACTED]"
+	return redactedText
 }

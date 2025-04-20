@@ -22,8 +22,9 @@ func Get() (*ProjectCredentials, error) {
 	}
 
 	// Validate credentials struct
-	if err := validation.ValidateStruct(credentials); err != nil {
-		return nil, err
+	validationErr := validation.ValidateStruct(credentials)
+	if validationErr != nil {
+		return nil, validationErr
 	}
 
 	// DO NOT LOG credentials directly. Use credentials.Redacted() if logging is needed.

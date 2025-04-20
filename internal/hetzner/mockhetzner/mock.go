@@ -5,13 +5,13 @@ import (
 	"github.com/stretchr/testify/mock"
 )
 
-// MockHetznerAPI is a mock of the Hetzner API client interface.
-type MockHetznerAPI struct {
+// API is a mock of the Hetzner API client interface.
+type API struct {
 	mock.Mock
 }
 
 // Example mocked method for demonstration
-func (m *MockHetznerAPI) CreateServer(name string) (string, error) {
+func (m *API) CreateServer(name string) (string, error) {
 	args := m.Called(name)
 	return args.String(0), args.Error(1)
 }

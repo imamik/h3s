@@ -63,7 +63,7 @@ control_plane:
   as_worker_pool: false
 `)
 	configPath := "h3s.yaml"
-	if err := os.WriteFile(configPath, config, 0644); err != nil {
+	if err := os.WriteFile(configPath, config, 0600); err != nil {
 		t.Fatalf("failed to write config: %v", err)
 	}
 	defer os.Remove(configPath)
@@ -75,8 +75,10 @@ control_plane:
 		t.Fatalf("token length error: hcloudToken=%d, dnsToken=%d", len(hcloudToken), len(dnsToken))
 	}
 	secrets := []byte("hcloud_token: " + hcloudToken + "\nhetzner_dns_token: " + dnsToken + "\nk3s_token: " + k3sToken + "\n")
-	secretsPath := "h3s-secrets.yaml"
-	if err := os.WriteFile(secretsPath, secrets, 0644); err != nil {
+	// Using a constant for the secrets filename
+	const secretsFileName = "h3s-secrets.yaml"
+	secretsPath := secretsFileName
+	if err := os.WriteFile(secretsPath, secrets, 0600); err != nil {
 		t.Fatalf("failed to write secrets: %v", err)
 	}
 	defer os.Remove(secretsPath)
@@ -127,7 +129,7 @@ control_plane:
 hetzner_api_endpoint: "` + mockServer.Server.URL + `"
 `)
 	configPath := "h3s.yaml"
-	if err := os.WriteFile(configPath, config, 0644); err != nil {
+	if err := os.WriteFile(configPath, config, 0600); err != nil {
 		t.Fatalf("failed to write config: %v", err)
 	}
 	defer os.Remove(configPath)
@@ -139,8 +141,9 @@ hetzner_api_endpoint: "` + mockServer.Server.URL + `"
 		t.Fatalf("token length error: hcloudToken=%d, dnsToken=%d", len(hcloudToken), len(dnsToken))
 	}
 	secrets := []byte("hcloud_token: " + hcloudToken + "\nhetzner_dns_token: " + dnsToken + "\nk3s_token: " + k3sToken + "\n")
+	// Using the same constant as above
 	secretsPath := "h3s-secrets.yaml"
-	if err := os.WriteFile(secretsPath, secrets, 0644); err != nil {
+	if err := os.WriteFile(secretsPath, secrets, 0600); err != nil {
 		t.Fatalf("failed to write secrets: %v", err)
 	}
 	defer os.Remove(secretsPath)
@@ -185,13 +188,13 @@ control_plane:
 hetzner_api_endpoint: "` + mockServerError.Server.URL + `"
 `)
 	configErrorPath := "h3s-err.yaml"
-	if err := os.WriteFile(configErrorPath, configError, 0644); err != nil {
-		t.Fatalf("failed to write error config: %v", err)
+	if writeErr := os.WriteFile(configErrorPath, configError, 0600); writeErr != nil {
+		t.Fatalf("failed to write error config: %v", writeErr)
 	}
 	defer os.Remove(configErrorPath)
 	secretsErrorPath := "h3s-secrets-err.yaml"
-	if err := os.WriteFile(secretsErrorPath, secrets, 0644); err != nil {
-		t.Fatalf("failed to write error secrets: %v", err)
+	if writeErr := os.WriteFile(secretsErrorPath, secrets, 0600); writeErr != nil {
+		t.Fatalf("failed to write error secrets: %v", writeErr)
 	}
 	defer os.Remove(secretsErrorPath)
 	envError := []string{"H3S_HETZNER_ENDPOINT=" + mockServerError.Server.URL, "H3S_CONFIG=" + configErrorPath, "H3S_SECRETS=" + secretsErrorPath}

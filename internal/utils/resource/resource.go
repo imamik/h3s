@@ -6,16 +6,16 @@ import (
 	"h3s/internal/utils/logger"
 )
 
-// ResourceManager provides a generic interface for resource operations
-type ResourceManager[T any] struct {
+// Manager provides a generic interface for resource operations
+type Manager[T any] struct {
 	Ctx          *cluster.Cluster
 	ResourceType logger.LogResource
 	Name         string
 }
 
 // NewManager creates a new resource manager
-func NewManager[T any](ctx *cluster.Cluster, resourceType logger.LogResource, name string) *ResourceManager[T] {
-	return &ResourceManager[T]{
+func NewManager[T any](ctx *cluster.Cluster, resourceType logger.LogResource, name string) *Manager[T] {
+	return &Manager[T]{
 		Ctx:          ctx,
 		ResourceType: resourceType,
 		Name:         name,
@@ -23,7 +23,7 @@ func NewManager[T any](ctx *cluster.Cluster, resourceType logger.LogResource, na
 }
 
 // Get retrieves a resource using the provided getter function
-func (m *ResourceManager[T]) Get(getter func() (T, error)) (T, error) {
+func (m *Manager[T]) Get(getter func() (T, error)) (T, error) {
 	l := logger.New(nil, m.ResourceType, logger.Get, m.Name)
 	defer l.LogEvents()
 
@@ -42,7 +42,7 @@ func (m *ResourceManager[T]) Get(getter func() (T, error)) (T, error) {
 }
 
 // Create creates a resource using the provided creator function
-func (m *ResourceManager[T]) Create(creator func() (T, error)) (T, error) {
+func (m *Manager[T]) Create(creator func() (T, error)) (T, error) {
 	l := logger.New(nil, m.ResourceType, logger.Create, m.Name)
 	defer l.LogEvents()
 
@@ -61,7 +61,7 @@ func (m *ResourceManager[T]) Create(creator func() (T, error)) (T, error) {
 }
 
 // Delete deletes a resource using the provided deleter function
-func (m *ResourceManager[T]) Delete(deleter func() error) error {
+func (m *Manager[T]) Delete(deleter func() error) error {
 	l := logger.New(nil, m.ResourceType, logger.Delete, m.Name)
 	defer l.LogEvents()
 
@@ -75,7 +75,7 @@ func (m *ResourceManager[T]) Delete(deleter func() error) error {
 }
 
 // GetOrCreate gets a resource if it exists, or creates it if it doesn't
-func (m *ResourceManager[T]) GetOrCreate(getter func() (T, error), creator func() (T, error)) (T, error) {
+func (m *Manager[T]) GetOrCreate(getter func() (T, error), creator func() (T, error)) (T, error) {
 	resource, err := m.Get(getter)
 	var zero T
 	if err == nil {

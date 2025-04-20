@@ -98,7 +98,7 @@ func (r Release) FormattedDate() string {
 func PrintReleases(releases []Release) {
 	// Calculate column widths
 	maxNameLength := len("Name")
-	maxTypeLength := max(len("Type"), max(len(rc), len(stable))) + 5
+	maxTypeLength := maxInt(len("Type"), maxInt(len(rc), len(stable))) + 5
 	for _, r := range releases {
 		if len(r.Name) > maxNameLength {
 			maxNameLength = len(r.Name) + 5
@@ -115,7 +115,8 @@ func PrintReleases(releases []Release) {
 	}
 }
 
-func max(a, b int) int {
+// maxInt returns the larger of two integers
+func maxInt(a, b int) int {
 	if a > b {
 		return a
 	}

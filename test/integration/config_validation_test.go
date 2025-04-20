@@ -61,7 +61,7 @@ func TestConfigValidationIntegration(t *testing.T) {
 // Returns the full path to the created file.
 func createConfigFile(t *testing.T, dir, filename, content string) string {
 	path := filepath.Join(dir, filename)
-	err := os.WriteFile(path, []byte(content), 0644)
+	err := os.WriteFile(path, []byte(content), 0600)
 	if err != nil {
 		t.Fatalf("Failed to create config file: %v", err)
 	}
@@ -466,7 +466,11 @@ func testPermissionIssues(t *testing.T, tempDir string) {
 	if err != nil {
 		t.Fatalf("Failed to change file permissions: %v", err)
 	}
-	defer os.Chmod(configPath, 0644) // Restore permissions for cleanup
+	defer func() {
+		if chmodErr := os.Chmod(configPath, 0600); chmodErr != nil {
+			t.Logf("Warning: failed to restore file permissions: %v", chmodErr)
+		}
+	}() // Restore permissions for cleanup
 
 	// Set the environment variable to point to the test config file
 	oldEnv := os.Getenv("H3S_CONFIG")

@@ -9,7 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func newMockK3sCmd(runE func(cmd *cobra.Command, args []string) error) *cobra.Command {
+func newMockK3sCmd(runE func(cmd *cobra.Command, _ []string) error) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "k3s",
 		Short: "Install k3s on all servers in the cluster",
@@ -38,7 +38,7 @@ func TestInstall_Help(t *testing.T) {
 
 func TestInstallK3s_Success(t *testing.T) {
 	// Create a mock command that simulates the behavior of the real command
-	cmd := newMockK3sCmd(func(cmd *cobra.Command, args []string) error {
+	cmd := newMockK3sCmd(func(cmd *cobra.Command, _ []string) error {
 		cmd.Println("K3s installed successfully")
 		return nil
 	})
@@ -54,7 +54,7 @@ func TestInstallK3s_Success(t *testing.T) {
 
 func TestInstallK3s_Error(t *testing.T) {
 	// Create a mock command that simulates the behavior of the real command with an error
-	cmd := newMockK3sCmd(func(cmd *cobra.Command, args []string) error {
+	cmd := newMockK3sCmd(func(_ *cobra.Command, _ []string) error {
 		return errors.New("failed to install k3s: mock k3s installation failure")
 	})
 
@@ -72,7 +72,7 @@ func TestInstallComponents_Success(t *testing.T) {
 	cmd := &cobra.Command{
 		Use:   "components",
 		Short: "Install k8s components in the cluster",
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: func(cmd *cobra.Command, _ []string) error {
 			cmd.Println("Kubernetes components installed successfully")
 			return nil
 		},
@@ -92,7 +92,7 @@ func TestInstallComponents_Error(t *testing.T) {
 	cmd := &cobra.Command{
 		Use:   "components",
 		Short: "Install k8s components in the cluster",
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: func(_ *cobra.Command, _ []string) error {
 			return errors.New("failed to install kubernetes components: mock components installation failure")
 		},
 	}

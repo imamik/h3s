@@ -44,12 +44,12 @@ func StringNotEmpty(s string) error {
 }
 
 // StringLength validates that a string has a length within the specified range
-func StringLength(s string, min, max int) error {
-	if len(s) < min {
-		return fmt.Errorf("%w: must be at least %d characters long", ErrInvalidLength, min)
+func StringLength(s string, minLen, maxLen int) error {
+	if len(s) < minLen {
+		return fmt.Errorf("%w: must be at least %d characters long", ErrInvalidLength, minLen)
 	}
-	if max > 0 && len(s) > max {
-		return fmt.Errorf("%w: must not be longer than %d characters", ErrInvalidLength, max)
+	if maxLen > 0 && len(s) > maxLen {
+		return fmt.Errorf("%w: must not be longer than %d characters", ErrInvalidLength, maxLen)
 	}
 	return nil
 }
@@ -115,13 +115,13 @@ func Number(s string) error {
 }
 
 // NumberInRange validates that a string is a valid number within the specified range
-func NumberInRange(s string, min, max int) error {
+func NumberInRange(s string, minVal, maxVal int) error {
 	i, err := strconv.Atoi(s)
 	if err != nil {
 		return fmt.Errorf("%w: must be a number", ErrInvalidFormat)
 	}
-	if i < min || (max > 0 && i > max) {
-		return fmt.Errorf("%w: must be between %d and %d", ErrInvalidRange, min, max)
+	if i < minVal || (maxVal > 0 && i > maxVal) {
+		return fmt.Errorf("%w: must be between %d and %d", ErrInvalidRange, minVal, maxVal)
 	}
 	return nil
 }

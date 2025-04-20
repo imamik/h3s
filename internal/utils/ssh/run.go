@@ -28,8 +28,9 @@ func dialWithRetries(ip string, sshConfig *ssh.ClientConfig, retryInterval time.
 	}
 
 	errMsg := fmt.Sprintf("Failed to dial %s after %d retries", ip, maxRetries)
-	l.AddEvent(logger.Failure, fmt.Errorf(errMsg))
-	return nil, fmt.Errorf("%s", errMsg)
+	err := fmt.Errorf("%s", errMsg)
+	l.AddEvent(logger.Failure, err)
+	return nil, err
 }
 
 func run(client *ssh.Client, command string) (string, error) {

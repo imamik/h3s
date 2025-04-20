@@ -26,10 +26,10 @@ type MockCluster struct {
 	Context     context.Context
 }
 
-func (c *MockCluster) GetName(names ...string) string {
+func (c *MockCluster) GetName(_ ...string) string {
 	return "mock-cluster"
 }
 
-func (c *MockCluster) GetLabels(optionalLabels ...map[string]string) map[string]string {
+func (c *MockCluster) GetLabels(_ ...map[string]string) map[string]string {
 	return map[string]string{"mock": "label"}
 }

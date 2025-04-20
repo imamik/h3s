@@ -13,7 +13,7 @@ func TestNewCommand(t *testing.T) {
 		Use:   "test",
 		Short: "Test command",
 		Long:  "Test command long description",
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: func(_ *cobra.Command, _ []string) error {
 			return nil
 		},
 	})

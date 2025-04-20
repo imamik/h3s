@@ -11,7 +11,7 @@ func TestProjectCredentialsRedacted(t *testing.T) {
 		K3sToken:        "real-k3s-token",
 	}
 	redacted := creds.Redacted()
-	if redacted.HCloudToken != "[REDACTED]" || redacted.HetznerDNSToken != "[REDACTED]" || redacted.K3sToken != "[REDACTED]" {
+	if redacted.HCloudToken != redactedText || redacted.HetznerDNSToken != redactedText || redacted.K3sToken != redactedText {
 		t.Errorf("Redacted credentials did not redact all fields: %+v", redacted)
 	}
 }

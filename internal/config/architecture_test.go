@@ -1,8 +1,9 @@
 package config
 
 import (
-	"github.com/hetznercloud/hcloud-go/v2/hcloud"
 	"testing"
+
+	"github.com/hetznercloud/hcloud-go/v2/hcloud"
 )
 
 func TestGetArchitecture(t *testing.T) {

@@ -14,55 +14,87 @@ import (
 func Survey(k3sReleases []k3s.Release) (config.Config, error) {
 	var conf config.Config
 
-	if err := surveyProjectName(&conf); err != nil {
+	// Collect basic configuration
+	if err := surveyBasicConfig(&conf, k3sReleases); err != nil {
 		return conf, err
 	}
 
-	if err := surveyK3sVersion(k3sReleases, &conf); err != nil {
+	// Configure control plane
+	if err := setupControlPlane(&conf); err != nil {
 		return conf, err
 	}
 
-	conf.SSHKeyPaths.PrivateKeyPath = "$HOME/.ssh/id_ed25519"
-
-	if err := surveySSHPrivateKeyPath(&conf); err != nil {
-		return conf, err
-	}
-
-	conf.SSHKeyPaths.PublicKeyPath = conf.SSHKeyPaths.PrivateKeyPath + ".pub"
-
-	if err := surveyDomain(&conf); err != nil {
-		return conf, err
-	}
-
-	if err := surveyNetworkZone(&conf); err != nil {
-		return conf, err
-	}
-
-	conf.ControlPlane.Pool.Name = "control-plane"
-	location, err := getLocation("Control Plane Location", "Location of the control plane node", conf.NetworkZone)
-	if err != nil {
-		return conf, err
-	}
-	conf.ControlPlane.Pool.Location = location
-	conf.ControlPlane.Pool.Instance = getInstance()
-
-	if err := surveyControlPlaneNodes(&conf); err != nil {
-		return conf, err
-	}
-
+	// Configure cert manager
 	if err := surveyCertManagerEmail(&conf); err != nil {
 		return conf, err
 	}
 
-	if err := surveyControlPlaneAsWorkerPool(&conf); err != nil {
-		return conf, err
-	}
-
-	if err := surveyWorkerPools(&conf); err != nil {
+	// Configure worker pools
+	if err := configureWorkerPools(&conf); err != nil {
 		return conf, err
 	}
 
 	return conf, nil
+}
+
+// surveyBasicConfig collects the basic configuration for the cluster
+func surveyBasicConfig(conf *config.Config, k3sReleases []k3s.Release) error {
+	// Project name
+	if err := surveyProjectName(conf); err != nil {
+		return err
+	}
+
+	// K3s version
+	if err := surveyK3sVersion(k3sReleases, conf); err != nil {
+		return err
+	}
+
+	// SSH key paths
+	conf.SSHKeyPaths.PrivateKeyPath = "$HOME/.ssh/id_ed25519"
+	if err := surveySSHPrivateKeyPath(conf); err != nil {
+		return err
+	}
+	conf.SSHKeyPaths.PublicKeyPath = conf.SSHKeyPaths.PrivateKeyPath + ".pub"
+
+	// Domain and network zone
+	if err := surveyDomain(conf); err != nil {
+		return err
+	}
+
+	if err := surveyNetworkZone(conf); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// setupControlPlane configures the control plane
+func setupControlPlane(conf *config.Config) error {
+	// Set up control plane configuration
+	conf.ControlPlane.Pool.Name = "control-plane"
+	location, err := getLocation("Control Plane Location", "Location of the control plane node", conf.NetworkZone)
+	if err != nil {
+		return err
+	}
+	conf.ControlPlane.Pool.Location = location
+	conf.ControlPlane.Pool.Instance = getInstance()
+
+	// Control plane nodes
+	if err := surveyControlPlaneNodes(conf); err != nil {
+		return err
+	}
+
+	// Control plane as worker pool
+	if err := surveyControlPlaneAsWorkerPool(conf); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// configureWorkerPools sets up the worker pools
+func configureWorkerPools(conf *config.Config) error {
+	return surveyWorkerPools(conf)
 }
 
 func surveyProjectName(conf *config.Config) error {

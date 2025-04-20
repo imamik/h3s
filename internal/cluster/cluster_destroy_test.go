@@ -8,23 +8,8 @@ import (
 	"testing"
 )
 
-func writeTempConfig(content string) (string, func()) {
-	tempfile, _ := os.CreateTemp("", "h3s-config-*.yaml")
-	tempfile.Write([]byte(content))
-	tempfile.Close()
-	os.Setenv("H3S_CONFIG", tempfile.Name())
-	cleanup := func() {
-		os.Unsetenv("H3S_CONFIG")
-		os.Remove(tempfile.Name())
-	}
-	return tempfile.Name(), cleanup
-}
-
-func TestDestroy_HappyPath(t *testing.T) {
-	if os.Getenv("H3S_ENABLE_REAL_INTEGRATION") != "1" {
-		t.Skip("Skipping real Hetzner integration test (set H3S_ENABLE_REAL_INTEGRATION=1 to enable)")
-	}
-	configYAML := `
+// testConfigYAML is a common test configuration used across tests
+const testConfigYAML = `
 ssh_key_paths:
   private_key_path: /tmp/id_rsa
   public_key_path: /tmp/id_rsa.pub
@@ -48,7 +33,29 @@ control_plane:
     nodes: 1
   as_worker_pool: false
 `
-	_, cleanup := writeTempConfig(configYAML)
+
+// writeTempConfig creates a temporary config file and returns its path and a cleanup function
+// The path is not used in the tests but is returned for potential future use
+func writeTempConfig(content string) (string, func()) {
+	tempfile, _ := os.CreateTemp("", "h3s-config-*.yaml")
+	_, err := tempfile.Write([]byte(content))
+	if err != nil {
+		panic(err)
+	}
+	tempfile.Close()
+	os.Setenv("H3S_CONFIG", tempfile.Name())
+	cleanup := func() {
+		os.Unsetenv("H3S_CONFIG")
+		os.Remove(tempfile.Name())
+	}
+	return tempfile.Name(), cleanup
+}
+
+func TestDestroy_HappyPath(t *testing.T) {
+	if os.Getenv("H3S_ENABLE_REAL_INTEGRATION") != "1" {
+		t.Skip("Skipping real Hetzner integration test (set H3S_ENABLE_REAL_INTEGRATION=1 to enable)")
+	}
+	_, cleanup := writeTempConfig(testConfigYAML)
 	defer cleanup()
 	credentialsPath, _ := filepath.Abs("internal/cluster/testdata/valid-credentials.yaml")
 	os.Setenv("H3S_CREDENTIALS", credentialsPath)
@@ -78,31 +85,7 @@ func TestDestroy_MissingCredentials(t *testing.T) {
 	if os.Getenv("H3S_ENABLE_REAL_INTEGRATION") != "1" {
 		t.Skip("Skipping real Hetzner integration test (set H3S_ENABLE_REAL_INTEGRATION=1 to enable)")
 	}
-	configYAML := `
-ssh_key_paths:
-  private_key_path: /tmp/id_rsa
-  public_key_path: /tmp/id_rsa.pub
-network_zone: nbg1
-k3s_version: v1.28.0
-name: destroytestcluster
-domain: example.com
-cert_manager:
-  email: test@example.com
-  production: false
-worker_pools:
-  - instance: cx31
-    location: nbg1
-    name: workerpool1
-    nodes: 1
-control_plane:
-  pool:
-    instance: cx31
-    location: nbg1
-    name: cp01
-    nodes: 1
-  as_worker_pool: false
-`
-	_, cleanup := writeTempConfig(configYAML)
+	_, cleanup := writeTempConfig(testConfigYAML)
 	defer cleanup()
 	credentialsPath, _ := filepath.Abs("internal/cluster/testdata/nonexistent-creds.yaml")
 	os.Setenv("H3S_CREDENTIALS", credentialsPath)
@@ -116,31 +99,7 @@ func TestDestroy_PartialDeletion(t *testing.T) {
 	if os.Getenv("H3S_ENABLE_REAL_INTEGRATION") != "1" {
 		t.Skip("Skipping real Hetzner integration test (set H3S_ENABLE_REAL_INTEGRATION=1 to enable)")
 	}
-	configYAML := `
-ssh_key_paths:
-  private_key_path: /tmp/id_rsa
-  public_key_path: /tmp/id_rsa.pub
-network_zone: nbg1
-k3s_version: v1.28.0
-name: destroytestcluster
-domain: example.com
-cert_manager:
-  email: test@example.com
-  production: false
-worker_pools:
-  - instance: cx31
-    location: nbg1
-    name: workerpool1
-    nodes: 1
-control_plane:
-  pool:
-    instance: cx31
-    location: nbg1
-    name: cp01
-    nodes: 1
-  as_worker_pool: false
-`
-	_, cleanup := writeTempConfig(configYAML)
+	_, cleanup := writeTempConfig(testConfigYAML)
 	defer cleanup()
 	credentialsPath, _ := filepath.Abs("internal/cluster/testdata/valid-credentials.yaml")
 	os.Setenv("H3S_CREDENTIALS", credentialsPath)

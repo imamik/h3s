@@ -2,6 +2,8 @@
 package cli
 
 import (
+	"fmt"
+
 	"github.com/spf13/cobra"
 )
 
@@ -69,6 +71,8 @@ func addFlag(cmd *cobra.Command, flag Flag) {
 	}
 
 	if flag.Required {
-		cmd.MarkFlagRequired(flag.Name)
+		if err := cmd.MarkFlagRequired(flag.Name); err != nil {
+			panic(fmt.Sprintf("Failed to mark flag %s as required: %v", flag.Name, err))
+		}
 	}
 }

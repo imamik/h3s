@@ -62,3 +62,7 @@ push:
     # Check test coverage
     check-coverage:
       run: ./scripts/hooks/check_coverage.sh
+
+    # Run full linting check (same as CI)
+    run-full-lint:
+      run: ./scripts/hooks/run_golangci_lint_full.sh

@@ -35,8 +35,8 @@ control_plane:
 		t.Fatalf("failed to create temp file: %v", err)
 	}
 	defer os.Remove(tempfile.Name())
-	if _, err := tempfile.Write(content); err != nil {
-		t.Fatalf("failed to write to temp file: %v", err)
+	if _, writeErr := tempfile.Write(content); writeErr != nil {
+		t.Fatalf("failed to write to temp file: %v", writeErr)
 	}
 	tempfile.Close()
 	os.Setenv("H3S_CONFIG", tempfile.Name())
@@ -57,8 +57,8 @@ func TestLoadConfig_MissingFields(t *testing.T) {
 		t.Fatalf("failed to create temp file: %v", err)
 	}
 	defer os.Remove(tempfile.Name())
-	if _, err := tempfile.Write(content); err != nil {
-		t.Fatalf("failed to write to temp file: %v", err)
+	if _, writeErr := tempfile.Write(content); writeErr != nil {
+		t.Fatalf("failed to write to temp file: %v", writeErr)
 	}
 	tempfile.Close()
 	os.Setenv("H3S_CONFIG", tempfile.Name())
@@ -76,8 +76,8 @@ func TestLoadConfig_MalformedYAML(t *testing.T) {
 		t.Fatalf("failed to create temp file: %v", err)
 	}
 	defer os.Remove(tempfile.Name())
-	if _, err := tempfile.Write(content); err != nil {
-		t.Fatalf("failed to write to temp file: %v", err)
+	if _, writeErr := tempfile.Write(content); writeErr != nil {
+		t.Fatalf("failed to write to temp file: %v", writeErr)
 	}
 	tempfile.Close()
 	os.Setenv("H3S_CONFIG", tempfile.Name())
@@ -104,8 +104,14 @@ func TestLoadConfig_PermissionDenied(t *testing.T) {
 	}
 	defer os.Remove(tempfile.Name())
 	tempfile.Close()
-	os.Chmod(tempfile.Name(), 0000)
-	defer os.Chmod(tempfile.Name(), 0600)
+	if chmodErr := os.Chmod(tempfile.Name(), 0000); chmodErr != nil {
+		t.Fatalf("failed to change file permissions: %v", chmodErr)
+	}
+	defer func() {
+		if restoreErr := os.Chmod(tempfile.Name(), 0600); restoreErr != nil {
+			t.Logf("Warning: failed to restore file permissions: %v", restoreErr)
+		}
+	}()
 	os.Setenv("H3S_CONFIG", tempfile.Name())
 	defer os.Unsetenv("H3S_CONFIG")
 	_, err = Load()

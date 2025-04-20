@@ -8,6 +8,6 @@ import (
 )
 
 // createResourceManager is a helper function to create a resource manager
-func createResourceManager[T any](ctx *cluster.Cluster, resourceType logger.LogResource, name string) *resource.ResourceManager[T] {
+func createResourceManager[T any](ctx *cluster.Cluster, resourceType logger.LogResource, name string) *resource.Manager[T] {
 	return resource.NewManager[T](ctx, resourceType, name)
 }
