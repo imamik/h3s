@@ -48,6 +48,9 @@ func removeKnownHostsEntry(ip string) error {
 	// #nosec G304
 	in, err := os.Open(knownHostsFile)
 	if err != nil {
+		if os.IsNotExist(err) {
+			return nil
+		}
 		return err
 	}
 	defer func() {
