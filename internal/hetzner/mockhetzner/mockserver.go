@@ -10,9 +10,9 @@ import (
 
 // Error modes for the mock server
 const (
-	timeoutMode  = "timeout"
+	timeoutMode   = "timeout"
 	ratelimitMode = "ratelimit"
-	errorMode    = "error"
+	errorMode     = "error"
 )
 
 type MockServer struct {

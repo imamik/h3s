@@ -96,7 +96,7 @@ func TestPermissionDenied(t *testing.T) {
 	if err != nil {
 		t.Fatalf("unexpected error on save: %v", err)
 	}
-			err = os.Chmod(filename, 0400)
+	err = os.Chmod(filename, 0400)
 	if err != nil {
 		t.Fatalf("failed to set file to read-only: %v", err)
 	}
@@ -106,7 +106,7 @@ func TestPermissionDenied(t *testing.T) {
 	if err == nil {
 		t.Errorf("expected permission error when saving to read-only file, got nil")
 	}
-			_ = os.Chmod(filename, 0600)
+	_ = os.Chmod(filename, 0600)
 	_ = f.Delete()
 }
 

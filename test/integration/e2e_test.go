@@ -127,8 +127,8 @@ hetzner_api_endpoint: "` + mockServerURL + `"
 // Test token constants
 const (
 	testHCloudToken = "p1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcde" // 64 chars
-	testDNSToken    = "1234567890abcdef1234567890abcdef"                                    // 32 chars
-	testK3sToken    = "k3s1234567890abcdef1234567890abcdef"                                 // dummy, can be any string
+	testDNSToken    = "1234567890abcdef1234567890abcdef"                                 // 32 chars
+	testK3sToken    = "k3s1234567890abcdef1234567890abcdef"                              // dummy, can be any string
 )
 
 // createTestCredentials creates a test credentials file
