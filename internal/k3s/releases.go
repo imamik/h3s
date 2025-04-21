@@ -32,9 +32,7 @@ func getAllReleases() ([]Release, error) {
 	if err != nil {
 		return nil, err
 	}
-	if err := res.Body.Close(); err != nil { // Check for error on closing the response body
-		return nil, err
-	}
+	defer res.Body.Close() // Correct: defer closing until after decoding
 
 	if res.StatusCode != http.StatusOK {
 		return nil, fmt.Errorf("failed to fetch releases: status %d", res.StatusCode)

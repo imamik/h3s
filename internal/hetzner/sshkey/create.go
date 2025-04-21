@@ -43,13 +43,17 @@ func Create(ctx *cluster.Cluster) (*hcloud.SSHKey, error) {
 	sshKeyName := getName(ctx)
 	manager := resource.NewManager[*hcloud.SSHKey](ctx, logger.SSHKey, sshKeyName)
 
-	return manager.GetOrCreate(
-		func() (*hcloud.SSHKey, error) {
-			sshKey, _, err := ctx.CloudClient.SSHKey.GetByName(ctx.Context, sshKeyName)
-			return sshKey, err
-		},
-		func() (*hcloud.SSHKey, error) {
-			return createSSHKey(ctx)
-		},
-	)
+	// Try to get existing SSH key
+	sshKey, err := manager.Get(func() (*hcloud.SSHKey, error) {
+		key, _, err := ctx.CloudClient.SSHKey.GetByName(ctx.Context, sshKeyName)
+		return key, err
+	})
+	if err != nil {
+		return nil, err
+	}
+	if sshKey == nil {
+		// Create new SSH key if not found
+		return createSSHKey(ctx)
+	}
+	return sshKey, nil
 }
