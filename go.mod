@@ -1,6 +1,7 @@
 module h3s
 
 go 1.22.4
+toolchain go1.24.1
 
 require (
 	github.com/charmbracelet/huh v0.6.0
@@ -56,7 +57,7 @@ require (
 	github.com/stretchr/objx v0.5.2 // indirect
 	golang.org/x/net v0.34.0 // indirect
 	golang.org/x/sync v0.11.0 // indirect
-	golang.org/x/sys v0.30.0 // indirect
+	golang.org/x/sys v0.32.0 // indirect
 	golang.org/x/text v0.22.0 // indirect
 	google.golang.org/protobuf v1.35.1 // indirect
 )
